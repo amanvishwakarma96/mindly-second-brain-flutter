@@ -1,10 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:mindly/app/platform/screen_family.dart';
 import 'package:mindly/features/ai_settings/application/provider_settings_controller.dart';
+import 'package:mindly/features/text_capture/application/text_capture_controller.dart';
+import 'package:mindly/screens/desktop/capture/desktop_text_capture_screen.dart';
 import 'package:mindly/screens/desktop/home/desktop_home_screen.dart';
 import 'package:mindly/screens/desktop/settings/desktop_provider_settings_screen.dart';
+import 'package:mindly/screens/mobile/capture/mobile_text_capture_screen.dart';
 import 'package:mindly/screens/mobile/home/mobile_home_screen.dart';
 import 'package:mindly/screens/mobile/settings/mobile_provider_settings_screen.dart';
+import 'package:mindly/screens/web/capture/web_text_capture_screen.dart';
 import 'package:mindly/screens/web/home/web_home_screen.dart';
 import 'package:mindly/screens/web/settings/web_provider_settings_screen.dart';
 
@@ -13,6 +17,17 @@ Widget buildPlatformHome(ScreenFamily family) {
     ScreenFamily.mobile => const MobileHomeScreen(),
     ScreenFamily.desktop => const DesktopHomeScreen(),
     ScreenFamily.web => const WebHomeScreen(),
+  };
+}
+
+Widget buildPlatformTextCapture(
+  ScreenFamily family, {
+  TextCaptureController? controller,
+}) {
+  return switch (family) {
+    ScreenFamily.mobile => MobileTextCaptureScreen(controller: controller),
+    ScreenFamily.desktop => DesktopTextCaptureScreen(controller: controller),
+    ScreenFamily.web => WebTextCaptureScreen(controller: controller),
   };
 }
 

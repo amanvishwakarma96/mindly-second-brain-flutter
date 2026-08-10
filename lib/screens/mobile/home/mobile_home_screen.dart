@@ -27,18 +27,20 @@ class MobileHomeScreen extends StatelessWidget {
           const SizedBox(height: MindlySpacing.lg),
           Card(
             color: MindlyColors.mint,
-            child: Padding(
-              padding: const EdgeInsets.all(MindlySpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Quick capture',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: MindlySpacing.sm),
-                  const Text('Jot down a thought before it wanders off.'),
-                ],
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.textCapture),
+              child: const Padding(
+                padding: EdgeInsets.all(MindlySpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Quick capture'),
+                    SizedBox(height: MindlySpacing.sm),
+                    Text('Jot down a thought before it wanders off.'),
+                  ],
+                ),
               ),
             ),
           ),
@@ -47,14 +49,16 @@ class MobileHomeScreen extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: 0,
         onDestinationSelected: (index) {
-          if (index == 3) {
+          if (index == 1) {
+            Navigator.of(context).pushNamed(AppRoutes.textCapture);
+          } else if (index == 3) {
             Navigator.of(context).pushNamed(AppRoutes.providerSettings);
           }
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
           NavigationDestination(
-            icon: Icon(Icons.mic_rounded),
+            icon: Icon(Icons.edit_note_rounded),
             label: 'Capture',
           ),
           NavigationDestination(
