@@ -14,7 +14,7 @@ typedef CaptureClock = DateTime Function();
 typedef CaptureIdFactory = String Function(DateTime now);
 
 class TextCaptureService {
-  TextCaptureService({
+  factory TextCaptureService({
     required MemoryRepository memoryRepository,
     required ProviderKeyService keyService,
     required SpendCapsRepository capsRepository,
@@ -24,15 +24,31 @@ class TextCaptureService {
     required AiProviderTransport transport,
     CaptureClock? clock,
     CaptureIdFactory? idFactory,
-  }) : _memoryRepository = memoryRepository,
-       _keyService = keyService,
-       _capsRepository = capsRepository,
-       _spendLedger = spendLedger,
-       _spendGuard = spendGuard,
-       _costEstimator = costEstimator,
-       _transport = transport,
-       _clock = clock ?? DateTime.now,
-       _idFactory = idFactory ?? _defaultId;
+  }) {
+    return TextCaptureService._(
+      memoryRepository,
+      keyService,
+      capsRepository,
+      spendLedger,
+      spendGuard,
+      costEstimator,
+      transport,
+      clock ?? DateTime.now,
+      idFactory ?? _defaultId,
+    );
+  }
+
+  TextCaptureService._(
+    this._memoryRepository,
+    this._keyService,
+    this._capsRepository,
+    this._spendLedger,
+    this._spendGuard,
+    this._costEstimator,
+    this._transport,
+    this._clock,
+    this._idFactory,
+  );
 
   static const _promptOverheadCharacters = 1200;
 
