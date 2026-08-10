@@ -29,7 +29,7 @@ abstract interface class AudioTranscriptionGateway {
 }
 
 class AudioTranscriptionService implements AudioTranscriptionGateway {
-  AudioTranscriptionService({
+  factory AudioTranscriptionService({
     required bool isWeb,
     required NativeAudioTranscriber nativeTranscriber,
     required CloudAudioTranscriber cloudTranscriber,
@@ -41,19 +41,21 @@ class AudioTranscriptionService implements AudioTranscriptionGateway {
     required AudioArtifactCleaner artifactCleaner,
     required TranscriptCaptureHandler transcriptCaptureHandler,
     DateTime Function()? clock,
-  }) : this._(
-         isWeb,
-         nativeTranscriber,
-         cloudTranscriber,
-         keyService,
-         capsRepository,
-         spendLedger,
-         spendGuard,
-         costEstimator,
-         artifactCleaner,
-         transcriptCaptureHandler,
-         clock ?? DateTime.now,
-       );
+  }) {
+    return AudioTranscriptionService._(
+      isWeb,
+      nativeTranscriber,
+      cloudTranscriber,
+      keyService,
+      capsRepository,
+      spendLedger,
+      spendGuard,
+      costEstimator,
+      artifactCleaner,
+      transcriptCaptureHandler,
+      clock ?? DateTime.now,
+    );
+  }
 
   AudioTranscriptionService._(
     this.isWeb,
