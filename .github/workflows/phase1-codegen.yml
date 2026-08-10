@@ -31,6 +31,15 @@ jobs:
           curl -fL --retry 3 -o web/drift_worker.js https://github.com/simolus3/drift/releases/download/drift-2.34.3/drift_worker.js
           test $(stat -c%s web/sqlite3.wasm) -gt 500000
           test $(stat -c%s web/drift_worker.js) -gt 300000
+      - name: Commit generated and formatted artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.lock lib test tool web/sqlite3.wasm web/drift_worker.js
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate Phase 1 Drift artifacts"
+            git push
+          fi
       - name: Validate generated Phase 1 code
         run: |
           flutter analyze
@@ -38,10 +47,3 @@ jobs:
           dart run tool/vector_benchmark.dart
           flutter build web
           flutter build apk --debug
-      - name: Commit generated artifacts
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pubspec.lock lib test tool web/sqlite3.wasm web/drift_worker.js
-          git commit -m "Generate Phase 1 Drift artifacts"
-          git push
