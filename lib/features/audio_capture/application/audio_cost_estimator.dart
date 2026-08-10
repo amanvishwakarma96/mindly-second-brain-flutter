@@ -13,7 +13,8 @@ class AudioCostEstimator {
   CostEstimate estimate(Duration duration) {
     final billedMilliseconds = math.max(duration.inMilliseconds, 1000);
     final estimatedUsd =
-        billedMilliseconds / Duration.millisecondsPerMinute *
+        billedMilliseconds /
+        Duration.millisecondsPerMinute *
         estimatedUsdPerMinute;
     return CostEstimate(
       providerId: 'openai',

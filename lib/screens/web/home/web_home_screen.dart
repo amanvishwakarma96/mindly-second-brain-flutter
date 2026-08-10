@@ -42,11 +42,13 @@ class _WideWebHome extends StatelessWidget {
                 const Text('Home'),
                 const SizedBox(height: MindlySpacing.md),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.textCapture),
                   child: const Text('Text capture'),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.audioCapture),
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.audioCapture),
                   child: const Text('Audio capture'),
                 ),
                 const SizedBox(height: MindlySpacing.md),
@@ -55,7 +57,9 @@ class _WideWebHome extends StatelessWidget {
                 const Text('Insights'),
                 const Spacer(),
                 TextButton.icon(
-                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.providerSettings),
                   icon: const Icon(Icons.settings_rounded),
                   label: const Text('Settings'),
                 ),
@@ -92,14 +96,16 @@ class _WideWebHome extends StatelessWidget {
                           spacing: MindlySpacing.md,
                           children: [
                             FilledButton.icon(
-                              onPressed: () => Navigator.of(context)
-                                  .pushNamed(AppRoutes.textCapture),
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.textCapture),
                               icon: const Icon(Icons.edit_note_rounded),
                               label: const Text('Write'),
                             ),
                             FilledButton.icon(
-                              onPressed: () => Navigator.of(context)
-                                  .pushNamed(AppRoutes.audioCapture),
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.audioCapture),
                               icon: const Icon(Icons.mic_rounded),
                               label: const Text('Record'),
                             ),
@@ -144,19 +150,22 @@ class _NarrowWebHome extends StatelessWidget {
         ),
         const SizedBox(height: MindlySpacing.md),
         FilledButton.icon(
-          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.textCapture),
           icon: const Icon(Icons.edit_note_rounded),
           label: const Text('Text capture'),
         ),
         const SizedBox(height: MindlySpacing.sm),
         FilledButton.icon(
-          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.audioCapture),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.audioCapture),
           icon: const Icon(Icons.mic_rounded),
           label: const Text('Audio capture'),
         ),
         const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(
-          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.providerSettings),
           icon: const Icon(Icons.settings_rounded),
           label: const Text('AI provider settings'),
         ),

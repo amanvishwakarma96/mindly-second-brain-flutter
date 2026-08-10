@@ -29,7 +29,8 @@ class MobileHomeScreen extends StatelessWidget {
             color: MindlyColors.mint,
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.textCapture),
               child: const Padding(
                 padding: EdgeInsets.all(MindlySpacing.lg),
                 child: Column(
@@ -48,7 +49,8 @@ class MobileHomeScreen extends StatelessWidget {
             color: MindlyColors.peach,
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.audioCapture),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.audioCapture),
               child: const Padding(
                 padding: EdgeInsets.all(MindlySpacing.lg),
                 child: Column(
@@ -56,7 +58,9 @@ class MobileHomeScreen extends StatelessWidget {
                   children: [
                     Text('Record a thought'),
                     SizedBox(height: MindlySpacing.sm),
-                    Text('Capture audio now and transcribe it when you are ready.'),
+                    Text(
+                      'Capture audio now and transcribe it when you are ready.',
+                    ),
                   ],
                 ),
               ),
@@ -75,7 +79,10 @@ class MobileHomeScreen extends StatelessWidget {
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.mic_rounded), label: 'Capture'),
+          NavigationDestination(
+            icon: Icon(Icons.mic_rounded),
+            label: 'Capture',
+          ),
           NavigationDestination(
             icon: Icon(Icons.auto_stories_rounded),
             label: 'Memory',

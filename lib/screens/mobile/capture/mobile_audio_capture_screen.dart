@@ -11,7 +11,8 @@ class MobileAudioCaptureScreen extends StatefulWidget {
   final AudioCaptureController? controller;
 
   @override
-  State<MobileAudioCaptureScreen> createState() => _MobileAudioCaptureScreenState();
+  State<MobileAudioCaptureScreen> createState() =>
+      _MobileAudioCaptureScreenState();
 }
 
 class _MobileAudioCaptureScreenState extends State<MobileAudioCaptureScreen> {
@@ -48,7 +49,9 @@ class _MobileAudioCaptureScreenState extends State<MobileAudioCaptureScreen> {
           children: [
             Center(
               child: Icon(
-                _controller.isRecording ? Icons.mic_rounded : Icons.mic_none_rounded,
+                _controller.isRecording
+                    ? Icons.mic_rounded
+                    : Icons.mic_none_rounded,
                 size: 72,
               ),
             ),
@@ -82,14 +85,17 @@ class _MobileAudioCaptureScreenState extends State<MobileAudioCaptureScreen> {
                     : _controller.startRecording,
                 icon: const Icon(Icons.mic_rounded),
                 label: Text(
-                  _controller.recording == null ? 'Start recording' : 'Record again',
+                  _controller.recording == null
+                      ? 'Start recording'
+                      : 'Record again',
                 ),
               ),
             ],
             if (!_controller.isWeb) ...[
               const SizedBox(height: MindlySpacing.md),
               OutlinedButton.icon(
-                onPressed: _controller.status == AudioCaptureStatus.downloadingModel
+                onPressed:
+                    _controller.status == AudioCaptureStatus.downloadingModel
                     ? null
                     : _controller.downloadNativeModel,
                 icon: const Icon(Icons.download_rounded),
@@ -105,8 +111,11 @@ class _MobileAudioCaptureScreenState extends State<MobileAudioCaptureScreen> {
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 value: _webConsent,
-                onChanged: (value) => setState(() => _webConsent = value ?? false),
-                title: const Text('I agree to send this recording to OpenAI for transcription.'),
+                onChanged: (value) =>
+                    setState(() => _webConsent = value ?? false),
+                title: const Text(
+                  'I agree to send this recording to OpenAI for transcription.',
+                ),
               ),
             ],
             const SizedBox(height: MindlySpacing.md),
@@ -135,25 +144,30 @@ class _MobileAudioCaptureScreenState extends State<MobileAudioCaptureScreen> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: _deleteAfterTranscription,
-              onChanged: (value) => setState(() => _deleteAfterTranscription = value),
+              onChanged: (value) =>
+                  setState(() => _deleteAfterTranscription = value),
               title: const Text('Delete raw audio after transcript is saved'),
             ),
             const SizedBox(height: MindlySpacing.md),
             FilledButton.icon(
-              onPressed: _controller.canTranscribe &&
+              onPressed:
+                  _controller.canTranscribe &&
                       _controller.status != AudioCaptureStatus.transcribing
                   ? () => _controller.transcribeAndCapture(
-                        extractionProfile: _profile,
-                        webCloudConsent: _webConsent,
-                        deleteAfterTranscription: _deleteAfterTranscription,
-                      )
+                      extractionProfile: _profile,
+                      webCloudConsent: _webConsent,
+                      deleteAfterTranscription: _deleteAfterTranscription,
+                    )
                   : null,
               icon: const Icon(Icons.auto_awesome_rounded),
               label: const Text('Transcribe and remember'),
             ),
             if (_controller.lastOutcome?.transcript case final transcript?) ...[
               const SizedBox(height: MindlySpacing.lg),
-              Text('Transcript', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Transcript',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: MindlySpacing.sm),
               SelectableText(transcript),
             ],
@@ -164,18 +178,26 @@ class _MobileAudioCaptureScreenState extends State<MobileAudioCaptureScreen> {
   }
 
   String _statusText(AudioCaptureStatus status) => switch (status) {
-        AudioCaptureStatus.idle => 'Ready when you are.',
-        AudioCaptureStatus.requestingPermission => 'Checking microphone access…',
-        AudioCaptureStatus.permissionDenied => 'Microphone access is needed to record.',
-        AudioCaptureStatus.recording => 'Recording — your microphone is active.',
-        AudioCaptureStatus.recorded => 'Recording saved locally and ready to transcribe.',
-        AudioCaptureStatus.downloadingModel => 'Downloading the local Whisper model…',
-        AudioCaptureStatus.transcribing => 'Transcribing…',
-        AudioCaptureStatus.complete => 'Transcript saved to your local memory.',
-        AudioCaptureStatus.consentRequired => 'Confirm cloud transcription consent first.',
-        AudioCaptureStatus.modelRequired => 'Download the local transcription model first.',
-        AudioCaptureStatus.missingKey => 'Add an OpenAI key in Settings before Web transcription.',
-        AudioCaptureStatus.spendBlocked => 'Your configured spend cap blocks this transcription.',
-        AudioCaptureStatus.failed => 'This recording could not be processed. You can retry.',
-      };
+    AudioCaptureStatus.idle => 'Ready when you are.',
+    AudioCaptureStatus.requestingPermission => 'Checking microphone access…',
+    AudioCaptureStatus.permissionDenied =>
+      'Microphone access is needed to record.',
+    AudioCaptureStatus.recording => 'Recording — your microphone is active.',
+    AudioCaptureStatus.recorded =>
+      'Recording saved locally and ready to transcribe.',
+    AudioCaptureStatus.downloadingModel =>
+      'Downloading the local Whisper model…',
+    AudioCaptureStatus.transcribing => 'Transcribing…',
+    AudioCaptureStatus.complete => 'Transcript saved to your local memory.',
+    AudioCaptureStatus.consentRequired =>
+      'Confirm cloud transcription consent first.',
+    AudioCaptureStatus.modelRequired =>
+      'Download the local transcription model first.',
+    AudioCaptureStatus.missingKey =>
+      'Add an OpenAI key in Settings before Web transcription.',
+    AudioCaptureStatus.spendBlocked =>
+      'Your configured spend cap blocks this transcription.',
+    AudioCaptureStatus.failed =>
+      'This recording could not be processed. You can retry.',
+  };
 }

@@ -80,7 +80,8 @@ class _DesktopAudioCaptureScreenState extends State<DesktopAudioCaptureScreen> {
                           ),
                         ] else
                           FilledButton.icon(
-                            onPressed: _controller.status ==
+                            onPressed:
+                                _controller.status ==
                                     AudioCaptureStatus.transcribing
                                 ? null
                                 : _controller.startRecording,
@@ -93,7 +94,8 @@ class _DesktopAudioCaptureScreenState extends State<DesktopAudioCaptureScreen> {
                           ),
                         const SizedBox(height: MindlySpacing.sm),
                         OutlinedButton.icon(
-                          onPressed: _controller.status ==
+                          onPressed:
+                              _controller.status ==
                                   AudioCaptureStatus.downloadingModel
                               ? null
                               : _controller.downloadNativeModel,
@@ -146,17 +148,21 @@ class _DesktopAudioCaptureScreenState extends State<DesktopAudioCaptureScreen> {
                       value: _deleteAfterTranscription,
                       onChanged: (value) =>
                           setState(() => _deleteAfterTranscription = value),
-                      title: const Text('Delete raw audio after transcript is saved'),
+                      title: const Text(
+                        'Delete raw audio after transcript is saved',
+                      ),
                     ),
                     FilledButton.icon(
-                      onPressed: _controller.canTranscribe &&
-                              _controller.status != AudioCaptureStatus.transcribing
+                      onPressed:
+                          _controller.canTranscribe &&
+                              _controller.status !=
+                                  AudioCaptureStatus.transcribing
                           ? () => _controller.transcribeAndCapture(
-                                extractionProfile: _profile,
-                                webCloudConsent: false,
-                                deleteAfterTranscription:
-                                    _deleteAfterTranscription,
-                              )
+                              extractionProfile: _profile,
+                              webCloudConsent: false,
+                              deleteAfterTranscription:
+                                  _deleteAfterTranscription,
+                            )
                           : null,
                       icon: const Icon(Icons.auto_awesome_rounded),
                       label: const Text('Transcribe and remember'),
@@ -186,18 +192,19 @@ class _DesktopAudioCaptureScreenState extends State<DesktopAudioCaptureScreen> {
   }
 
   String _statusText(AudioCaptureStatus status) => switch (status) {
-        AudioCaptureStatus.idle => 'Ready to record',
-        AudioCaptureStatus.requestingPermission => 'Checking microphone access…',
-        AudioCaptureStatus.permissionDenied => 'Microphone access is required.',
-        AudioCaptureStatus.recording => 'Recording — microphone active',
-        AudioCaptureStatus.recorded => 'Saved locally',
-        AudioCaptureStatus.downloadingModel => 'Downloading Whisper model…',
-        AudioCaptureStatus.transcribing => 'Transcribing locally…',
-        AudioCaptureStatus.complete => 'Saved to local memory',
-        AudioCaptureStatus.modelRequired => 'Local Whisper model required',
-        AudioCaptureStatus.spendBlocked => 'Spend cap blocked downstream extraction',
-        AudioCaptureStatus.missingKey => 'Provider key required for extraction',
-        AudioCaptureStatus.consentRequired => 'Consent required',
-        AudioCaptureStatus.failed => 'Processing failed; recording can be retried',
-      };
+    AudioCaptureStatus.idle => 'Ready to record',
+    AudioCaptureStatus.requestingPermission => 'Checking microphone access…',
+    AudioCaptureStatus.permissionDenied => 'Microphone access is required.',
+    AudioCaptureStatus.recording => 'Recording — microphone active',
+    AudioCaptureStatus.recorded => 'Saved locally',
+    AudioCaptureStatus.downloadingModel => 'Downloading Whisper model…',
+    AudioCaptureStatus.transcribing => 'Transcribing locally…',
+    AudioCaptureStatus.complete => 'Saved to local memory',
+    AudioCaptureStatus.modelRequired => 'Local Whisper model required',
+    AudioCaptureStatus.spendBlocked =>
+      'Spend cap blocked downstream extraction',
+    AudioCaptureStatus.missingKey => 'Provider key required for extraction',
+    AudioCaptureStatus.consentRequired => 'Consent required',
+    AudioCaptureStatus.failed => 'Processing failed; recording can be retried',
+  };
 }

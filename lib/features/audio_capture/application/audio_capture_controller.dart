@@ -124,7 +124,11 @@ class AudioCaptureController extends ChangeNotifier {
     _setStatus(AudioCaptureStatus.downloadingModel);
     try {
       await _transcriptionService.downloadNativeModel();
-      _setStatus(_recording == null ? AudioCaptureStatus.idle : AudioCaptureStatus.recorded);
+      _setStatus(
+        _recording == null
+            ? AudioCaptureStatus.idle
+            : AudioCaptureStatus.recorded,
+      );
     } on Object {
       _errorMessage = 'The local transcription model could not be downloaded.';
       _setStatus(AudioCaptureStatus.failed);

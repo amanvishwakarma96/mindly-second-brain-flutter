@@ -7,7 +7,7 @@ AudioRecorderGateway createRecordAudioRecorder() => RecordAudioRecorderNative();
 
 class RecordAudioRecorderNative implements AudioRecorderGateway {
   RecordAudioRecorderNative({AudioRecorder? recorder})
-      : _recorder = recorder ?? AudioRecorder();
+    : _recorder = recorder ?? AudioRecorder();
 
   static const config = RecordConfig(
     encoder: AudioEncoder.wav,

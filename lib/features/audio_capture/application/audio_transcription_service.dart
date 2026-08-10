@@ -9,10 +9,11 @@ import 'package:mindly/features/audio_capture/data/openai_cloud_audio_transcribe
 import 'package:mindly/features/audio_capture/domain/audio_capture_models.dart';
 import 'package:mindly/features/text_capture/domain/text_capture_models.dart';
 
-typedef TranscriptCaptureHandler = Future<TextCaptureOutcome> Function({
-  required String text,
-  required ExtractionProviderProfile profile,
-});
+typedef TranscriptCaptureHandler =
+    Future<TextCaptureOutcome> Function({
+      required String text,
+      required ExtractionProviderProfile profile,
+    });
 
 abstract interface class AudioTranscriptionGateway {
   Future<bool> isNativeModelReady();
@@ -74,7 +75,9 @@ class AudioTranscriptionService implements AudioTranscriptionGateway {
   @override
   Future<void> downloadNativeModel() {
     if (isWeb) {
-      throw UnsupportedError('Native transcription models are unavailable on Web.');
+      throw UnsupportedError(
+        'Native transcription models are unavailable on Web.',
+      );
     }
     return _nativeTranscriber.downloadModel();
   }

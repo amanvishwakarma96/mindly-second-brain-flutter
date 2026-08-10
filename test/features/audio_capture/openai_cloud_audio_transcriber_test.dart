@@ -6,29 +6,32 @@ import 'package:http/http.dart' as http;
 import 'package:mindly/features/audio_capture/data/openai_cloud_audio_transcriber.dart';
 
 void main() {
-  test('Web transcription request is direct BYOK multipart OpenAI traffic', () async {
-    final client = _CapturingClient(
-      statusCode: 200,
-      responseBody: jsonEncode({'text': 'hello from audio'}),
-    );
-    final transcriber = OpenAiCloudAudioTranscriber(client);
+  test(
+    'Web transcription request is direct BYOK multipart OpenAI traffic',
+    () async {
+      final client = _CapturingClient(
+        statusCode: 200,
+        responseBody: jsonEncode({'text': 'hello from audio'}),
+      );
+      final transcriber = OpenAiCloudAudioTranscriber(client);
 
-    final transcript = await transcriber.transcribe(
-      wavBytes: Uint8List.fromList([82, 73, 70, 70, 1, 2, 3]),
-      apiKey: 'sk-contract-test',
-    );
+      final transcript = await transcriber.transcribe(
+        wavBytes: Uint8List.fromList([82, 73, 70, 70, 1, 2, 3]),
+        apiKey: 'sk-contract-test',
+      );
 
-    final request = client.request!;
-    expect(request.url, OpenAiCloudAudioTranscriber.endpoint);
-    expect(request.url.host, 'api.openai.com');
-    expect(request.url.path, '/v1/audio/transcriptions');
-    expect(request.headers['Authorization'], 'Bearer sk-contract-test');
-    expect(request.fields['model'], OpenAiCloudAudioTranscriber.model);
-    expect(request.files, hasLength(1));
-    expect(request.files.single.field, 'file');
-    expect(request.files.single.filename, 'mindly-recording.wav');
-    expect(transcript, 'hello from audio');
-  });
+      final request = client.request!;
+      expect(request.url, OpenAiCloudAudioTranscriber.endpoint);
+      expect(request.url.host, 'api.openai.com');
+      expect(request.url.path, '/v1/audio/transcriptions');
+      expect(request.headers['Authorization'], 'Bearer sk-contract-test');
+      expect(request.fields['model'], OpenAiCloudAudioTranscriber.model);
+      expect(request.files, hasLength(1));
+      expect(request.files.single.field, 'file');
+      expect(request.files.single.filename, 'mindly-recording.wav');
+      expect(transcript, 'hello from audio');
+    },
+  );
 
   test('provider error text never contains response body or API key', () async {
     final client = _CapturingClient(

@@ -67,7 +67,9 @@ class _WebAudioCaptureScreenState extends State<WebAudioCaptureScreen> {
                               size: 48,
                             ),
                             const SizedBox(width: MindlySpacing.md),
-                            Expanded(child: Text(_statusText(_controller.status))),
+                            Expanded(
+                              child: Text(_statusText(_controller.status)),
+                            ),
                           ],
                         ),
                       ),
@@ -91,7 +93,9 @@ class _WebAudioCaptureScreenState extends State<WebAudioCaptureScreen> {
                       ),
                     ] else
                       FilledButton.icon(
-                        onPressed: _controller.status == AudioCaptureStatus.transcribing
+                        onPressed:
+                            _controller.status ==
+                                AudioCaptureStatus.transcribing
                             ? null
                             : _controller.startRecording,
                         icon: const Icon(Icons.mic_rounded),
@@ -142,22 +146,27 @@ class _WebAudioCaptureScreenState extends State<WebAudioCaptureScreen> {
                       value: _deleteAfterTranscription,
                       onChanged: (value) =>
                           setState(() => _deleteAfterTranscription = value),
-                      title: const Text('Clear raw audio after transcript is saved'),
+                      title: const Text(
+                        'Clear raw audio after transcript is saved',
+                      ),
                     ),
                     FilledButton.icon(
-                      onPressed: _controller.canTranscribe &&
-                              _controller.status != AudioCaptureStatus.transcribing
+                      onPressed:
+                          _controller.canTranscribe &&
+                              _controller.status !=
+                                  AudioCaptureStatus.transcribing
                           ? () => _controller.transcribeAndCapture(
-                                extractionProfile: _profile,
-                                webCloudConsent: _cloudConsent,
-                                deleteAfterTranscription:
-                                    _deleteAfterTranscription,
-                              )
+                              extractionProfile: _profile,
+                              webCloudConsent: _cloudConsent,
+                              deleteAfterTranscription:
+                                  _deleteAfterTranscription,
+                            )
                           : null,
                       icon: const Icon(Icons.cloud_upload_rounded),
                       label: const Text('Transcribe and remember'),
                     ),
-                    if (_controller.lastOutcome?.estimate case final estimate?) ...[
+                    if (_controller.lastOutcome?.estimate
+                        case final estimate?) ...[
                       const SizedBox(height: MindlySpacing.sm),
                       Text(
                         'Preflight transcription estimate: '
@@ -189,18 +198,27 @@ class _WebAudioCaptureScreenState extends State<WebAudioCaptureScreen> {
   }
 
   String _statusText(AudioCaptureStatus status) => switch (status) {
-        AudioCaptureStatus.idle => 'Ready to record in this browser.',
-        AudioCaptureStatus.requestingPermission => 'Checking browser microphone access…',
-        AudioCaptureStatus.permissionDenied => 'Browser microphone access is required.',
-        AudioCaptureStatus.recording => 'Recording — browser microphone active.',
-        AudioCaptureStatus.recorded => 'Recording is local and ready for optional cloud transcription.',
-        AudioCaptureStatus.transcribing => 'Sending directly to OpenAI and transcribing…',
-        AudioCaptureStatus.complete => 'Transcript saved to your local Mindly memory.',
-        AudioCaptureStatus.consentRequired => 'Cloud transcription consent is required.',
-        AudioCaptureStatus.missingKey => 'Add an OpenAI BYOK key in Settings first.',
-        AudioCaptureStatus.spendBlocked => 'Your configured spend cap blocks this request.',
-        AudioCaptureStatus.failed => 'Transcription failed; the recording remains available to retry.',
-        AudioCaptureStatus.modelRequired => 'Native model is not used on Web.',
-        AudioCaptureStatus.downloadingModel => 'Native model is not used on Web.',
-      };
+    AudioCaptureStatus.idle => 'Ready to record in this browser.',
+    AudioCaptureStatus.requestingPermission =>
+      'Checking browser microphone access…',
+    AudioCaptureStatus.permissionDenied =>
+      'Browser microphone access is required.',
+    AudioCaptureStatus.recording => 'Recording — browser microphone active.',
+    AudioCaptureStatus.recorded =>
+      'Recording is local and ready for optional cloud transcription.',
+    AudioCaptureStatus.transcribing =>
+      'Sending directly to OpenAI and transcribing…',
+    AudioCaptureStatus.complete =>
+      'Transcript saved to your local Mindly memory.',
+    AudioCaptureStatus.consentRequired =>
+      'Cloud transcription consent is required.',
+    AudioCaptureStatus.missingKey =>
+      'Add an OpenAI BYOK key in Settings first.',
+    AudioCaptureStatus.spendBlocked =>
+      'Your configured spend cap blocks this request.',
+    AudioCaptureStatus.failed =>
+      'Transcription failed; the recording remains available to retry.',
+    AudioCaptureStatus.modelRequired => 'Native model is not used on Web.',
+    AudioCaptureStatus.downloadingModel => 'Native model is not used on Web.',
+  };
 }

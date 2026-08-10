@@ -19,48 +19,58 @@ import '../../helpers/in_memory_secret_store.dart';
 void main() {
   const profile = ExtractionProviderProfile.openAiDefault;
 
-  test('native transcription stops when the Whisper model is missing', () async {
-    final fixture = _Fixture(isWeb: false, modelReady: false, nativeText: 'hello');
+  test(
+    'native transcription stops when the Whisper model is missing',
+    () async {
+      final fixture = _Fixture(
+        isWeb: false,
+        modelReady: false,
+        nativeText: 'hello',
+      );
 
-    final outcome = await fixture.service.transcribeAndCapture(
-      recording: AudioRecording(
+      final outcome = await fixture.service.transcribeAndCapture(
+        recording: AudioRecording(
+          path: '/tmp/mindly.wav',
+          duration: const Duration(seconds: 5),
+        ),
+        extractionProfile: profile,
+        webCloudConsent: false,
+        deleteAfterTranscription: true,
+      );
+
+      expect(outcome.kind, AudioProcessOutcomeKind.nativeModelRequired);
+      expect(fixture.native.transcribeCalls, 0);
+      expect(fixture.handoffTexts, isEmpty);
+      expect(fixture.cleaner.deleted, isEmpty);
+    },
+  );
+
+  test(
+    'native transcript is handed to text capture before raw audio deletion',
+    () async {
+      final fixture = _Fixture(
+        isWeb: false,
+        modelReady: true,
+        nativeText: '  Exact native transcript.  ',
+      );
+      final recording = AudioRecording(
         path: '/tmp/mindly.wav',
-        duration: const Duration(seconds: 5),
-      ),
-      extractionProfile: profile,
-      webCloudConsent: false,
-      deleteAfterTranscription: true,
-    );
+        duration: const Duration(seconds: 8),
+      );
 
-    expect(outcome.kind, AudioProcessOutcomeKind.nativeModelRequired);
-    expect(fixture.native.transcribeCalls, 0);
-    expect(fixture.handoffTexts, isEmpty);
-    expect(fixture.cleaner.deleted, isEmpty);
-  });
+      final outcome = await fixture.service.transcribeAndCapture(
+        recording: recording,
+        extractionProfile: profile,
+        webCloudConsent: false,
+        deleteAfterTranscription: true,
+      );
 
-  test('native transcript is handed to text capture before raw audio deletion', () async {
-    final fixture = _Fixture(
-      isWeb: false,
-      modelReady: true,
-      nativeText: '  Exact native transcript.  ',
-    );
-    final recording = AudioRecording(
-      path: '/tmp/mindly.wav',
-      duration: const Duration(seconds: 8),
-    );
-
-    final outcome = await fixture.service.transcribeAndCapture(
-      recording: recording,
-      extractionProfile: profile,
-      webCloudConsent: false,
-      deleteAfterTranscription: true,
-    );
-
-    expect(outcome.kind, AudioProcessOutcomeKind.captured);
-    expect(outcome.transcript, '  Exact native transcript.  ');
-    expect(fixture.handoffTexts, ['  Exact native transcript.  ']);
-    expect(fixture.cleaner.deleted, [recording]);
-  });
+      expect(outcome.kind, AudioProcessOutcomeKind.captured);
+      expect(outcome.transcript, '  Exact native transcript.  ');
+      expect(fixture.handoffTexts, ['  Exact native transcript.  ']);
+      expect(fixture.cleaner.deleted, [recording]);
+    },
+  );
 
   test('Web requires explicit cloud consent before dispatch', () async {
     final fixture = _Fixture(isWeb: true, cloudText: 'web transcript');
@@ -113,27 +123,30 @@ void main() {
     expect(fixture.cloud.calls, 0);
   });
 
-  test('successful Web transcription records estimated spend and handoff', () async {
-    final fixture = _Fixture(isWeb: true, cloudText: 'web transcript');
-    await fixture.saveOpenAiKey();
+  test(
+    'successful Web transcription records estimated spend and handoff',
+    () async {
+      final fixture = _Fixture(isWeb: true, cloudText: 'web transcript');
+      await fixture.saveOpenAiKey();
 
-    final outcome = await fixture.service.transcribeAndCapture(
-      recording: _webRecording(duration: const Duration(minutes: 1)),
-      extractionProfile: profile,
-      webCloudConsent: true,
-      deleteAfterTranscription: false,
-    );
+      final outcome = await fixture.service.transcribeAndCapture(
+        recording: _webRecording(duration: const Duration(minutes: 1)),
+        extractionProfile: profile,
+        webCloudConsent: true,
+        deleteAfterTranscription: false,
+      );
 
-    expect(outcome.kind, AudioProcessOutcomeKind.captured);
-    expect(fixture.cloud.calls, 1);
-    expect(fixture.cloud.lastKey, 'sk-phase4-test');
-    expect(fixture.handoffTexts, ['web transcript']);
-    expect(fixture.spend.entries, hasLength(1));
-    expect(
-      fixture.spend.entries.single.usd,
-      closeTo(AudioCostEstimator.estimatedUsdPerMinute, 0.0000001),
-    );
-  });
+      expect(outcome.kind, AudioProcessOutcomeKind.captured);
+      expect(fixture.cloud.calls, 1);
+      expect(fixture.cloud.lastKey, 'sk-phase4-test');
+      expect(fixture.handoffTexts, ['web transcript']);
+      expect(fixture.spend.entries, hasLength(1));
+      expect(
+        fixture.spend.entries.single.usd,
+        closeTo(AudioCostEstimator.estimatedUsdPerMinute, 0.0000001),
+      );
+    },
+  );
 
   test('provider failure never deletes retryable Web audio', () async {
     final fixture = _Fixture(isWeb: true, cloudShouldFail: true);
@@ -170,7 +183,9 @@ void main() {
   });
 }
 
-AudioRecording _webRecording({Duration duration = const Duration(seconds: 10)}) {
+AudioRecording _webRecording({
+  Duration duration = const Duration(seconds: 10),
+}) {
   return AudioRecording(
     bytes: Uint8List.fromList([82, 73, 70, 70, 1, 2, 3, 4]),
     duration: duration,

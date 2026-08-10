@@ -4,11 +4,8 @@ import 'package:mindly/features/ai_settings/domain/cost_models.dart';
 import 'package:mindly/features/text_capture/domain/text_capture_models.dart';
 
 class AudioRecording {
-  AudioRecording({
-    required this.duration,
-    this.path,
-    Uint8List? bytes,
-  }) : _bytes = bytes {
+  AudioRecording({required this.duration, this.path, Uint8List? bytes})
+    : _bytes = bytes {
     if ((path == null || path!.isEmpty) && bytes == null) {
       throw ArgumentError('Audio recording requires a path or bytes.');
     }

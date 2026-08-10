@@ -9,7 +9,7 @@ AudioRecorderGateway createRecordAudioRecorder() => RecordAudioRecorderWeb();
 
 class RecordAudioRecorderWeb implements AudioRecorderGateway {
   RecordAudioRecorderWeb({AudioRecorder? recorder})
-      : _recorder = recorder ?? AudioRecorder();
+    : _recorder = recorder ?? AudioRecorder();
 
   static const config = RecordConfig(
     encoder: AudioEncoder.pcm16bits,

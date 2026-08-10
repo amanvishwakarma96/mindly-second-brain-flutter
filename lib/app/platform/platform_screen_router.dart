@@ -22,19 +22,28 @@ Widget buildPlatformHome(ScreenFamily family) => switch (family) {
   ScreenFamily.web => const WebHomeScreen(),
 };
 
-Widget buildPlatformTextCapture(ScreenFamily family, {TextCaptureController? controller}) => switch (family) {
+Widget buildPlatformTextCapture(
+  ScreenFamily family, {
+  TextCaptureController? controller,
+}) => switch (family) {
   ScreenFamily.mobile => MobileTextCaptureScreen(controller: controller),
   ScreenFamily.desktop => DesktopTextCaptureScreen(controller: controller),
   ScreenFamily.web => WebTextCaptureScreen(controller: controller),
 };
 
-Widget buildPlatformAudioCapture(ScreenFamily family, {AudioCaptureController? controller}) => switch (family) {
+Widget buildPlatformAudioCapture(
+  ScreenFamily family, {
+  AudioCaptureController? controller,
+}) => switch (family) {
   ScreenFamily.mobile => MobileAudioCaptureScreen(controller: controller),
   ScreenFamily.desktop => DesktopAudioCaptureScreen(controller: controller),
   ScreenFamily.web => WebAudioCaptureScreen(controller: controller),
 };
 
-Widget buildPlatformProviderSettings(ScreenFamily family, {ProviderSettingsController? controller}) => switch (family) {
+Widget buildPlatformProviderSettings(
+  ScreenFamily family, {
+  ProviderSettingsController? controller,
+}) => switch (family) {
   ScreenFamily.mobile => MobileProviderSettingsScreen(controller: controller),
   ScreenFamily.desktop => DesktopProviderSettingsScreen(controller: controller),
   ScreenFamily.web => WebProviderSettingsScreen(controller: controller),

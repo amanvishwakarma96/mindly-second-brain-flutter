@@ -8,7 +8,7 @@ NativeAudioTranscriber createNativeWhisperTranscriber() =>
 
 class WhisperNativeAudioTranscriber implements NativeAudioTranscriber {
   WhisperNativeAudioTranscriber({WhisperController? controller})
-      : _controller = controller ?? WhisperController();
+    : _controller = controller ?? WhisperController();
 
   final WhisperController _controller;
 
