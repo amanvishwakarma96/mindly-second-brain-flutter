@@ -1,0 +1,57 @@
+name: Bootstrap Phase 0 v2
+
+on:
+  push:
+    branches:
+      - agent/phase-0-scaffolding
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: ${{ !contains(github.event.head_commit.message, 'Bootstrap Flutter six-platform architecture') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+
+      - name: Generate Flutter platform runners
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter create \
+            --project-name mindly \
+            --org com.amanvishwakarma96 \
+            --platforms=android,ios,linux,macos,windows,web \
+            .
+          bash tools/bootstrap_phase0.sh
+
+      - name: Validate generated application
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter pub get
+          dart format --output=none --set-exit-if-changed lib test
+          flutter analyze
+          flutter test
+          flutter build web
+          flutter build apk --debug
+
+      - name: Commit validated scaffold
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/bootstrap-phase0-v2.yml tools/bootstrap_phase0.sh
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Bootstrap Flutter six-platform architecture'
+          git push origin HEAD:agent/phase-0-scaffolding
