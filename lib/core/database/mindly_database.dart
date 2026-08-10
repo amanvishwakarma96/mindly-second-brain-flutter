@@ -124,6 +124,11 @@ class MindlyDatabase extends _$MindlyDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.addColumn(captures, captures.isPinned);
+            await m.createTable(people);
+            await m.createTable(topics);
+            await m.createTable(commitments);
+            await m.createTable(memoryRelationships);
+            await m.createTable(memoryEmbeddings);
           }
           await _createSearchIndex();
         },
