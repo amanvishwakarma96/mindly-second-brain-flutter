@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:mindly/features/audio_capture/data/native_audio_transcriber.dart';
-import 'package:whisper_ggml_plus/whisper_ggml_plus.dart';
+import 'package:whisper_ggml/whisper_ggml.dart';
 
 NativeAudioTranscriber createNativeWhisperTranscriber() =>
     WhisperNativeAudioTranscriber();
