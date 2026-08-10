@@ -16,7 +16,7 @@ dependencies:
   http: ^1.6.0
   path_provider: ^2.1.6
   record: ^7.1.1
-  whisper_ggml_plus: ^1.5.2
+  whisper_ggml: ^2.6.0
 
 dev_dependencies:
   flutter_test:
