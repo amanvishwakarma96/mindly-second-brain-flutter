@@ -1,0 +1,47 @@
+name: Phase 1 Codegen
+
+on:
+  push:
+    branches:
+      - agent/phase-1-local-data
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: '3.44.8'
+
+jobs:
+  generate:
+    if: github.event.head_commit.message != 'Generate Phase 1 Drift artifacts'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: dart format lib test tool
+      - name: Download matching Drift web assets
+        run: |
+          curl -fL --retry 3 -o web/sqlite3.wasm https://github.com/simolus3/drift/releases/download/drift-2.34.3/sqlite3.wasm
+          curl -fL --retry 3 -o web/drift_worker.js https://github.com/simolus3/drift/releases/download/drift-2.34.3/drift_worker.js
+          test $(stat -c%s web/sqlite3.wasm) -gt 500000
+          test $(stat -c%s web/drift_worker.js) -gt 300000
+      - name: Validate generated Phase 1 code
+        run: |
+          flutter analyze
+          flutter test
+          dart run tool/vector_benchmark.dart
+          flutter build web
+          flutter build apk --debug
+      - name: Commit generated artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.lock lib test tool web/sqlite3.wasm web/drift_worker.js
+          git commit -m "Generate Phase 1 Drift artifacts"
+          git push
