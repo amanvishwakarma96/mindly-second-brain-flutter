@@ -6,7 +6,11 @@ abstract final class Float32VectorCodec {
       throw ArgumentError.value(values, 'values', 'Vector must not be empty.');
     }
     if (values.any((value) => !value.isFinite)) {
-      throw ArgumentError.value(values, 'values', 'Vector values must be finite.');
+      throw ArgumentError.value(
+        values,
+        'values',
+        'Vector values must be finite.',
+      );
     }
 
     final bytes = ByteData(values.length * Float32List.bytesPerElement);
@@ -21,7 +25,8 @@ abstract final class Float32VectorCodec {
   }
 
   static List<double> decode(Uint8List bytes) {
-    if (bytes.isEmpty || bytes.lengthInBytes % Float32List.bytesPerElement != 0) {
+    if (bytes.isEmpty ||
+        bytes.lengthInBytes % Float32List.bytesPerElement != 0) {
       throw ArgumentError.value(
         bytes.lengthInBytes,
         'bytes',
@@ -32,10 +37,8 @@ abstract final class Float32VectorCodec {
     final data = ByteData.sublistView(bytes);
     return List<double>.generate(
       bytes.lengthInBytes ~/ Float32List.bytesPerElement,
-      (index) => data.getFloat32(
-        index * Float32List.bytesPerElement,
-        Endian.little,
-      ),
+      (index) =>
+          data.getFloat32(index * Float32List.bytesPerElement, Endian.little),
       growable: false,
     );
   }

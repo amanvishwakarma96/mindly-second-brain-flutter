@@ -18,7 +18,9 @@ class VectorSearchService {
     required List<double> vector,
   }) async {
     final encoded = Float32VectorCodec.encode(vector);
-    await _database.into(_database.memoryEmbeddings).insertOnConflictUpdate(
+    await _database
+        .into(_database.memoryEmbeddings)
+        .insertOnConflictUpdate(
           MemoryEmbeddingsCompanion.insert(
             id: id,
             ownerType: ownerType,
@@ -51,19 +53,20 @@ class VectorSearchService {
     }
 
     final rows = await select.get();
-    final hits = rows
-        .map(
-          (row) => VectorSearchHit(
-            ownerType: row.ownerType,
-            ownerId: row.ownerId,
-            score: cosineSimilarity(
-              query,
-              Float32VectorCodec.decode(row.vector),
-            ),
-          ),
-        )
-        .toList(growable: false)
-      ..sort((left, right) => right.score.compareTo(left.score));
+    final hits =
+        rows
+            .map(
+              (row) => VectorSearchHit(
+                ownerType: row.ownerType,
+                ownerId: row.ownerId,
+                score: cosineSimilarity(
+                  query,
+                  Float32VectorCodec.decode(row.vector),
+                ),
+              ),
+            )
+            .toList(growable: false)
+          ..sort((left, right) => right.score.compareTo(left.score));
 
     return hits.take(math.min(limit, hits.length)).toList(growable: false);
   }

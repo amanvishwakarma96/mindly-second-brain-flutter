@@ -73,39 +73,42 @@ void main() {
     expect(await repository.keywordSearch('Pune'), isEmpty);
   });
 
-  test('vector search ranks closest vectors and isolates model/dimension', () async {
-    await vectors.upsert(
-      id: 'e1',
-      ownerType: 'capture',
-      ownerId: 'c1',
-      model: 'model-a',
-      vector: [1, 0, 0],
-    );
-    await vectors.upsert(
-      id: 'e2',
-      ownerType: 'capture',
-      ownerId: 'c2',
-      model: 'model-a',
-      vector: [0.8, 0.2, 0],
-    );
-    await vectors.upsert(
-      id: 'e3',
-      ownerType: 'capture',
-      ownerId: 'c3',
-      model: 'model-b',
-      vector: [1, 0, 0],
-    );
-    await vectors.upsert(
-      id: 'e4',
-      ownerType: 'capture',
-      ownerId: 'c4',
-      model: 'model-a',
-      vector: [1, 0],
-    );
+  test(
+    'vector search ranks closest vectors and isolates model/dimension',
+    () async {
+      await vectors.upsert(
+        id: 'e1',
+        ownerType: 'capture',
+        ownerId: 'c1',
+        model: 'model-a',
+        vector: [1, 0, 0],
+      );
+      await vectors.upsert(
+        id: 'e2',
+        ownerType: 'capture',
+        ownerId: 'c2',
+        model: 'model-a',
+        vector: [0.8, 0.2, 0],
+      );
+      await vectors.upsert(
+        id: 'e3',
+        ownerType: 'capture',
+        ownerId: 'c3',
+        model: 'model-b',
+        vector: [1, 0, 0],
+      );
+      await vectors.upsert(
+        id: 'e4',
+        ownerType: 'capture',
+        ownerId: 'c4',
+        model: 'model-a',
+        vector: [1, 0],
+      );
 
-    final hits = await vectors.search(model: 'model-a', query: [1, 0, 0]);
-    expect(hits.map((hit) => hit.ownerId), ['c1', 'c2']);
-  });
+      final hits = await vectors.search(model: 'model-a', query: [1, 0, 0]);
+      expect(hits.map((hit) => hit.ownerId), ['c1', 'c2']);
+    },
+  );
 
   test('full wipe removes structured, FTS and vector data', () async {
     await repository.saveCapture(

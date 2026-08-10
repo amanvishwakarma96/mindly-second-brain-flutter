@@ -21,7 +21,9 @@ class MemoryRepository {
   }) async {
     final now = DateTime.now().toUtc();
     await _database.transaction(() async {
-      await _database.into(_database.captures).insertOnConflictUpdate(
+      await _database
+          .into(_database.captures)
+          .insertOnConflictUpdate(
             CapturesCompanion.insert(
               id: id,
               mode: mode,
@@ -53,7 +55,9 @@ class MemoryRepository {
   }) async {
     final value = displayName.trim();
     await _database.transaction(() async {
-      await _database.into(_database.people).insertOnConflictUpdate(
+      await _database
+          .into(_database.people)
+          .insertOnConflictUpdate(
             PeopleCompanion.insert(
               id: id,
               displayName: value,
@@ -72,7 +76,9 @@ class MemoryRepository {
   Future<void> saveTopic({required String id, required String label}) async {
     final value = label.trim();
     await _database.transaction(() async {
-      await _database.into(_database.topics).insertOnConflictUpdate(
+      await _database
+          .into(_database.topics)
+          .insertOnConflictUpdate(
             TopicsCompanion.insert(
               id: id,
               label: value,
@@ -97,7 +103,9 @@ class MemoryRepository {
     String status = 'open',
   }) async {
     await _database.transaction(() async {
-      await _database.into(_database.commitments).insertOnConflictUpdate(
+      await _database
+          .into(_database.commitments)
+          .insertOnConflictUpdate(
             CommitmentsCompanion.insert(
               id: id,
               captureId: Value(captureId),
@@ -124,7 +132,9 @@ class MemoryRepository {
     required String toType,
     required String toId,
   }) {
-    return _database.into(_database.memoryRelationships).insertOnConflictUpdate(
+    return _database
+        .into(_database.memoryRelationships)
+        .insertOnConflictUpdate(
           MemoryRelationshipsCompanion.insert(
             id: id,
             fromType: fromType,
@@ -146,16 +156,18 @@ class MemoryRepository {
       return const [];
     }
 
-    final rows = await _database.customSelect(
-      '''
+    final rows = await _database
+        .customSelect(
+          '''
       SELECT entity_type, entity_id, content, bm25(memory_fts) AS rank
       FROM memory_fts
       WHERE memory_fts MATCH ?
       ORDER BY rank
       LIMIT ?
       ''',
-      variables: [Variable<String>(expression), Variable<int>(limit)],
-    ).get();
+          variables: [Variable<String>(expression), Variable<int>(limit)],
+        )
+        .get();
 
     return rows
         .map(
@@ -174,19 +186,17 @@ class MemoryRepository {
     required String entityId,
   }) async {
     await _database.transaction(() async {
-      await (_database.delete(_database.memoryRelationships)
-            ..where(
-              (row) =>
-                  (row.fromType.equals(entityType) &
-                      row.fromId.equals(entityId)) |
-                  (row.toType.equals(entityType) & row.toId.equals(entityId)),
-            ))
+      await (_database.delete(_database.memoryRelationships)..where(
+            (row) =>
+                (row.fromType.equals(entityType) &
+                    row.fromId.equals(entityId)) |
+                (row.toType.equals(entityType) & row.toId.equals(entityId)),
+          ))
           .go();
-      await (_database.delete(_database.memoryEmbeddings)
-            ..where(
-              (row) =>
-                  row.ownerType.equals(entityType) & row.ownerId.equals(entityId),
-            ))
+      await (_database.delete(_database.memoryEmbeddings)..where(
+            (row) =>
+                row.ownerType.equals(entityType) & row.ownerId.equals(entityId),
+          ))
           .go();
       await _database.customStatement(
         'DELETE FROM memory_fts WHERE entity_type = ? AND entity_id = ?',
@@ -195,21 +205,21 @@ class MemoryRepository {
 
       switch (entityType) {
         case 'capture':
-          await (_database.delete(_database.captures)
-                ..where((row) => row.id.equals(entityId)))
-              .go();
+          await (_database.delete(
+            _database.captures,
+          )..where((row) => row.id.equals(entityId))).go();
         case 'person':
-          await (_database.delete(_database.people)
-                ..where((row) => row.id.equals(entityId)))
-              .go();
+          await (_database.delete(
+            _database.people,
+          )..where((row) => row.id.equals(entityId))).go();
         case 'topic':
-          await (_database.delete(_database.topics)
-                ..where((row) => row.id.equals(entityId)))
-              .go();
+          await (_database.delete(
+            _database.topics,
+          )..where((row) => row.id.equals(entityId))).go();
         case 'commitment':
-          await (_database.delete(_database.commitments)
-                ..where((row) => row.id.equals(entityId)))
-              .go();
+          await (_database.delete(
+            _database.commitments,
+          )..where((row) => row.id.equals(entityId))).go();
         default:
           throw ArgumentError.value(
             entityType,
