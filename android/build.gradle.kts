@@ -18,11 +18,12 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 
     if (name == "whisper_ggml") {
-        plugins.withId("com.android.library") {
+        afterEvaluate {
             extensions.configure<LibraryExtension> {
-                // ffmpeg_kit_flutter_new_min 3.6.2 requires compileSdk 35+.
-                // This changes compile-time API availability only; Mindly's
-                // minSdk and targetSdk remain controlled by the app module.
+                // whisper_ggml 2.6.0 hardcodes compileSdk 34, while the
+                // simulator-safe FFmpeg runtime requires compileSdk 35+.
+                // Apply this after the plugin evaluates so its own android
+                // block cannot overwrite the consumer-side compatibility fix.
                 compileSdk = 35
             }
         }
