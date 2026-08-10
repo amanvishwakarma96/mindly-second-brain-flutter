@@ -17,17 +17,19 @@ import 'package:mindly/features/text_capture/application/text_capture_controller
 import 'package:mindly/features/text_capture/domain/text_capture_models.dart';
 
 class AudioCaptureController extends ChangeNotifier {
-  AudioCaptureController({
+  factory AudioCaptureController({
     required AudioRecorderGateway recorder,
     required AudioTranscriptionGateway transcriptionService,
-    required this.isWeb,
-  }) : this._(recorder, transcriptionService, isWeb: isWeb);
+    required bool isWeb,
+  }) {
+    return AudioCaptureController._(recorder, transcriptionService, isWeb);
+  }
 
   AudioCaptureController._(
     this._recorder,
-    this._transcriptionService, {
-    required this.isWeb,
-  });
+    this._transcriptionService,
+    this.isWeb,
+  );
 
   factory AudioCaptureController.production() {
     final store = FlutterSecureSecretStore();
