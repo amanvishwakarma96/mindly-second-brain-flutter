@@ -1,0 +1,3 @@
+# Phase 1 test plan — local data layer and vector search
+
+Phase 1 establishes Drift persistence, migrations, graph-modeled memory data, FTS, and provider-agnostic local vector search across all six targets. Critical validation covers fresh-schema creation, capture/entity/relationship round-trips, FTS update/delete consistency, Float32 vector codec and cosine ranking, model/dimension isolation, cascading deletion/full wipe, migration fixtures, architecture-boundary regression, all six platform builds, and Web persistence with Drift WASM assets. A 10,000-vector timing run is characterization only; hosted CI timing is not treated as proof of the SRS mid-tier-device performance target.
