@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:drift/drift.dart';
 import 'package:mindly/core/database/mindly_database.dart';
 import 'package:mindly/features/memory/data/float32_vector_codec.dart';
+import 'package:mindly/features/memory/data/vector_math.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 
 class VectorSearchService {
@@ -72,24 +73,6 @@ class VectorSearchService {
   }
 
   static double cosineSimilarity(List<double> left, List<double> right) {
-    if (left.length != right.length || left.isEmpty) {
-      throw ArgumentError(
-        'Vectors must be non-empty and have identical dimensions.',
-      );
-    }
-
-    var dot = 0.0;
-    var leftNorm = 0.0;
-    var rightNorm = 0.0;
-    for (var index = 0; index < left.length; index++) {
-      dot += left[index] * right[index];
-      leftNorm += left[index] * left[index];
-      rightNorm += right[index] * right[index];
-    }
-
-    if (leftNorm == 0 || rightNorm == 0) {
-      return 0;
-    }
-    return dot / (math.sqrt(leftNorm) * math.sqrt(rightNorm));
+    return VectorMath.cosineSimilarity(left, right);
   }
 }

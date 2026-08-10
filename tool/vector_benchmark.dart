@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:mindly/features/memory/data/vector_search_service.dart';
+import 'package:mindly/features/memory/data/vector_math.dart';
 
 void main() {
   const count = 10000;
@@ -25,7 +25,7 @@ void main() {
   final watch = Stopwatch()..start();
   var best = -2.0;
   for (final vector in corpus) {
-    final score = VectorSearchService.cosineSimilarity(query, vector);
+    final score = VectorMath.cosineSimilarity(query, vector);
     if (score > best) {
       best = score;
     }
