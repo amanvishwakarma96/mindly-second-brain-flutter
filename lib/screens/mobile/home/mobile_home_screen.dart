@@ -29,8 +29,7 @@ class MobileHomeScreen extends StatelessWidget {
             color: MindlyColors.mint,
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
-              onTap: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.textCapture),
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
               child: const Padding(
                 padding: EdgeInsets.all(MindlySpacing.lg),
                 child: Column(
@@ -44,23 +43,39 @@ class MobileHomeScreen extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: MindlySpacing.md),
+          Card(
+            color: MindlyColors.peach,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.audioCapture),
+              child: const Padding(
+                padding: EdgeInsets.all(MindlySpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Record a thought'),
+                    SizedBox(height: MindlySpacing.sm),
+                    Text('Capture audio now and transcribe it when you are ready.'),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: 0,
         onDestinationSelected: (index) {
           if (index == 1) {
-            Navigator.of(context).pushNamed(AppRoutes.textCapture);
+            Navigator.of(context).pushNamed(AppRoutes.audioCapture);
           } else if (index == 3) {
             Navigator.of(context).pushNamed(AppRoutes.providerSettings);
           }
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.edit_note_rounded),
-            label: 'Capture',
-          ),
+          NavigationDestination(icon: Icon(Icons.mic_rounded), label: 'Capture'),
           NavigationDestination(
             icon: Icon(Icons.auto_stories_rounded),
             label: 'Memory',
