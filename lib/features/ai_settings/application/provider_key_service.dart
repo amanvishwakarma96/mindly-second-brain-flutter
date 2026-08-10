@@ -24,18 +24,18 @@ class ProviderKeyService {
     String providerId,
     String apiKey, {
     bool webRiskAccepted = false,
-  }) {
+  }) async {
     _requireWebConsent(webRiskAccepted);
-    return _repository.save(providerId, apiKey);
+    await _repository.save(providerId, apiKey);
   }
 
   Future<void> rotateKey(
     String providerId,
     String apiKey, {
     bool webRiskAccepted = false,
-  }) {
+  }) async {
     _requireWebConsent(webRiskAccepted);
-    return _repository.save(providerId, apiKey);
+    await _repository.save(providerId, apiKey);
   }
 
   Future<void> removeKey(String providerId) {
