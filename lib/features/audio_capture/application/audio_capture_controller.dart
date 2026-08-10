@@ -21,8 +21,13 @@ class AudioCaptureController extends ChangeNotifier {
     required AudioRecorderGateway recorder,
     required AudioTranscriptionGateway transcriptionService,
     required this.isWeb,
-  }) : _recorder = recorder,
-       _transcriptionService = transcriptionService;
+  }) : this._(recorder, transcriptionService, isWeb: isWeb);
+
+  AudioCaptureController._(
+    this._recorder,
+    this._transcriptionService, {
+    required this.isWeb,
+  });
 
   factory AudioCaptureController.production() {
     final store = FlutterSecureSecretStore();
