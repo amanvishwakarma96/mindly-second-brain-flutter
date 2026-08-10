@@ -6,11 +6,14 @@ import 'package:mindly/features/ai_settings/data/secure_spend_store.dart';
 import 'package:mindly/features/ai_settings/domain/cost_models.dart';
 
 class ProviderSettingsController {
-  ProviderSettingsController({
+  factory ProviderSettingsController({
     required ProviderKeyService keyService,
     required SpendCapsRepository capsRepository,
-  }) : _keyService = keyService,
-       _capsRepository = capsRepository;
+  }) {
+    return ProviderSettingsController._(keyService, capsRepository);
+  }
+
+  ProviderSettingsController._(this._keyService, this._capsRepository);
 
   factory ProviderSettingsController.production() {
     final store = FlutterSecureSecretStore();
