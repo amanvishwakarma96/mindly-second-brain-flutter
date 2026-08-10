@@ -52,6 +52,9 @@ Ambiguous context must remain explicitly `ambiguous`; Phase 3 must not silently 
 | P3-26 | macOS debug build | Pass |
 | P3-27 | Linux debug build | Pass |
 
+## Generated-code gate
+`lib/core/database/mindly_database.g.dart` is tracked so production builds that import the local database do not depend on another CI job's workspace. The permanent quality job regenerates Drift output and uses `git diff --exit-code` to detect drift from the committed generated source.
+
 ## Manual tests
 1. Native: save a note with no internet; verify it remains in local memory and AI state is retryable.
 2. Native: configure a real BYOK provider key and confirm a text capture receives a structured extraction.
