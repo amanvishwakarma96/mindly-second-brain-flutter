@@ -28,7 +28,7 @@ Phase 4 adds explicit microphone capture, native Whisper.cpp transcription, Web 
 
 ## Native implementation acceptance
 
-- Android, iOS, Linux, macOS, and Windows use on-device Whisper.cpp through `whisper_ggml_plus`.
+- Android, iOS, Linux, macOS, and Windows use on-device Whisper.cpp through `whisper_ggml`.
 - Recording format is 16 kHz, mono WAV so no conversion service is required for the default path.
 - Whisper model files live in app-writable local storage. Model download/setup is explicit and never uploads user audio.
 - Native transcription must not require an API key or network once the model exists locally.
