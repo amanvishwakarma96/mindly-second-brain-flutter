@@ -1,0 +1,844 @@
+name: Bootstrap Phase 0
+
+on:
+  push:
+    branches:
+      - agent/phase-0-scaffolding
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: ${{ !contains(github.event.head_commit.message, 'Bootstrap Flutter six-platform architecture') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+
+      - name: Generate six-platform Flutter scaffold
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f README.md
+          flutter create \
+            --project-name mindly \
+            --org com.amanvishwakarma96 \
+            --platforms=android,ios,linux,macos,windows,web \
+            .
+
+      - name: Add Mindly architecture
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p \
+            lib/app/platform \
+            lib/core \
+            lib/features/home/application \
+            lib/shared/design_tokens \
+            lib/shared/widgets \
+            lib/screens/mobile/home \
+            lib/screens/desktop/home \
+            lib/screens/web/home \
+            test/app/platform \
+            test/app \
+            test/architecture \
+            docs/architecture \
+            .github/workflows
+
+          cat > lib/main.dart <<'DART'
+          import 'package:flutter/widgets.dart';
+          import 'package:mindly/app/mindly_app.dart';
+
+          void main() {
+            WidgetsFlutterBinding.ensureInitialized();
+            runApp(const MindlyApp());
+          }
+          DART
+
+          cat > lib/app/platform/screen_family.dart <<'DART'
+          import 'package:flutter/foundation.dart';
+
+          enum ScreenFamily { mobile, desktop, web }
+
+          ScreenFamily resolveScreenFamily({
+            bool? isWebOverride,
+            TargetPlatform? platformOverride,
+          }) {
+            final isWeb = isWebOverride ?? kIsWeb;
+            if (isWeb) {
+              return ScreenFamily.web;
+            }
+
+            final platform = platformOverride ?? defaultTargetPlatform;
+            return switch (platform) {
+              TargetPlatform.android || TargetPlatform.iOS => ScreenFamily.mobile,
+              TargetPlatform.windows ||
+              TargetPlatform.macOS ||
+              TargetPlatform.linux => ScreenFamily.desktop,
+              TargetPlatform.fuchsia => ScreenFamily.mobile,
+            };
+          }
+          DART
+
+          cat > lib/app/platform/platform_screen_router.dart <<'DART'
+          import 'package:flutter/widgets.dart';
+          import 'package:mindly/app/platform/screen_family.dart';
+          import 'package:mindly/screens/desktop/home/desktop_home_screen.dart';
+          import 'package:mindly/screens/mobile/home/mobile_home_screen.dart';
+          import 'package:mindly/screens/web/home/web_home_screen.dart';
+
+          Widget buildPlatformHome(ScreenFamily family) {
+            return switch (family) {
+              ScreenFamily.mobile => const MobileHomeScreen(),
+              ScreenFamily.desktop => const DesktopHomeScreen(),
+              ScreenFamily.web => const WebHomeScreen(),
+            };
+          }
+          DART
+
+          cat > lib/app/mindly_app.dart <<'DART'
+          import 'package:flutter/material.dart';
+          import 'package:mindly/app/platform/platform_screen_router.dart';
+          import 'package:mindly/app/platform/screen_family.dart';
+          import 'package:mindly/shared/design_tokens/mindly_theme.dart';
+
+          class MindlyApp extends StatelessWidget {
+            const MindlyApp({super.key, this.screenFamilyOverride});
+
+            final ScreenFamily? screenFamilyOverride;
+
+            @override
+            Widget build(BuildContext context) {
+              final family = screenFamilyOverride ?? resolveScreenFamily();
+
+              return MaterialApp(
+                title: 'Mindly',
+                debugShowCheckedModeBanner: false,
+                theme: MindlyTheme.light(),
+                home: buildPlatformHome(family),
+              );
+            }
+          }
+          DART
+
+          cat > lib/core/app_info.dart <<'DART'
+          abstract final class AppInfo {
+            static const String name = 'Mindly';
+            static const String tagline = 'A private place for the things worth remembering.';
+          }
+          DART
+
+          cat > lib/features/home/application/home_presenter.dart <<'DART'
+          import 'package:mindly/core/app_info.dart';
+
+          abstract final class HomePresenter {
+            static const String greeting = 'Good to see you.';
+            static const String prompt = 'What would you like me to remember?';
+            static const String brand = AppInfo.name;
+          }
+          DART
+
+          cat > lib/shared/design_tokens/mindly_colors.dart <<'DART'
+          import 'package:flutter/material.dart';
+
+          abstract final class MindlyColors {
+            static const Color ink = Color(0xFF25232A);
+            static const Color canvas = Color(0xFFFFFBF7);
+            static const Color lavender = Color(0xFFE9E1FF);
+            static const Color mint = Color(0xFFDDF5E8);
+            static const Color peach = Color(0xFFFFE5D5);
+          }
+          DART
+
+          cat > lib/shared/design_tokens/mindly_spacing.dart <<'DART'
+          abstract final class MindlySpacing {
+            static const double xs = 4;
+            static const double sm = 8;
+            static const double md = 16;
+            static const double lg = 24;
+            static const double xl = 32;
+          }
+          DART
+
+          cat > lib/shared/design_tokens/mindly_theme.dart <<'DART'
+          import 'package:flutter/material.dart';
+          import 'package:mindly/shared/design_tokens/mindly_colors.dart';
+
+          abstract final class MindlyTheme {
+            static ThemeData light() {
+              final scheme = ColorScheme.fromSeed(
+                seedColor: MindlyColors.lavender,
+                brightness: Brightness.light,
+                surface: MindlyColors.canvas,
+              );
+
+              return ThemeData(
+                useMaterial3: true,
+                colorScheme: scheme,
+                scaffoldBackgroundColor: MindlyColors.canvas,
+                cardTheme: const CardThemeData(
+                  elevation: 0,
+                  margin: EdgeInsets.zero,
+                ),
+              );
+            }
+          }
+          DART
+
+          cat > lib/shared/widgets/mindly_brand_badge.dart <<'DART'
+          import 'package:flutter/material.dart';
+          import 'package:mindly/shared/design_tokens/mindly_colors.dart';
+          import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
+
+          class MindlyBrandBadge extends StatelessWidget {
+            const MindlyBrandBadge({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: MindlySpacing.md,
+                  vertical: MindlySpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  color: MindlyColors.lavender,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Text('Mindly ✦'),
+              );
+            }
+          }
+          DART
+
+          cat > lib/screens/mobile/home/mobile_home_screen.dart <<'DART'
+          import 'package:flutter/material.dart';
+          import 'package:mindly/features/home/application/home_presenter.dart';
+          import 'package:mindly/shared/design_tokens/mindly_colors.dart';
+          import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
+          import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
+
+          class MobileHomeScreen extends StatelessWidget {
+            const MobileHomeScreen({super.key});
+
+            static const screenKey = ValueKey<String>('screen-mobile-home');
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                key: screenKey,
+                appBar: AppBar(
+                  title: const MindlyBrandBadge(),
+                  centerTitle: false,
+                ),
+                body: ListView(
+                  padding: const EdgeInsets.all(MindlySpacing.md),
+                  children: [
+                    Text(
+                      HomePresenter.greeting,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    const SizedBox(height: MindlySpacing.sm),
+                    Text(HomePresenter.prompt),
+                    const SizedBox(height: MindlySpacing.lg),
+                    Card(
+                      color: MindlyColors.mint,
+                      child: Padding(
+                        padding: const EdgeInsets.all(MindlySpacing.lg),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Quick capture',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: MindlySpacing.sm),
+                            const Text('Jot down a thought before it wanders off.'),
+                            const SizedBox(height: MindlySpacing.md),
+                            FilledButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.add_rounded),
+                              label: const Text('Capture something'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                bottomNavigationBar: const NavigationBar(
+                  selectedIndex: 0,
+                  destinations: [
+                    NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
+                    NavigationDestination(icon: Icon(Icons.mic_rounded), label: 'Capture'),
+                    NavigationDestination(icon: Icon(Icons.auto_stories_rounded), label: 'Memory'),
+                    NavigationDestination(icon: Icon(Icons.settings_rounded), label: 'Settings'),
+                  ],
+                ),
+              );
+            }
+          }
+          DART
+
+          cat > lib/screens/desktop/home/desktop_home_screen.dart <<'DART'
+          import 'package:flutter/material.dart';
+          import 'package:mindly/features/home/application/home_presenter.dart';
+          import 'package:mindly/shared/design_tokens/mindly_colors.dart';
+          import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
+          import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
+
+          class DesktopHomeScreen extends StatelessWidget {
+            const DesktopHomeScreen({super.key});
+
+            static const screenKey = ValueKey<String>('screen-desktop-home');
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                key: screenKey,
+                body: Row(
+                  children: [
+                    const SizedBox(
+                      width: 220,
+                      child: _DesktopSidebar(),
+                    ),
+                    const VerticalDivider(width: 1),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(MindlySpacing.xl),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              HomePresenter.greeting,
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                            const SizedBox(height: MindlySpacing.sm),
+                            Text(HomePresenter.prompt),
+                            const SizedBox(height: MindlySpacing.xl),
+                            Expanded(
+                              child: Card(
+                                color: MindlyColors.mint,
+                                child: Center(
+                                  child: Text(
+                                    'Your review space will grow here.',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const VerticalDivider(width: 1),
+                    const SizedBox(
+                      width: 300,
+                      child: Padding(
+                        padding: EdgeInsets.all(MindlySpacing.lg),
+                        child: Text('Details and connections'),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+
+          class _DesktopSidebar extends StatelessWidget {
+            const _DesktopSidebar();
+
+            @override
+            Widget build(BuildContext context) {
+              return Padding(
+                padding: const EdgeInsets.all(MindlySpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    MindlyBrandBadge(),
+                    SizedBox(height: MindlySpacing.xl),
+                    ListTile(leading: Icon(Icons.home_rounded), title: Text('Home')),
+                    ListTile(leading: Icon(Icons.mic_rounded), title: Text('Capture')),
+                    ListTile(leading: Icon(Icons.auto_stories_rounded), title: Text('Memory')),
+                    ListTile(leading: Icon(Icons.lightbulb_rounded), title: Text('Insights')),
+                    Spacer(),
+                    ListTile(leading: Icon(Icons.settings_rounded), title: Text('Settings')),
+                  ],
+                ),
+              );
+            }
+          }
+          DART
+
+          cat > lib/screens/web/home/web_home_screen.dart <<'DART'
+          import 'package:flutter/material.dart';
+          import 'package:mindly/features/home/application/home_presenter.dart';
+          import 'package:mindly/shared/design_tokens/mindly_colors.dart';
+          import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
+          import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
+
+          class WebHomeScreen extends StatelessWidget {
+            const WebHomeScreen({super.key});
+
+            static const screenKey = ValueKey<String>('screen-web-home');
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                key: screenKey,
+                body: LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth < 760) {
+                      return const _NarrowWebHome();
+                    }
+                    return const _WideWebHome();
+                  },
+                ),
+              );
+            }
+          }
+
+          class _WideWebHome extends StatelessWidget {
+            const _WideWebHome();
+
+            @override
+            Widget build(BuildContext context) {
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 200,
+                    child: Padding(
+                      padding: EdgeInsets.all(MindlySpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          MindlyBrandBadge(),
+                          SizedBox(height: MindlySpacing.xl),
+                          Text('Home'),
+                          SizedBox(height: MindlySpacing.md),
+                          Text('Capture'),
+                          SizedBox(height: MindlySpacing.md),
+                          Text('Memory'),
+                          SizedBox(height: MindlySpacing.md),
+                          Text('Insights'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const VerticalDivider(width: 1),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(MindlySpacing.xl),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            HomePresenter.greeting,
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                          const SizedBox(height: MindlySpacing.sm),
+                          Text(HomePresenter.prompt),
+                          const SizedBox(height: MindlySpacing.xl),
+                          Card(
+                            color: MindlyColors.peach,
+                            child: const Padding(
+                              padding: EdgeInsets.all(MindlySpacing.lg),
+                              child: Text('A browser-friendly home, with your memories staying local.'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          }
+
+          class _NarrowWebHome extends StatelessWidget {
+            const _NarrowWebHome();
+
+            @override
+            Widget build(BuildContext context) {
+              return ListView(
+                padding: const EdgeInsets.all(MindlySpacing.md),
+                children: [
+                  const MindlyBrandBadge(),
+                  const SizedBox(height: MindlySpacing.xl),
+                  Text(
+                    HomePresenter.greeting,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: MindlySpacing.sm),
+                  Text(HomePresenter.prompt),
+                  const SizedBox(height: MindlySpacing.lg),
+                  const Card(
+                    color: MindlyColors.peach,
+                    child: Padding(
+                      padding: EdgeInsets.all(MindlySpacing.lg),
+                      child: Text('The web layout has collapsed for this smaller browser window.'),
+                    ),
+                  ),
+                ],
+              );
+            }
+          }
+          DART
+
+          cat > test/app/platform/screen_family_test.dart <<'DART'
+          import 'package:flutter/foundation.dart';
+          import 'package:flutter_test/flutter_test.dart';
+          import 'package:mindly/app/platform/screen_family.dart';
+
+          void main() {
+            group('resolveScreenFamily', () {
+              test('web override always selects web', () {
+                expect(
+                  resolveScreenFamily(
+                    isWebOverride: true,
+                    platformOverride: TargetPlatform.android,
+                  ),
+                  ScreenFamily.web,
+                );
+              });
+
+              test('Android and iOS select mobile screens', () {
+                for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+                  expect(
+                    resolveScreenFamily(
+                      isWebOverride: false,
+                      platformOverride: platform,
+                    ),
+                    ScreenFamily.mobile,
+                  );
+                }
+              });
+
+              test('Windows, macOS and Linux select desktop screens', () {
+                for (final platform in [
+                  TargetPlatform.windows,
+                  TargetPlatform.macOS,
+                  TargetPlatform.linux,
+                ]) {
+                  expect(
+                    resolveScreenFamily(
+                      isWebOverride: false,
+                      platformOverride: platform,
+                    ),
+                    ScreenFamily.desktop,
+                  );
+                }
+              });
+            });
+          }
+          DART
+
+          cat > test/app/mindly_app_test.dart <<'DART'
+          import 'package:flutter_test/flutter_test.dart';
+          import 'package:mindly/app/mindly_app.dart';
+          import 'package:mindly/app/platform/screen_family.dart';
+          import 'package:mindly/screens/desktop/home/desktop_home_screen.dart';
+          import 'package:mindly/screens/mobile/home/mobile_home_screen.dart';
+          import 'package:mindly/screens/web/home/web_home_screen.dart';
+
+          void main() {
+            for (final testCase in <(ScreenFamily, Key, Key, Key)>[
+              (
+                ScreenFamily.mobile,
+                MobileHomeScreen.screenKey,
+                DesktopHomeScreen.screenKey,
+                WebHomeScreen.screenKey,
+              ),
+              (
+                ScreenFamily.desktop,
+                DesktopHomeScreen.screenKey,
+                MobileHomeScreen.screenKey,
+                WebHomeScreen.screenKey,
+              ),
+              (
+                ScreenFamily.web,
+                WebHomeScreen.screenKey,
+                MobileHomeScreen.screenKey,
+                DesktopHomeScreen.screenKey,
+              ),
+            ]) {
+              testWidgets('${testCase.$1.name} loads only its own home screen', (tester) async {
+                await tester.pumpWidget(MindlyApp(screenFamilyOverride: testCase.$1));
+
+                expect(find.byKey(testCase.$2), findsOneWidget);
+                expect(find.byKey(testCase.$3), findsNothing);
+                expect(find.byKey(testCase.$4), findsNothing);
+              });
+            }
+          }
+          DART
+
+          cat > test/architecture/platform_screen_boundary_test.dart <<'DART'
+          import 'dart:io';
+
+          import 'package:flutter_test/flutter_test.dart';
+
+          void main() {
+            test('platform screen folders never import sibling screen folders', () {
+              final platformFolders = ['mobile', 'desktop', 'web'];
+
+              for (final platform in platformFolders) {
+                final directory = Directory('lib/screens/$platform');
+                final forbidden = platformFolders.where((value) => value != platform);
+
+                for (final entity in directory.listSync(recursive: true)) {
+                  if (entity is! File || !entity.path.endsWith('.dart')) {
+                    continue;
+                  }
+
+                  final source = entity.readAsStringSync();
+                  for (final sibling in forbidden) {
+                    expect(
+                      source.contains('package:mindly/screens/$sibling/'),
+                      isFalse,
+                      reason: '${entity.path} imports the $sibling screen layer.',
+                    );
+                  }
+                }
+              }
+            });
+
+            test('shared layers never import platform screens', () {
+              for (final root in ['lib/core', 'lib/features', 'lib/shared']) {
+                final directory = Directory(root);
+                for (final entity in directory.listSync(recursive: true)) {
+                  if (entity is! File || !entity.path.endsWith('.dart')) {
+                    continue;
+                  }
+
+                  final source = entity.readAsStringSync();
+                  expect(
+                    source.contains('package:mindly/screens/'),
+                    isFalse,
+                    reason: '${entity.path} leaks a screen dependency into a shared layer.',
+                  );
+                }
+              }
+            });
+          }
+          DART
+
+          cat > docs/architecture/platform-screen-boundary.md <<'MD'
+          # Platform screen boundary
+
+          Mindly deliberately keeps complete screen implementations separate by platform class:
+
+          - `lib/screens/mobile/`
+          - `lib/screens/desktop/`
+          - `lib/screens/web/`
+
+          Shared business logic belongs in `lib/core/` and `lib/features/`. Shared visual language belongs in `lib/shared/design_tokens/` and small reusable widgets in `lib/shared/widgets/`.
+
+          `lib/app/platform/platform_screen_router.dart` is the single allowed composition boundary that imports all three screen families and selects one complete screen implementation at runtime.
+
+          ## Enforcement
+
+          1. A platform screen folder must never import another platform screen folder.
+          2. `core`, `features`, and `shared` must never import `screens`.
+          3. Cross-platform behavior is changed in a shared layer, not copied into screens.
+          4. Platform-specific layout changes stay inside that platform's screen folder.
+          5. `test/architecture/platform_screen_boundary_test.dart` fails when rules 1 or 2 are violated.
+
+          These constraints are intentional even when sharing a conditional layout would use fewer files.
+          MD
+
+          cat > README.md <<'MD'
+          # Mindly
+
+          Mindly is a local-first, BYOK second-brain application built with Flutter for iOS, Android, Windows, macOS, Linux, and Web.
+
+          ## Phase 0 architecture
+
+          ```text
+          lib/
+          ├── app/                      # app composition + platform screen routing
+          ├── core/                     # shared non-UI logic
+          ├── features/                 # shared feature/application logic
+          ├── shared/
+          │   ├── design_tokens/        # colors, spacing, theme
+          │   └── widgets/              # intentionally small shared components
+          └── screens/
+              ├── mobile/               # independent mobile screens
+              ├── desktop/              # independent desktop screens
+              └── web/                  # independent web screens
+          ```
+
+          The platform screen folders are isolated by architecture tests. The app routing layer selects the complete mobile, desktop, or web screen implementation at runtime.
+
+          ## Supported targets
+
+          - Android
+          - iOS
+          - Windows
+          - macOS
+          - Linux
+          - Web
+
+          ## Development
+
+          ```bash
+          flutter pub get
+          flutter analyze
+          flutter test
+          flutter run
+          ```
+
+          See `docs/architecture/platform-screen-boundary.md` before adding or moving UI code.
+          MD
+
+          cat > .github/workflows/ci.yml <<'YAML'
+          name: CI
+
+          on:
+            push:
+              branches:
+                - main
+                - develop
+                - 'agent/**'
+            pull_request:
+              branches:
+                - main
+
+          permissions:
+            contents: read
+
+          env:
+            FLUTTER_VERSION: '3.44.8'
+
+          jobs:
+            quality:
+              name: Analyze and test
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: subosito/flutter-action@v2
+                  with:
+                    flutter-version: '3.44.8'
+                    channel: stable
+                    cache: true
+                - run: flutter pub get
+                - run: dart format --output=none --set-exit-if-changed lib test
+                - run: flutter analyze
+                - run: flutter test
+
+            android:
+              name: Build Android
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: subosito/flutter-action@v2
+                  with:
+                    flutter-version: '3.44.8'
+                    channel: stable
+                    cache: true
+                - run: flutter pub get
+                - run: flutter build apk --debug
+
+            web:
+              name: Build Web
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: subosito/flutter-action@v2
+                  with:
+                    flutter-version: '3.44.8'
+                    channel: stable
+                    cache: true
+                - run: flutter pub get
+                - run: flutter build web
+
+            linux:
+              name: Build Linux
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - name: Install Linux desktop dependencies
+                  run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+                - uses: subosito/flutter-action@v2
+                  with:
+                    flutter-version: '3.44.8'
+                    channel: stable
+                    cache: true
+                - run: flutter config --enable-linux-desktop
+                - run: flutter pub get
+                - run: flutter build linux --debug
+
+            windows:
+              name: Build Windows
+              runs-on: windows-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: subosito/flutter-action@v2
+                  with:
+                    flutter-version: '3.44.8'
+                    channel: stable
+                    cache: true
+                - run: flutter config --enable-windows-desktop
+                - run: flutter pub get
+                - run: flutter build windows --debug
+
+            macos:
+              name: Build macOS
+              runs-on: macos-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: subosito/flutter-action@v2
+                  with:
+                    flutter-version: '3.44.8'
+                    channel: stable
+                    cache: true
+                - run: flutter config --enable-macos-desktop
+                - run: flutter pub get
+                - run: flutter build macos --debug
+
+            ios:
+              name: Build iOS simulator
+              runs-on: macos-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: subosito/flutter-action@v2
+                  with:
+                    flutter-version: '3.44.8'
+                    channel: stable
+                    cache: true
+                - run: flutter pub get
+                - run: flutter build ios --simulator --debug
+          YAML
+
+          rm -f test/widget_test.dart
+          dart format lib test
+
+      - name: Validate Phase 0 before publishing scaffold
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter pub get
+          dart format --output=none --set-exit-if-changed lib test
+          flutter analyze
+          flutter test
+          flutter build web
+          flutter build apk --debug
+
+      - name: Commit generated scaffold
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/bootstrap-phase0.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Bootstrap Flutter six-platform architecture'
+          git push origin HEAD:agent/phase-0-scaffolding
