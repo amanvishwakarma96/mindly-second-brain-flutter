@@ -38,7 +38,7 @@ void main() {
       )
     ''');
     raw.execute('PRAGMA user_version = 1');
-    raw.dispose();
+    raw.close();
 
     final database = MindlyDatabase(NativeDatabase(file));
     addTearDown(database.close);

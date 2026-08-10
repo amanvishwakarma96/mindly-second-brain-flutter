@@ -11,7 +11,8 @@ class Captures extends Table {
   TextColumn get transcript => text().nullable()();
   TextColumn get summary => text().nullable()();
   TextColumn get audioPath => text().nullable()();
-  BoolColumn get isIncomplete => boolean().withDefault(const Constant(false))();
+  BoolColumn get isIncomplete =>
+      boolean().withDefault(const Constant(false))();
   BoolColumn get isPinned => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
@@ -42,9 +43,10 @@ class Topics extends Table {
 
 class Commitments extends Table {
   TextColumn get id => text()();
-  TextColumn get captureId =>
-      text().nullable().references(Captures, #id, onDelete: KeyAction.cascade)();
-  TextColumn get text => text()();
+  TextColumn get captureId => text()
+      .nullable()
+      .references(Captures, #id, onDelete: KeyAction.cascade)();
+  TextColumn get commitmentText => text().named('text')();
   DateTimeColumn get dueDate => dateTime().nullable()();
   TextColumn get owner => text().nullable()();
   TextColumn get status => text().withDefault(const Constant('open'))();

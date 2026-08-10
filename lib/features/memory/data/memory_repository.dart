@@ -101,7 +101,7 @@ class MemoryRepository {
             CommitmentsCompanion.insert(
               id: id,
               captureId: Value(captureId),
-              text: text,
+              commitmentText: text,
               dueDate: Value(dueDate),
               owner: Value(owner),
               status: Value(status),

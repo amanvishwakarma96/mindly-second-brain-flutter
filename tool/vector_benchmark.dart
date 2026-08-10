@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:mindly/features/memory/data/vector_search_service.dart';
@@ -34,7 +35,7 @@ void main() {
   if (!best.isFinite) {
     throw StateError('Vector benchmark produced an invalid result.');
   }
-  print(
+  stdout.writeln(
     'Mindly vector characterization: $count x $dimensions in '
     '${watch.elapsedMilliseconds} ms; best=$best',
   );
