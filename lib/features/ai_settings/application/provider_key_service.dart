@@ -8,11 +8,14 @@ class WebKeyConsentRequiredException implements Exception {
 }
 
 class ProviderKeyService {
-  ProviderKeyService({
+  factory ProviderKeyService({
     required ProviderKeyRepository repository,
     required bool isWeb,
-  }) : _repository = repository,
-       _isWeb = isWeb;
+  }) {
+    return ProviderKeyService._(repository, isWeb);
+  }
+
+  ProviderKeyService._(this._repository, this._isWeb);
 
   final ProviderKeyRepository _repository;
   final bool _isWeb;
