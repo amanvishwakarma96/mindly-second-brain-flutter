@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindly/app/app_routes.dart';
 import 'package:mindly/features/home/application/home_presenter.dart';
 import 'package:mindly/shared/design_tokens/mindly_colors.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
@@ -45,6 +46,11 @@ class MobileHomeScreen extends StatelessWidget {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: 0,
+        onDestinationSelected: (index) {
+          if (index == 3) {
+            Navigator.of(context).pushNamed(AppRoutes.providerSettings);
+          }
+        },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
           NavigationDestination(
