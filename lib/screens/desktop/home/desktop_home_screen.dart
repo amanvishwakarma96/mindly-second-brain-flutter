@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindly/app/app_routes.dart';
 import 'package:mindly/features/home/application/home_presenter.dart';
 import 'package:mindly/shared/design_tokens/mindly_colors.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
@@ -61,23 +62,31 @@ class _DesktopSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(MindlySpacing.md),
+    return Padding(
+      padding: const EdgeInsets.all(MindlySpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MindlyBrandBadge(),
-          SizedBox(height: MindlySpacing.xl),
-          ListTile(leading: Icon(Icons.home_rounded), title: Text('Home')),
-          ListTile(leading: Icon(Icons.mic_rounded), title: Text('Capture')),
-          ListTile(
+          const MindlyBrandBadge(),
+          const SizedBox(height: MindlySpacing.xl),
+          const ListTile(
+            leading: Icon(Icons.home_rounded),
+            title: Text('Home'),
+          ),
+          const ListTile(
+            leading: Icon(Icons.mic_rounded),
+            title: Text('Capture'),
+          ),
+          const ListTile(
             leading: Icon(Icons.auto_stories_rounded),
             title: Text('Memory'),
           ),
-          Spacer(),
+          const Spacer(),
           ListTile(
-            leading: Icon(Icons.settings_rounded),
-            title: Text('Settings'),
+            leading: const Icon(Icons.settings_rounded),
+            title: const Text('Settings'),
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.providerSettings),
           ),
         ],
       ),
