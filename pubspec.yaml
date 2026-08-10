@@ -20,9 +20,9 @@ dependencies:
 
 dependency_overrides:
   # whisper_ggml still declares the older 2.x FFmpeg package. The maintained
-  # 3.6.0 build adds current iOS simulator XCFrameworks and Linux support while
-  # preserving the FFmpegKit Dart API used by whisper_ggml.
-  ffmpeg_kit_flutter_new_min: 3.6.0
+  # 3.6.2 build adds current iOS simulator XCFrameworks, Linux support, and the
+  # Windows symlink-safe native archive extraction used by this six-target app.
+  ffmpeg_kit_flutter_new_min: 3.6.2
 
 dev_dependencies:
   flutter_test:
