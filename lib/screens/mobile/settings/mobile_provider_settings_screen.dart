@@ -27,8 +27,7 @@ class _MobileProviderSettingsScreenState
   @override
   void initState() {
     super.initState();
-    _controller =
-        widget.controller ?? ProviderSettingsController.production();
+    _controller = widget.controller ?? ProviderSettingsController.production();
     _loadCaps();
   }
 

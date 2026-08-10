@@ -28,8 +28,7 @@ class _WebProviderSettingsScreenState extends State<WebProviderSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        widget.controller ?? ProviderSettingsController.production();
+    _controller = widget.controller ?? ProviderSettingsController.production();
     _loadCaps();
   }
 
@@ -103,9 +102,7 @@ class _WebProviderSettingsScreenState extends State<WebProviderSettingsScreen> {
                 value: _riskAccepted,
                 onChanged: (value) =>
                     setState(() => _riskAccepted = value ?? false),
-                title: const Text(
-                  'I understand the browser key-storage risk.',
-                ),
+                title: const Text('I understand the browser key-storage risk.'),
               ),
               DropdownButtonFormField<String>(
                 initialValue: _providerId,

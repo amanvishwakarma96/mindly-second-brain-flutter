@@ -39,11 +39,7 @@ void main() {
       );
       expect(store.values, isEmpty);
 
-      await service.saveKey(
-        'anthropic',
-        'fake-web-key',
-        webRiskAccepted: true,
-      );
+      await service.saveKey('anthropic', 'fake-web-key', webRiskAccepted: true);
       expect(await service.readKey('anthropic'), 'fake-web-key');
     });
 

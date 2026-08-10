@@ -6,8 +6,7 @@ import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 class DesktopProviderSettingsScreen extends StatefulWidget {
   const DesktopProviderSettingsScreen({super.key, this.controller});
 
-  static const screenKey =
-      ValueKey<String>('screen-desktop-provider-settings');
+  static const screenKey = ValueKey<String>('screen-desktop-provider-settings');
 
   final ProviderSettingsController? controller;
 
@@ -28,8 +27,7 @@ class _DesktopProviderSettingsScreenState
   @override
   void initState() {
     super.initState();
-    _controller =
-        widget.controller ?? ProviderSettingsController.production();
+    _controller = widget.controller ?? ProviderSettingsController.production();
     _loadCaps();
   }
 

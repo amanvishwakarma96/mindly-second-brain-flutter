@@ -12,8 +12,7 @@ class CostEstimator {
       throw ArgumentError('Token counts cannot be negative.');
     }
 
-    final inputCost =
-        inputTokens * rateCard.inputUsdPerMillionTokens / 1000000;
+    final inputCost = inputTokens * rateCard.inputUsdPerMillionTokens / 1000000;
     final outputCost =
         outputTokens * rateCard.outputUsdPerMillionTokens / 1000000;
 

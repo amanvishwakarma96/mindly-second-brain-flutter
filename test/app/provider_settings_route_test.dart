@@ -30,23 +30,24 @@ void main() {
     ScreenFamily.desktop: DesktopProviderSettingsScreen.screenKey,
     ScreenFamily.web: WebProviderSettingsScreen.screenKey,
   }.entries) {
-    testWidgets('${entry.key.name} routes to its own provider settings screen', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        MindlyApp(
-          screenFamilyOverride: entry.key,
-          providerSettingsControllerOverride: _controller(
-            isWeb: entry.key == ScreenFamily.web,
+    testWidgets(
+      '${entry.key.name} routes to its own provider settings screen',
+      (tester) async {
+        await tester.pumpWidget(
+          MindlyApp(
+            screenFamilyOverride: entry.key,
+            providerSettingsControllerOverride: _controller(
+              isWeb: entry.key == ScreenFamily.web,
+            ),
           ),
-        ),
-      );
-      Navigator.of(
-        tester.element(find.byType(Scaffold).first),
-      ).pushNamed(AppRoutes.providerSettings);
-      await tester.pumpAndSettle();
+        );
+        Navigator.of(
+          tester.element(find.byType(Scaffold).first),
+        ).pushNamed(AppRoutes.providerSettings);
+        await tester.pumpAndSettle();
 
-      expect(find.byKey(entry.value), findsOneWidget);
-    });
+        expect(find.byKey(entry.value), findsOneWidget);
+      },
+    );
   }
 }

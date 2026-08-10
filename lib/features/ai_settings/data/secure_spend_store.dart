@@ -36,10 +36,11 @@ class SecureSpendStore implements SpendLedger, SpendCapsRepository {
   Future<void> record(SpendEntry entry) async {
     final entries = await _loadEntries();
     final pruneBefore = entry.at.toUtc().subtract(const Duration(days: 8));
-    final retained = entries
-        .where((candidate) => !candidate.at.isBefore(pruneBefore))
-        .toList()
-      ..add(entry);
+    final retained =
+        entries
+            .where((candidate) => !candidate.at.isBefore(pruneBefore))
+            .toList()
+          ..add(entry);
     await _store.write(
       key: _entriesKey,
       value: jsonEncode(retained.map((item) => item.toJson()).toList()),
@@ -71,9 +72,8 @@ class SecureSpendStore implements SpendLedger, SpendCapsRepository {
     final decoded = jsonDecode(raw) as List<Object?>;
     return decoded
         .map(
-          (item) => SpendEntry.fromJson(
-            Map<String, Object?>.from(item! as Map),
-          ),
+          (item) =>
+              SpendEntry.fromJson(Map<String, Object?>.from(item! as Map)),
         )
         .toList(growable: false);
   }

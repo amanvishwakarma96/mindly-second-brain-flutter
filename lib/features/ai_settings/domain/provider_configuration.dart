@@ -21,12 +21,10 @@ class ProviderConfiguration {
       displayName = 'Anthropic',
       baseUrl = null;
 
-  const ProviderConfiguration.compatible({
-    this.defaultModel,
-    this.baseUrl,
-  }) : id = 'compatible',
-       kind = AiProviderKind.compatible,
-       displayName = 'OpenAI-compatible';
+  const ProviderConfiguration.compatible({this.defaultModel, this.baseUrl})
+    : id = 'compatible',
+      kind = AiProviderKind.compatible,
+      displayName = 'OpenAI-compatible';
 
   final String id;
   final AiProviderKind kind;
