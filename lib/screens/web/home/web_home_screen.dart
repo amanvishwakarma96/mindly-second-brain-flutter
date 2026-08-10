@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindly/app/app_routes.dart';
 import 'package:mindly/features/home/application/home_presenter.dart';
 import 'package:mindly/shared/design_tokens/mindly_colors.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
@@ -31,22 +32,30 @@ class _WideWebHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const SizedBox(
+        SizedBox(
           width: 200,
           child: Padding(
-            padding: EdgeInsets.all(MindlySpacing.lg),
+            padding: const EdgeInsets.all(MindlySpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MindlyBrandBadge(),
-                SizedBox(height: MindlySpacing.xl),
-                Text('Home'),
-                SizedBox(height: MindlySpacing.md),
-                Text('Capture'),
-                SizedBox(height: MindlySpacing.md),
-                Text('Memory'),
-                SizedBox(height: MindlySpacing.md),
-                Text('Insights'),
+                const MindlyBrandBadge(),
+                const SizedBox(height: MindlySpacing.xl),
+                const Text('Home'),
+                const SizedBox(height: MindlySpacing.md),
+                const Text('Capture'),
+                const SizedBox(height: MindlySpacing.md),
+                const Text('Memory'),
+                const SizedBox(height: MindlySpacing.md),
+                const Text('Insights'),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.providerSettings),
+                  icon: const Icon(Icons.settings_rounded),
+                  label: const Text('Settings'),
+                ),
               ],
             ),
           ),
@@ -106,6 +115,13 @@ class _NarrowWebHome extends StatelessWidget {
             padding: EdgeInsets.all(MindlySpacing.lg),
             child: Text('The web layout has collapsed for this browser width.'),
           ),
+        ),
+        const SizedBox(height: MindlySpacing.md),
+        OutlinedButton.icon(
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+          icon: const Icon(Icons.settings_rounded),
+          label: const Text('AI provider settings'),
         ),
       ],
     );
