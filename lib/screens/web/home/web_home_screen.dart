@@ -43,7 +43,11 @@ class _WideWebHome extends StatelessWidget {
                 const SizedBox(height: MindlySpacing.xl),
                 const Text('Home'),
                 const SizedBox(height: MindlySpacing.md),
-                const Text('Capture'),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.textCapture),
+                  child: const Text('Capture'),
+                ),
                 const SizedBox(height: MindlySpacing.md),
                 const Text('Memory'),
                 const SizedBox(height: MindlySpacing.md),
@@ -74,12 +78,25 @@ class _WideWebHome extends StatelessWidget {
                 const SizedBox(height: MindlySpacing.sm),
                 Text(HomePresenter.prompt),
                 const SizedBox(height: MindlySpacing.xl),
-                const Card(
+                Card(
                   color: MindlyColors.peach,
                   child: Padding(
-                    padding: EdgeInsets.all(MindlySpacing.lg),
-                    child: Text(
-                      'A browser-friendly home, with your memories staying local.',
+                    padding: const EdgeInsets.all(MindlySpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'A browser-friendly home, with your memories staying local.',
+                        ),
+                        const SizedBox(height: MindlySpacing.md),
+                        FilledButton.icon(
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pushNamed(AppRoutes.textCapture),
+                          icon: const Icon(Icons.edit_note_rounded),
+                          label: const Text('Capture a thought'),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -117,6 +134,13 @@ class _NarrowWebHome extends StatelessWidget {
           ),
         ),
         const SizedBox(height: MindlySpacing.md),
+        FilledButton.icon(
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.textCapture),
+          icon: const Icon(Icons.edit_note_rounded),
+          label: const Text('Text capture'),
+        ),
+        const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(
           onPressed: () =>
               Navigator.of(context).pushNamed(AppRoutes.providerSettings),

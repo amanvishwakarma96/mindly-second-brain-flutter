@@ -34,8 +34,14 @@ class DesktopHomeScreen extends StatelessWidget {
                   Expanded(
                     child: Card(
                       color: MindlyColors.mint,
-                      child: const Center(
-                        child: Text('Your review space will grow here.'),
+                      child: Center(
+                        child: FilledButton.icon(
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pushNamed(AppRoutes.textCapture),
+                          icon: const Icon(Icons.edit_note_rounded),
+                          label: const Text('Capture a thought'),
+                        ),
                       ),
                     ),
                   ),
@@ -73,9 +79,10 @@ class _DesktopSidebar extends StatelessWidget {
             leading: Icon(Icons.home_rounded),
             title: Text('Home'),
           ),
-          const ListTile(
-            leading: Icon(Icons.mic_rounded),
-            title: Text('Capture'),
+          ListTile(
+            leading: const Icon(Icons.edit_note_rounded),
+            title: const Text('Capture'),
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
           ),
           const ListTile(
             leading: Icon(Icons.auto_stories_rounded),
