@@ -13,12 +13,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   FLUTTER_VERSION: '3.44.8'
 
 jobs:
   quality:
-    name: Analyze and test
+    name: Analyze, test and characterize
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -28,9 +32,13 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: dart run build_runner build
+      - name: Verify generated Drift code is current
+        run: git diff --exit-code
+      - run: dart format --output=none --set-exit-if-changed lib test tool
       - run: flutter analyze
       - run: flutter test
+      - run: dart run tool/vector_benchmark.dart
 
   android:
     name: Build Android
