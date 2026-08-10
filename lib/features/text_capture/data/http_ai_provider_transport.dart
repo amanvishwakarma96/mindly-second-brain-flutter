@@ -8,7 +8,8 @@ import 'package:mindly/features/text_capture/domain/memory_extraction.dart';
 import 'package:mindly/features/text_capture/domain/text_capture_models.dart';
 
 class HttpAiProviderTransport implements AiProviderTransport {
-  HttpAiProviderTransport(this._client, {bool? isWeb}) : _isWeb = isWeb ?? kIsWeb;
+  HttpAiProviderTransport(this._client, {bool? isWeb})
+    : _isWeb = isWeb ?? kIsWeb;
 
   final http.Client _client;
   final bool _isWeb;
@@ -179,7 +180,10 @@ Return only the requested structured object.
     );
   }
 
-  Map<String, Object?> _successfulBody(http.Response response, String providerId) {
+  Map<String, Object?> _successfulBody(
+    http.Response response,
+    String providerId,
+  ) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw AiProviderRequestException(
         providerId: providerId,
@@ -245,7 +249,11 @@ Return only the requested structured object.
     throw const AiProviderRequestException(providerId: 'compatible');
   }
 
-  int? _nestedInt(Map<String, Object?> body, String objectKey, String fieldKey) {
+  int? _nestedInt(
+    Map<String, Object?> body,
+    String objectKey,
+    String fieldKey,
+  ) {
     final object = body[objectKey];
     if (object is! Map) return null;
     final value = object[fieldKey];
@@ -260,7 +268,8 @@ Return only the requested structured object.
     return model;
   }
 
-  String _capturePrompt(String captureId, String text) => '''
+  String _capturePrompt(String captureId, String text) =>
+      '''
 Capture ID: $captureId
 
 Source note:

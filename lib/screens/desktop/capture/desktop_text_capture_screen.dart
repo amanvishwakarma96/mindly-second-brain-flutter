@@ -14,7 +14,8 @@ class DesktopTextCaptureScreen extends StatefulWidget {
   final TextCaptureController? controller;
 
   @override
-  State<DesktopTextCaptureScreen> createState() => _DesktopTextCaptureScreenState();
+  State<DesktopTextCaptureScreen> createState() =>
+      _DesktopTextCaptureScreenState();
 }
 
 class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
@@ -91,7 +92,9 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
       });
     } on Object {
       if (!mounted) return;
-      setState(() => _status = 'Check the note and provider details, then try again.');
+      setState(
+        () => _status = 'Check the note and provider details, then try again.',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -134,7 +137,8 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
         title: const Text('Text capture'),
         actions: [
           TextButton.icon(
-            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRoutes.providerSettings),
             icon: const Icon(Icons.settings_rounded),
             label: const Text('Provider settings'),
           ),
@@ -161,7 +165,10 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
                     decoration: const InputDecoration(labelText: 'AI provider'),
                     items: const [
                       DropdownMenuItem(value: 'openai', child: Text('OpenAI')),
-                      DropdownMenuItem(value: 'anthropic', child: Text('Anthropic')),
+                      DropdownMenuItem(
+                        value: 'anthropic',
+                        child: Text('Anthropic'),
+                      ),
                       DropdownMenuItem(
                         value: 'compatible',
                         child: Text('OpenAI-compatible'),
@@ -179,7 +186,9 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
                     TextField(
                       controller: _baseUrlController,
                       onChanged: (_) => _refreshEstimate(),
-                      decoration: const InputDecoration(labelText: 'API base URL'),
+                      decoration: const InputDecoration(
+                        labelText: 'API base URL',
+                      ),
                     ),
                     const SizedBox(height: MindlySpacing.sm),
                     TextField(
@@ -195,7 +204,7 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
                             controller: _inputRateController,
                             onChanged: (_) => _refreshEstimate(),
                             decoration: const InputDecoration(
-                              labelText: 'Input $/1M tokens',
+                              labelText: 'Input \$/1M tokens',
                             ),
                           ),
                         ),
@@ -205,7 +214,7 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
                             controller: _outputRateController,
                             onChanged: (_) => _refreshEstimate(),
                             decoration: const InputDecoration(
-                              labelText: 'Output $/1M tokens',
+                              labelText: 'Output \$/1M tokens',
                             ),
                           ),
                         ),
@@ -219,7 +228,8 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
                     maxLines: 20,
                     autofocus: true,
                     decoration: const InputDecoration(
-                      hintText: 'Write or paste a thought, note, or commitment…',
+                      hintText:
+                          'Write or paste a thought, note, or commitment…',
                     ),
                   ),
                   const SizedBox(height: MindlySpacing.sm),
@@ -259,7 +269,10 @@ class _DesktopTextCaptureScreenState extends State<DesktopTextCaptureScreen> {
 }
 
 class _DesktopExtractionPanel extends StatelessWidget {
-  const _DesktopExtractionPanel({required this.outcome, required this.onClassify});
+  const _DesktopExtractionPanel({
+    required this.outcome,
+    required this.onClassify,
+  });
 
   final TextCaptureOutcome? outcome;
   final Future<void> Function(ExtractionContext context) onClassify;
@@ -268,7 +281,9 @@ class _DesktopExtractionPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final extraction = outcome?.extraction;
     if (extraction == null) {
-      return const Center(child: Text('Your structured memory will appear here.'));
+      return const Center(
+        child: Text('Your structured memory will appear here.'),
+      );
     }
     return ListView(
       children: [
@@ -294,8 +309,10 @@ class _DesktopExtractionPanel extends StatelessWidget {
           ),
         ],
         const SizedBox(height: MindlySpacing.md),
-        if (extraction.people.isNotEmpty) Text('People: ${extraction.people.join(', ')}'),
-        if (extraction.topics.isNotEmpty) Text('Topics: ${extraction.topics.join(', ')}'),
+        if (extraction.people.isNotEmpty)
+          Text('People: ${extraction.people.join(', ')}'),
+        if (extraction.topics.isNotEmpty)
+          Text('Topics: ${extraction.topics.join(', ')}'),
         if (extraction.commitments.isNotEmpty) ...[
           const SizedBox(height: MindlySpacing.md),
           Text('Commitments', style: Theme.of(context).textTheme.titleMedium),

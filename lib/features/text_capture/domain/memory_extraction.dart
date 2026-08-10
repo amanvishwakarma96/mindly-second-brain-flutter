@@ -37,7 +37,9 @@ class MemoryExtraction {
   }) {
     final captureId = _requiredString(json, 'capture_id');
     if (captureId != expectedCaptureId) {
-      throw const FormatException('Extraction capture ID does not match source.');
+      throw const FormatException(
+        'Extraction capture ID does not match source.',
+      );
     }
 
     final contextValue = _requiredString(json, 'context');

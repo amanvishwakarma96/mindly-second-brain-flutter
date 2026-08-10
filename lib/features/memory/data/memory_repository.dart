@@ -53,14 +53,15 @@ class MemoryRepository {
     required String id,
     required String context,
   }) async {
-    final updated = await (_database.update(
-      _database.captures,
-    )..where((row) => row.id.equals(id))).write(
-      CapturesCompanion(
-        context: Value(context),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    final updated =
+        await (_database.update(
+          _database.captures,
+        )..where((row) => row.id.equals(id))).write(
+          CapturesCompanion(
+            context: Value(context),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
     if (updated != 1) {
       throw StateError('Capture was not found for context update.');
     }

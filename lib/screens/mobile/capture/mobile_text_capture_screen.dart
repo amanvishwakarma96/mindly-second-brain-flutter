@@ -14,7 +14,8 @@ class MobileTextCaptureScreen extends StatefulWidget {
   final TextCaptureController? controller;
 
   @override
-  State<MobileTextCaptureScreen> createState() => _MobileTextCaptureScreenState();
+  State<MobileTextCaptureScreen> createState() =>
+      _MobileTextCaptureScreenState();
 }
 
 class _MobileTextCaptureScreenState extends State<MobileTextCaptureScreen> {
@@ -97,7 +98,9 @@ class _MobileTextCaptureScreenState extends State<MobileTextCaptureScreen> {
       });
     } on Object {
       if (!mounted) return;
-      setState(() => _status = 'Check the note and provider details, then try again.');
+      setState(
+        () => _status = 'Check the note and provider details, then try again.',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -188,9 +191,11 @@ class _MobileTextCaptureScreenState extends State<MobileTextCaptureScreen> {
                   child: TextField(
                     controller: _inputRateController,
                     onChanged: (_) => _refreshEstimate(),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: const InputDecoration(
-                      labelText: 'Input $/1M tokens',
+                      labelText: 'Input \$/1M tokens',
                     ),
                   ),
                 ),
@@ -199,9 +204,11 @@ class _MobileTextCaptureScreenState extends State<MobileTextCaptureScreen> {
                   child: TextField(
                     controller: _outputRateController,
                     onChanged: (_) => _refreshEstimate(),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: const InputDecoration(
-                      labelText: 'Output $/1M tokens',
+                      labelText: 'Output \$/1M tokens',
                     ),
                   ),
                 ),
@@ -231,7 +238,8 @@ class _MobileTextCaptureScreenState extends State<MobileTextCaptureScreen> {
             label: Text(_busy ? 'Saving…' : 'Save & organize'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRoutes.providerSettings),
             child: const Text('AI provider settings'),
           ),
           if (_status.isNotEmpty) ...[
@@ -267,7 +275,10 @@ class _MobileTextCaptureScreenState extends State<MobileTextCaptureScreen> {
               Text('Topics: ${extraction.topics.join(', ')}'),
             if (extraction.commitments.isNotEmpty) ...[
               const SizedBox(height: MindlySpacing.sm),
-              Text('Commitments', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Commitments',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               for (final item in extraction.commitments) Text('• $item'),
             ],
           ],

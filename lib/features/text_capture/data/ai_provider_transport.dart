@@ -13,10 +13,7 @@ class AiProviderResponse {
 }
 
 class AiProviderRequestException implements Exception {
-  const AiProviderRequestException({
-    required this.providerId,
-    this.statusCode,
-  });
+  const AiProviderRequestException({required this.providerId, this.statusCode});
 
   final String providerId;
   final int? statusCode;

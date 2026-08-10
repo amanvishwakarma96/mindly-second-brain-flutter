@@ -10,9 +10,7 @@ class ExtractionProviderProfile {
   });
 
   static const openAiDefault = ExtractionProviderProfile(
-    configuration: ProviderConfiguration.openAi(
-      defaultModel: 'gpt-5.6-luna',
-    ),
+    configuration: ProviderConfiguration.openAi(defaultModel: 'gpt-5.6-luna'),
     rateCard: ModelRateCard(
       providerId: 'openai',
       model: 'gpt-5.6-luna',
@@ -48,13 +46,19 @@ class ExtractionProviderProfile {
         !uri.hasAuthority ||
         (uri.scheme != 'https' && uri.scheme != 'http') ||
         uri.userInfo.isNotEmpty) {
-      throw ArgumentError.value(baseUrl, 'baseUrl', 'Enter a valid HTTP(S) API base URL.');
+      throw ArgumentError.value(
+        baseUrl,
+        'baseUrl',
+        'Enter a valid HTTP(S) API base URL.',
+      );
     }
     if (model.trim().isEmpty) {
       throw ArgumentError.value(model, 'model', 'Model is required.');
     }
     if (inputUsdPerMillionTokens < 0 || outputUsdPerMillionTokens < 0) {
-      throw ArgumentError('Compatible-provider token prices cannot be negative.');
+      throw ArgumentError(
+        'Compatible-provider token prices cannot be negative.',
+      );
     }
     if (maxOutputTokens <= 0) {
       throw ArgumentError.value(

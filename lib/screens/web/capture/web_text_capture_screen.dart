@@ -92,7 +92,9 @@ class _WebTextCaptureScreenState extends State<WebTextCaptureScreen> {
       });
     } on Object {
       if (!mounted) return;
-      setState(() => _status = 'Check the note and provider details, then try again.');
+      setState(
+        () => _status = 'Check the note and provider details, then try again.',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -135,7 +137,8 @@ class _WebTextCaptureScreenState extends State<WebTextCaptureScreen> {
         title: const Text('Text capture'),
         actions: [
           TextButton.icon(
-            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRoutes.providerSettings),
             icon: const Icon(Icons.settings_rounded),
             label: const Text('Provider settings'),
           ),
@@ -150,7 +153,11 @@ class _WebTextCaptureScreenState extends State<WebTextCaptureScreen> {
           if (narrow) {
             return ListView(
               padding: const EdgeInsets.all(MindlySpacing.md),
-              children: [form, const SizedBox(height: MindlySpacing.lg), result],
+              children: [
+                form,
+                const SizedBox(height: MindlySpacing.lg),
+                result,
+              ],
             );
           }
           return Row(
@@ -236,7 +243,9 @@ class _WebTextCaptureScreenState extends State<WebTextCaptureScreen> {
                 child: TextField(
                   controller: _inputRateController,
                   onChanged: (_) => _refreshEstimate(),
-                  decoration: const InputDecoration(labelText: 'Input $/1M tokens'),
+                  decoration: const InputDecoration(
+                    labelText: 'Input \$/1M tokens',
+                  ),
                 ),
               ),
               const SizedBox(width: MindlySpacing.sm),
@@ -244,7 +253,9 @@ class _WebTextCaptureScreenState extends State<WebTextCaptureScreen> {
                 child: TextField(
                   controller: _outputRateController,
                   onChanged: (_) => _refreshEstimate(),
-                  decoration: const InputDecoration(labelText: 'Output $/1M tokens'),
+                  decoration: const InputDecoration(
+                    labelText: 'Output \$/1M tokens',
+                  ),
                 ),
               ),
             ],
@@ -285,7 +296,9 @@ class _WebTextCaptureScreenState extends State<WebTextCaptureScreen> {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(MindlySpacing.lg),
-          child: Text('Summary, people, topics, and commitments will appear here.'),
+          child: Text(
+            'Summary, people, topics, and commitments will appear here.',
+          ),
         ),
       );
     }
@@ -324,7 +337,10 @@ class _WebTextCaptureScreenState extends State<WebTextCaptureScreen> {
               Text('Topics: ${extraction.topics.join(', ')}'),
             if (extraction.commitments.isNotEmpty) ...[
               const SizedBox(height: MindlySpacing.md),
-              Text('Commitments', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Commitments',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               for (final item in extraction.commitments) Text('• $item'),
             ],
           ],

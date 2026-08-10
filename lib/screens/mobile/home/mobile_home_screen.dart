@@ -29,7 +29,8 @@ class MobileHomeScreen extends StatelessWidget {
             color: MindlyColors.mint,
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.textCapture),
               child: const Padding(
                 padding: EdgeInsets.all(MindlySpacing.lg),
                 child: Column(

@@ -53,32 +53,36 @@ void main() {
 
   tearDown(() => database.close());
 
-  test('empty text is rejected before persistence or provider dispatch', () async {
-    await expectLater(
-      service.captureAndExtract(
-        text: '   ',
-        profile: ExtractionProviderProfile.openAiDefault,
-      ),
-      throwsArgumentError,
-    );
-    expect(await database.select(database.captures).get(), isEmpty);
-    expect(transport.calls, 0);
-  });
+  test(
+    'empty text is rejected before persistence or provider dispatch',
+    () async {
+      await expectLater(
+        service.captureAndExtract(
+          text: '   ',
+          profile: ExtractionProviderProfile.openAiDefault,
+        ),
+        throwsArgumentError,
+      );
+      expect(await database.select(database.captures).get(), isEmpty);
+      expect(transport.calls, 0);
+    },
+  );
 
   test('capture is saved locally before provider dispatch', () async {
     await keyService.saveKey('openai', 'test-key');
-    transport.onExtract = ({
-      required profile,
-      required apiKey,
-      required captureId,
-      required text,
-    }) async {
-      final captures = await database.select(database.captures).get();
-      expect(captures, hasLength(1));
-      expect(captures.single.id, 'capture-1');
-      expect(captures.single.rawText, 'Discuss launch with Priya.');
-      return _validResponse(captureId);
-    };
+    transport.onExtract =
+        ({
+          required profile,
+          required apiKey,
+          required captureId,
+          required text,
+        }) async {
+          final captures = await database.select(database.captures).get();
+          expect(captures, hasLength(1));
+          expect(captures.single.id, 'capture-1');
+          expect(captures.single.rawText, 'Discuss launch with Priya.');
+          return _validResponse(captureId);
+        };
 
     final outcome = await service.captureAndExtract(
       text: ' Discuss launch with Priya. ',
@@ -89,46 +93,53 @@ void main() {
     expect(transport.calls, 1);
   });
 
-  test('missing provider key leaves capture saved and skips transport', () async {
-    final outcome = await service.captureAndExtract(
-      text: 'Remember this even without an API key.',
-      profile: ExtractionProviderProfile.openAiDefault,
-    );
+  test(
+    'missing provider key leaves capture saved and skips transport',
+    () async {
+      final outcome = await service.captureAndExtract(
+        text: 'Remember this even without an API key.',
+        profile: ExtractionProviderProfile.openAiDefault,
+      );
 
-    expect(outcome.kind, TextCaptureOutcomeKind.savedMissingKey);
-    expect(transport.calls, 0);
-    final captures = await database.select(database.captures).get();
-    expect(captures.single.rawText, 'Remember this even without an API key.');
-  });
+      expect(outcome.kind, TextCaptureOutcomeKind.savedMissingKey);
+      expect(transport.calls, 0);
+      final captures = await database.select(database.captures).get();
+      expect(captures.single.rawText, 'Remember this even without an API key.');
+    },
+  );
 
-  test('spend-cap preflight blocks transport but keeps the local capture', () async {
-    await keyService.saveKey('openai', 'test-key');
-    await spendStore.save(const SpendCaps(dailyUsd: 0.000001));
+  test(
+    'spend-cap preflight blocks transport but keeps the local capture',
+    () async {
+      await keyService.saveKey('openai', 'test-key');
+      await spendStore.save(const SpendCaps(dailyUsd: 0.000001));
 
-    final outcome = await service.captureAndExtract(
-      text: 'A note that should be saved before cost controls are evaluated.',
-      profile: ExtractionProviderProfile.openAiDefault,
-    );
+      final outcome = await service.captureAndExtract(
+        text: 'A note that should be saved before cost controls are evaluated.',
+        profile: ExtractionProviderProfile.openAiDefault,
+      );
 
-    expect(outcome.kind, TextCaptureOutcomeKind.savedSpendBlocked);
-    expect(outcome.spendBlockReason, SpendBlockReason.dailyCap);
-    expect(transport.calls, 0);
-    expect(await database.select(database.captures).get(), hasLength(1));
-  });
+      expect(outcome.kind, TextCaptureOutcomeKind.savedSpendBlocked);
+      expect(outcome.spendBlockReason, SpendBlockReason.dailyCap);
+      expect(transport.calls, 0);
+      expect(await database.select(database.captures).get(), hasLength(1));
+    },
+  );
 
   test('provider failure preserves local source text for retry', () async {
     await keyService.saveKey('openai', 'test-key');
-    transport.onExtract = ({
-      required profile,
-      required apiKey,
-      required captureId,
-      required text,
-    }) async {
-      throw const AiProviderRequestException(
-        providerId: 'openai',
-        statusCode: 503,
-      );
-    };
+    transport.onExtract =
+        ({
+          required profile,
+          required apiKey,
+          required captureId,
+          required text,
+        }) async {
+          throw const AiProviderRequestException(
+            providerId: 'openai',
+            statusCode: 503,
+          );
+        };
 
     final outcome = await service.captureAndExtract(
       text: 'Provider outages must never eat this note.',
@@ -142,86 +153,95 @@ void main() {
     expect(capture.summary, isNull);
   });
 
-  test('invalid extraction is controlled and raw provider body is not persisted', () async {
-    await keyService.saveKey('openai', 'test-key');
-    transport.onExtract = ({
-      required profile,
-      required apiKey,
-      required captureId,
-      required text,
-    }) async {
-      return const AiProviderResponse(
-        outputText: '{"capture_id":"wrong","summary":"bad"}',
-        inputTokens: 10,
-        outputTokens: 5,
+  test(
+    'invalid extraction is controlled and raw provider body is not persisted',
+    () async {
+      await keyService.saveKey('openai', 'test-key');
+      transport.onExtract =
+          ({
+            required profile,
+            required apiKey,
+            required captureId,
+            required text,
+          }) async {
+            return const AiProviderResponse(
+              outputText: '{"capture_id":"wrong","summary":"bad"}',
+              inputTokens: 10,
+              outputTokens: 5,
+            );
+          };
+
+      final outcome = await service.captureAndExtract(
+        text: 'Keep the source; reject malformed AI memory.',
+        profile: ExtractionProviderProfile.openAiDefault,
       );
-    };
 
-    final outcome = await service.captureAndExtract(
-      text: 'Keep the source; reject malformed AI memory.',
-      profile: ExtractionProviderProfile.openAiDefault,
-    );
+      expect(outcome.kind, TextCaptureOutcomeKind.savedInvalidExtraction);
+      final capture = (await database.select(database.captures).get()).single;
+      expect(capture.rawText, 'Keep the source; reject malformed AI memory.');
+      expect(capture.summary, isNull);
+      expect(await memoryRepository.keywordSearch('wrong'), isEmpty);
+    },
+  );
 
-    expect(outcome.kind, TextCaptureOutcomeKind.savedInvalidExtraction);
-    final capture = (await database.select(database.captures).get()).single;
-    expect(capture.rawText, 'Keep the source; reject malformed AI memory.');
-    expect(capture.summary, isNull);
-    expect(await memoryRepository.keywordSearch('wrong'), isEmpty);
-  });
+  test(
+    'successful extraction persists structured memory and source links',
+    () async {
+      await keyService.saveKey('openai', 'test-key');
+      transport.onExtract =
+          ({
+            required profile,
+            required apiKey,
+            required captureId,
+            required text,
+          }) async => _validResponse(captureId);
 
-  test('successful extraction persists structured memory and source links', () async {
-    await keyService.saveKey('openai', 'test-key');
-    transport.onExtract = ({
-      required profile,
-      required apiKey,
-      required captureId,
-      required text,
-    }) async => _validResponse(captureId);
+      final outcome = await service.captureAndExtract(
+        text: 'Discuss launch timing with Priya and send the rollout plan.',
+        profile: ExtractionProviderProfile.openAiDefault,
+      );
 
-    final outcome = await service.captureAndExtract(
-      text: 'Discuss launch timing with Priya and send the rollout plan.',
-      profile: ExtractionProviderProfile.openAiDefault,
-    );
+      expect(outcome.kind, TextCaptureOutcomeKind.extracted);
+      expect(outcome.extraction?.context, ExtractionContext.work);
 
-    expect(outcome.kind, TextCaptureOutcomeKind.extracted);
-    expect(outcome.extraction?.context, ExtractionContext.work);
-
-    final capture = (await database.select(database.captures).get()).single;
-    expect(capture.summary, 'Discussed launch timing with Priya.');
-    expect(capture.context, 'work');
-    expect(await database.select(database.people).get(), hasLength(1));
-    expect(await database.select(database.topics).get(), hasLength(1));
-    expect(await database.select(database.commitments).get(), hasLength(1));
-    expect(
-      await database.select(database.memoryRelationships).get(),
-      hasLength(3),
-    );
-    expect(await memoryRepository.keywordSearch('rollout'), isNotEmpty);
-    expect(await spendStore.entriesSince(fixedNow), hasLength(1));
-  });
+      final capture = (await database.select(database.captures).get()).single;
+      expect(capture.summary, 'Discussed launch timing with Priya.');
+      expect(capture.context, 'work');
+      expect(await database.select(database.people).get(), hasLength(1));
+      expect(await database.select(database.topics).get(), hasLength(1));
+      expect(await database.select(database.commitments).get(), hasLength(1));
+      expect(
+        await database.select(database.memoryRelationships).get(),
+        hasLength(3),
+      );
+      expect(await memoryRepository.keywordSearch('rollout'), isNotEmpty);
+      expect(await spendStore.entriesSince(fixedNow), hasLength(1));
+    },
+  );
 
   test('ambiguous extraction can be explicitly classified later', () async {
     await keyService.saveKey('openai', 'test-key');
-    transport.onExtract = ({
-      required profile,
-      required apiKey,
-      required captureId,
-      required text,
-    }) async {
-      return AiProviderResponse(
-        outputText: jsonEncode({
-          'capture_id': captureId,
-          'summary': 'Call Alex tomorrow.',
-          'context': 'ambiguous',
-          'people': ['Alex'],
-          'topics': ['Follow-up'],
-          'commitments': ['Call Alex tomorrow'],
-          'tone': null,
-        }),
-        inputTokens: 20,
-        outputTokens: 10,
-      );
-    };
+    transport.onExtract =
+        ({
+          required profile,
+          required apiKey,
+          required captureId,
+          required text,
+        }) async {
+          return AiProviderResponse(
+            outputText: jsonEncode({
+              'capture_id': captureId,
+              'summary': 'Call Alex tomorrow.',
+              'context': 'ambiguous',
+              'people': ['Alex'],
+              'topics': ['Follow-up'],
+              'commitments': ['Call Alex tomorrow'],
+              'tone': null,
+            }),
+            inputTokens: 20,
+            outputTokens: 10,
+          );
+        };
 
     final outcome = await service.captureAndExtract(
       text: 'Call Alex tomorrow.',
