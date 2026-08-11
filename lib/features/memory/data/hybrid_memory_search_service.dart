@@ -6,13 +6,23 @@ import 'package:mindly/features/memory/data/vector_search_service.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 
 class HybridMemorySearchService {
-  HybridMemorySearchService({
+  factory HybridMemorySearchService({
     required MemoryRepository lexicalRepository,
     required MemoryBrowserRepository browserRepository,
     required VectorSearchService vectorSearch,
-  }) : _lexicalRepository = lexicalRepository,
-       _browserRepository = browserRepository,
-       _vectorSearch = vectorSearch;
+  }) {
+    return HybridMemorySearchService._(
+      lexicalRepository,
+      browserRepository,
+      vectorSearch,
+    );
+  }
+
+  HybridMemorySearchService._(
+    this._lexicalRepository,
+    this._browserRepository,
+    this._vectorSearch,
+  );
 
   static const _rrfK = 60.0;
 
