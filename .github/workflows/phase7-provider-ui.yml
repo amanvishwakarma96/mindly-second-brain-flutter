@@ -1,0 +1,69 @@
+name: Phase 7 Provider UI
+
+on:
+  push:
+    branches:
+      - agent/phase-7-tier-3-ai-insights
+
+permissions:
+  contents: write
+
+concurrency:
+  group: phase7-provider-ui-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  wire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+      - name: Wire provider picker into all platform insight screens
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          files = [
+              Path('lib/screens/mobile/insights/mobile_insights_screen.dart'),
+              Path('lib/screens/desktop/insights/desktop_insights_screen.dart'),
+              Path('lib/screens/web/insights/web_insights_screen.dart'),
+          ]
+          import_line = "import 'package:mindly/features/insights/presentation/tier3_provider_picker.dart';\n"
+          marker = "import 'package:mindly/features/insights/domain/insight_models.dart';\n"
+          pattern = re.compile(
+              r"    final profile = await (?:showModalBottomSheet|showDialog)<Tier3ProviderProfile>\([\s\S]*?    if \(profile == null \|\| !mounted\) return;\n",
+          )
+          replacement = (
+              "    final profile = await showTier3ProviderPicker(context);\n"
+              "    if (profile == null || !mounted) return;\n"
+          )
+
+          for path in files:
+              text = path.read_text()
+              if import_line not in text:
+                  text = text.replace(marker, marker + import_line, 1)
+              text, count = pattern.subn(replacement, text, count=1)
+              if count != 1:
+                  raise SystemExit(f'Provider picker block not found exactly once in {path}')
+              path.write_text(text)
+      - name: Format updated Dart sources
+        run: dart format lib/features/insights/presentation/tier3_provider_picker.dart lib/screens/mobile/insights/mobile_insights_screen.dart lib/screens/desktop/insights/desktop_insights_screen.dart lib/screens/web/insights/web_insights_screen.dart
+      - name: Commit provider UI wiring
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/features/insights/presentation/tier3_provider_picker.dart lib/screens/mobile/insights/mobile_insights_screen.dart lib/screens/desktop/insights/desktop_insights_screen.dart lib/screens/web/insights/web_insights_screen.dart
+          if git diff --cached --quiet; then
+            echo "No provider UI changes needed."
+            exit 0
+          fi
+          git commit -m "Expose compatible providers for Tier 3 insights"
+          git push
