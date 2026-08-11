@@ -4,6 +4,7 @@ import 'package:mindly/app/platform/platform_screen_router.dart';
 import 'package:mindly/app/platform/screen_family.dart';
 import 'package:mindly/features/ai_settings/application/provider_settings_controller.dart';
 import 'package:mindly/features/audio_capture/application/audio_capture_controller.dart';
+import 'package:mindly/features/memory/application/memory_browser_controller.dart';
 import 'package:mindly/features/text_capture/application/text_capture_controller.dart';
 import 'package:mindly/shared/design_tokens/mindly_theme.dart';
 
@@ -14,12 +15,14 @@ class MindlyApp extends StatelessWidget {
     this.providerSettingsControllerOverride,
     this.textCaptureControllerOverride,
     this.audioCaptureControllerOverride,
+    this.memoryBrowserControllerOverride,
   });
 
   final ScreenFamily? screenFamilyOverride;
   final ProviderSettingsController? providerSettingsControllerOverride;
   final TextCaptureController? textCaptureControllerOverride;
   final AudioCaptureController? audioCaptureControllerOverride;
+  final MemoryBrowserController? memoryBrowserControllerOverride;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +49,15 @@ class MindlyApp extends StatelessWidget {
             builder: (_) => buildPlatformAudioCapture(
               family,
               controller: audioCaptureControllerOverride,
+            ),
+          );
+        }
+        if (settings.name == AppRoutes.memory) {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => buildPlatformMemory(
+              family,
+              controller: memoryBrowserControllerOverride,
             ),
           );
         }

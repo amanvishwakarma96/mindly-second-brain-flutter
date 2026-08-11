@@ -52,7 +52,11 @@ class _WideWebHome extends StatelessWidget {
                   child: const Text('Audio capture'),
                 ),
                 const SizedBox(height: MindlySpacing.md),
-                const Text('Memory'),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.memory),
+                  child: const Text('Memory'),
+                ),
                 const SizedBox(height: MindlySpacing.md),
                 const Text('Insights'),
                 const Spacer(),
@@ -109,6 +113,13 @@ class _WideWebHome extends StatelessWidget {
                               icon: const Icon(Icons.mic_rounded),
                               label: const Text('Record'),
                             ),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.memory),
+                              icon: const Icon(Icons.auto_stories_rounded),
+                              label: const Text('Browse memory'),
+                            ),
                           ],
                         ),
                       ],
@@ -161,6 +172,12 @@ class _NarrowWebHome extends StatelessWidget {
               Navigator.of(context).pushNamed(AppRoutes.audioCapture),
           icon: const Icon(Icons.mic_rounded),
           label: const Text('Audio capture'),
+        ),
+        const SizedBox(height: MindlySpacing.sm),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.memory),
+          icon: const Icon(Icons.auto_stories_rounded),
+          label: const Text('Browse memory'),
         ),
         const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(

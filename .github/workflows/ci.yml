@@ -130,4 +130,22 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build ios --simulator --debug
+      - name: Build iOS simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for attempt in 1 2 3; do
+            echo "iOS build attempt ${attempt}/3"
+
+            if flutter build ios --simulator --debug; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 3 ]; then
+              echo "iOS build failed after ${attempt} attempts." >&2
+              exit 1
+            fi
+
+            sleep $((attempt * 10))
+          done

@@ -52,6 +52,13 @@ class DesktopHomeScreen extends StatelessWidget {
                               icon: const Icon(Icons.mic_rounded),
                               label: const Text('Record a thought'),
                             ),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.memory),
+                              icon: const Icon(Icons.auto_stories_rounded),
+                              label: const Text('Browse memory'),
+                            ),
                           ],
                         ),
                       ),
@@ -102,9 +109,10 @@ class _DesktopSidebar extends StatelessWidget {
             onTap: () =>
                 Navigator.of(context).pushNamed(AppRoutes.audioCapture),
           ),
-          const ListTile(
-            leading: Icon(Icons.auto_stories_rounded),
-            title: Text('Memory'),
+          ListTile(
+            leading: const Icon(Icons.auto_stories_rounded),
+            title: const Text('Memory'),
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.memory),
           ),
           const Spacer(),
           ListTile(
