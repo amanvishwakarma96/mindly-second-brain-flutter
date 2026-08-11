@@ -66,6 +66,15 @@ class MobileHomeScreen extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: MindlySpacing.md),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.auto_awesome_rounded),
+              title: const Text('Local insights'),
+              subtitle: const Text('See what your saved memories suggest.'),
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.insights),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -76,6 +85,8 @@ class MobileHomeScreen extends StatelessWidget {
           } else if (index == 2) {
             Navigator.of(context).pushNamed(AppRoutes.memory);
           } else if (index == 3) {
+            Navigator.of(context).pushNamed(AppRoutes.insights);
+          } else if (index == 4) {
             Navigator.of(context).pushNamed(AppRoutes.providerSettings);
           }
         },
@@ -88,6 +99,10 @@ class MobileHomeScreen extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.auto_stories_rounded),
             label: 'Memory',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_awesome_rounded),
+            label: 'Insights',
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_rounded),

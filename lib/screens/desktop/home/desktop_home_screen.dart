@@ -37,6 +37,7 @@ class DesktopHomeScreen extends StatelessWidget {
                       child: Center(
                         child: Wrap(
                           spacing: MindlySpacing.md,
+                          runSpacing: MindlySpacing.md,
                           children: [
                             FilledButton.icon(
                               onPressed: () => Navigator.of(
@@ -58,6 +59,13 @@ class DesktopHomeScreen extends StatelessWidget {
                               ).pushNamed(AppRoutes.memory),
                               icon: const Icon(Icons.auto_stories_rounded),
                               label: const Text('Browse memory'),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.insights),
+                              icon: const Icon(Icons.auto_awesome_rounded),
+                              label: const Text('Review insights'),
                             ),
                           ],
                         ),
@@ -113,6 +121,11 @@ class _DesktopSidebar extends StatelessWidget {
             leading: const Icon(Icons.auto_stories_rounded),
             title: const Text('Memory'),
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.memory),
+          ),
+          ListTile(
+            leading: const Icon(Icons.auto_awesome_rounded),
+            title: const Text('Insights'),
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.insights),
           ),
           const Spacer(),
           ListTile(

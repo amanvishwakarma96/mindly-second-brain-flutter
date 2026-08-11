@@ -57,8 +57,11 @@ class _WideWebHome extends StatelessWidget {
                       Navigator.of(context).pushNamed(AppRoutes.memory),
                   child: const Text('Memory'),
                 ),
-                const SizedBox(height: MindlySpacing.md),
-                const Text('Insights'),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.insights),
+                  child: const Text('Insights'),
+                ),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () => Navigator.of(
@@ -98,6 +101,7 @@ class _WideWebHome extends StatelessWidget {
                         const SizedBox(height: MindlySpacing.md),
                         Wrap(
                           spacing: MindlySpacing.md,
+                          runSpacing: MindlySpacing.md,
                           children: [
                             FilledButton.icon(
                               onPressed: () => Navigator.of(
@@ -119,6 +123,13 @@ class _WideWebHome extends StatelessWidget {
                               ).pushNamed(AppRoutes.memory),
                               icon: const Icon(Icons.auto_stories_rounded),
                               label: const Text('Browse memory'),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.insights),
+                              icon: const Icon(Icons.auto_awesome_rounded),
+                              label: const Text('Review insights'),
                             ),
                           ],
                         ),
@@ -178,6 +189,12 @@ class _NarrowWebHome extends StatelessWidget {
           onPressed: () => Navigator.of(context).pushNamed(AppRoutes.memory),
           icon: const Icon(Icons.auto_stories_rounded),
           label: const Text('Browse memory'),
+        ),
+        const SizedBox(height: MindlySpacing.sm),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.insights),
+          icon: const Icon(Icons.auto_awesome_rounded),
+          label: const Text('Review insights'),
         ),
         const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(
