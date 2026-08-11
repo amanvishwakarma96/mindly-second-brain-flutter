@@ -154,8 +154,7 @@ class Tier3InsightService {
       for (final existing in await _insightStore.load())
         existing.fingerprint: existing,
       for (final insight in insights) insight.fingerprint: insight,
-    }.values.toList(growable: false)
-      ..sort(_compareInsights);
+    }.values.toList(growable: false)..sort(_compareInsights);
     await _insightStore.save(merged);
 
     return Tier3GenerationOutcome(
