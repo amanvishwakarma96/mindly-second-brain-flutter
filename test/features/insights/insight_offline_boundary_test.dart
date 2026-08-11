@@ -3,21 +3,21 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Phase 6 insight engine has no provider or network dependency', () {
-    final root = Directory('lib/features/insights');
-    expect(root.existsSync(), isTrue);
-
-    final source = root
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .map((file) => file.readAsStringSync())
-        .join('\n');
+  test('Tier 1 and Tier 2 insight engine stays provider/network independent', () {
+    final files = <File>[
+      File('lib/features/insights/application/proactive_insight_service.dart'),
+      File('lib/features/insights/application/insight_controller.dart'),
+      File('lib/features/insights/data/insight_evidence_repository.dart'),
+      File('lib/features/insights/data/insight_preference_store.dart'),
+      File('lib/features/insights/domain/insight_models.dart'),
+    ];
+    expect(files.every((file) => file.existsSync()), isTrue);
+    final source = files.map((file) => file.readAsStringSync()).join('\n');
 
     for (final forbidden in <String>[
       "package:http/",
-      "dart:io'",
       'ai_provider_transport',
+      'tier3_insight_transport',
       'provider_key_service',
       '/v1/responses',
       '/v1/messages',

@@ -3,6 +3,7 @@ import 'package:mindly/app/platform/screen_family.dart';
 import 'package:mindly/features/ai_settings/application/provider_settings_controller.dart';
 import 'package:mindly/features/audio_capture/application/audio_capture_controller.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
+import 'package:mindly/features/insights/application/tier3_insight_controller.dart';
 import 'package:mindly/features/memory/application/memory_browser_controller.dart';
 import 'package:mindly/features/text_capture/application/text_capture_controller.dart';
 import 'package:mindly/screens/desktop/capture/desktop_audio_capture_screen.dart';
@@ -60,10 +61,20 @@ Widget buildPlatformMemory(
 Widget buildPlatformInsights(
   ScreenFamily family, {
   InsightController? controller,
+  Tier3InsightController? tier3Controller,
 }) => switch (family) {
-  ScreenFamily.mobile => MobileInsightsScreen(controller: controller),
-  ScreenFamily.desktop => DesktopInsightsScreen(controller: controller),
-  ScreenFamily.web => WebInsightsScreen(controller: controller),
+  ScreenFamily.mobile => MobileInsightsScreen(
+    controller: controller,
+    tier3Controller: tier3Controller,
+  ),
+  ScreenFamily.desktop => DesktopInsightsScreen(
+    controller: controller,
+    tier3Controller: tier3Controller,
+  ),
+  ScreenFamily.web => WebInsightsScreen(
+    controller: controller,
+    tier3Controller: tier3Controller,
+  ),
 };
 
 Widget buildPlatformProviderSettings(

@@ -1,6 +1,6 @@
 import 'package:mindly/features/memory/domain/memory_models.dart';
 
-enum InsightTier { tier1, tier2 }
+enum InsightTier { tier1, tier2, tier3 }
 
 enum InsightSeverity {
   info(1),
@@ -17,7 +17,8 @@ enum InsightKind {
   followUp,
   overdueCommitment,
   dueSoonCommitment,
-  staleCommitment;
+  staleCommitment,
+  aiSynthesis;
 
   String get displayName => switch (this) {
     InsightKind.relatedMemory => 'Related memories',
@@ -25,6 +26,7 @@ enum InsightKind {
     InsightKind.overdueCommitment => 'Overdue commitments',
     InsightKind.dueSoonCommitment => 'Due soon',
     InsightKind.staleCommitment => 'Stale commitments',
+    InsightKind.aiSynthesis => 'AI synthesis',
   };
 }
 
@@ -52,6 +54,7 @@ class ProactiveInsight {
     required this.body,
     required this.evidenceAt,
     required this.sources,
+    this.explanation,
   });
 
   final String fingerprint;
@@ -60,6 +63,7 @@ class ProactiveInsight {
   final InsightSeverity severity;
   final String title;
   final String body;
+  final String? explanation;
   final DateTime evidenceAt;
   final List<InsightSourceReference> sources;
 }

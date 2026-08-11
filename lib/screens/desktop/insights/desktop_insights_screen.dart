@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
+import 'package:mindly/features/insights/application/tier3_insight_controller.dart';
+import 'package:mindly/features/insights/application/tier3_ui_presenter.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
+import 'package:mindly/features/insights/domain/tier3_models.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
+import 'package:mindly/features/text_capture/domain/text_capture_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
 
 class DesktopInsightsScreen extends StatefulWidget {
-  const DesktopInsightsScreen({super.key, this.controller});
+  const DesktopInsightsScreen({
+    super.key,
+    this.controller,
+    this.tier3Controller,
+  });
 
   static const screenKey = ValueKey<String>('screen-desktop-insights');
 
   final InsightController? controller;
+  final Tier3InsightController? tier3Controller;
 
   @override
   State<DesktopInsightsScreen> createState() => _DesktopInsightsScreenState();
@@ -18,15 +27,26 @@ class DesktopInsightsScreen extends StatefulWidget {
 
 class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
   late final InsightController _controller;
+  late final Tier3InsightController _tier3Controller;
   late Future<List<ProactiveInsight>> _insightsFuture;
   ProactiveInsight? _selected;
+  ProactiveInsight? _tier3Insight;
+  Tier3GenerationPreview? _tier3Preview;
+  String _tier3ProviderId = 'openai';
+  String _tier3Status = '';
+  bool _tier3Busy = false;
 
   @override
   void initState() {
     super.initState();
     _controller = widget.controller ?? InsightController.production();
+    _tier3Controller =
+        widget.tier3Controller ?? Tier3InsightController.production();
     _insightsFuture = _controller.load();
   }
+
+  ExtractionProviderProfile get _tier3Profile =>
+      Tier3UiPresenter.profileFor(_tier3ProviderId);
 
   void _replaceFuture(Future<List<ProactiveInsight>> future) {
     setState(() {
@@ -35,11 +55,85 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
     });
   }
 
-  Future<void> _openSource(InsightSourceReference source) async {
-    final detail = await _controller.sourceDetail(source);
-    if (!mounted) {
+  Future<void> _previewTier3() async {
+    setState(() {
+      _tier3Busy = true;
+      _tier3Status = '';
+      _tier3Preview = null;
+    });
+    try {
+      final preview = await _tier3Controller.preview(_tier3Profile);
+      if (!mounted) return;
+      setState(() {
+        _tier3Preview = preview;
+        _tier3Status = Tier3UiPresenter.previewMessage(preview);
+      });
+    } on Object {
+      if (!mounted) return;
+      setState(() => _tier3Status = 'Could not prepare AI synthesis safely.');
+    } finally {
+      if (mounted) setState(() => _tier3Busy = false);
+    }
+  }
+
+  Future<void> _generateTier3() async {
+    final preview = _tier3Preview;
+    if (preview == null || !preview.isReady) return;
+    setState(() {
+      _tier3Busy = true;
+      _tier3Status = '';
+    });
+    try {
+      final outcome = await _tier3Controller.generate(_tier3Profile);
+      if (!mounted) return;
+      setState(() {
+        _tier3Insight = outcome.insight;
+        _selected = outcome.insight;
+        _tier3Preview = outcome.preview;
+        _tier3Status = Tier3UiPresenter.outcomeMessage(outcome);
+      });
+    } on Object {
+      if (!mounted) return;
+      setState(
+        () => _tier3Status =
+            'AI synthesis failed safely. Local insights are unchanged.',
+      );
+    } finally {
+      if (mounted) setState(() => _tier3Busy = false);
+    }
+  }
+
+  Future<void> _dismissSelected() async {
+    final selected = _selected;
+    if (selected == null) return;
+    if (_tier3Insight?.fingerprint == selected.fingerprint) {
+      await _controller.dismiss(selected.fingerprint);
+      if (!mounted) return;
+      setState(() {
+        _tier3Insight = null;
+        _selected = null;
+      });
       return;
     }
+    _replaceFuture(_controller.dismiss(selected.fingerprint));
+  }
+
+  Future<void> _muteSelected() async {
+    final selected = _selected;
+    if (selected == null) return;
+    _replaceFuture(_controller.setMuted(selected.kind, true));
+    if (selected.kind == InsightKind.aiSynthesis && mounted) {
+      setState(() {
+        _tier3Insight = null;
+        _tier3Preview = null;
+        _tier3Status = 'AI synthesis is muted.';
+      });
+    }
+  }
+
+  Future<void> _openSource(InsightSourceReference source) async {
+    final detail = await _controller.sourceDetail(source);
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -60,9 +154,7 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
 
   Future<void> _showMutedKinds() async {
     final muted = await _controller.mutedKinds();
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -81,6 +173,12 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                           onPressed: () {
                             Navigator.of(context).pop();
                             _replaceFuture(_controller.setMuted(kind, false));
+                            if (kind == InsightKind.aiSynthesis) {
+                              setState(() {
+                                _tier3Preview = null;
+                                _tier3Status = '';
+                              });
+                            }
                           },
                           child: const Text('Unmute'),
                         ),
@@ -99,7 +197,7 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
       body: Row(
         children: [
           SizedBox(
-            width: 220,
+            width: 260,
             child: Padding(
               padding: const EdgeInsets.all(MindlySpacing.md),
               child: Column(
@@ -107,14 +205,54 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                 children: [
                   const MindlyBrandBadge(),
                   const SizedBox(height: MindlySpacing.xl),
+                  Text('Insights', style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: MindlySpacing.sm),
+                  const Text('Local signals stay available without AI.'),
+                  const SizedBox(height: MindlySpacing.lg),
                   Text(
-                    'Insights',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    'Optional AI synthesis',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: MindlySpacing.sm),
-                  const Text(
-                    'Local signals from your memory graph and commitments.',
+                  DropdownButtonFormField<String>(
+                    initialValue: _tier3ProviderId,
+                    decoration: const InputDecoration(labelText: 'Provider'),
+                    items: const [
+                      DropdownMenuItem(value: 'openai', child: Text('OpenAI')),
+                      DropdownMenuItem(
+                        value: 'anthropic',
+                        child: Text('Anthropic'),
+                      ),
+                    ],
+                    onChanged: _tier3Busy
+                        ? null
+                        : (value) {
+                            if (value == null) return;
+                            setState(() {
+                              _tier3ProviderId = value;
+                              _tier3Preview = null;
+                              _tier3Status = '';
+                            });
+                          },
                   ),
+                  const SizedBox(height: MindlySpacing.sm),
+                  OutlinedButton(
+                    key: const ValueKey<String>('desktop-tier3-preview'),
+                    onPressed: _tier3Busy ? null : _previewTier3,
+                    child: const Text('Preview cost'),
+                  ),
+                  const SizedBox(height: MindlySpacing.sm),
+                  FilledButton(
+                    key: const ValueKey<String>('desktop-tier3-generate'),
+                    onPressed: _tier3Busy || _tier3Preview?.isReady != true
+                        ? null
+                        : _generateTier3,
+                    child: const Text('Generate AI insight'),
+                  ),
+                  if (_tier3Status.isNotEmpty) ...[
+                    const SizedBox(height: MindlySpacing.sm),
+                    Text(_tier3Status),
+                  ],
                   const Spacer(),
                   OutlinedButton.icon(
                     onPressed: _showMutedKinds,
@@ -139,7 +277,11 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                     child: Text('Insights are unavailable right now.'),
                   );
                 }
-                final insights = snapshot.data ?? const <ProactiveInsight>[];
+                final local = snapshot.data ?? const <ProactiveInsight>[];
+                final insights = <ProactiveInsight>[
+                  if (_tier3Insight != null) _tier3Insight!,
+                  ...local,
+                ];
                 if (insights.isEmpty) {
                   return const Center(
                     child: Text('Nothing needs your attention right now.'),
@@ -169,7 +311,7 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
           ),
           const VerticalDivider(width: 1),
           SizedBox(
-            width: 360,
+            width: 380,
             child: _selected == null
                 ? const Padding(
                     padding: EdgeInsets.all(MindlySpacing.lg),
@@ -180,12 +322,8 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                 : _DesktopInsightDetail(
                     insight: _selected!,
                     onOpenSource: _openSource,
-                    onDismiss: () => _replaceFuture(
-                      _controller.dismiss(_selected!.fingerprint),
-                    ),
-                    onMute: () => _replaceFuture(
-                      _controller.setMuted(_selected!.kind, true),
-                    ),
+                    onDismiss: _dismissSelected,
+                    onMute: _muteSelected,
                   ),
           ),
         ],
@@ -223,6 +361,12 @@ class _DesktopInsightDetail extends StatelessWidget {
           Text(insight.title, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: MindlySpacing.sm),
           Text(insight.body),
+          if (insight.explanation != null) ...[
+            const SizedBox(height: MindlySpacing.md),
+            Text('Why this surfaced', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: MindlySpacing.xs),
+            Text(insight.explanation!),
+          ],
           const SizedBox(height: MindlySpacing.lg),
           Text('Sources', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: MindlySpacing.sm),
