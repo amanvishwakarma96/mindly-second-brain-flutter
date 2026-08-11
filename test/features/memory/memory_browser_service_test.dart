@@ -74,30 +74,32 @@ void main() {
 
     final pinnedText = await browserService.list(
       MemoryEntityType.capture,
-      captureFilter: const CaptureBrowserFilter(
-        mode: 'text',
-        isPinned: true,
-      ),
+      captureFilter: const CaptureBrowserFilter(mode: 'text', isPinned: true),
     );
     expect(pinnedText.map((item) => item.id), ['personal', 'old-work']);
   });
 
-  test('people, topics and commitments browse without cross-type leakage', () async {
-    await memoryRepository.savePerson(id: 'p1', displayName: 'Maya');
-    await memoryRepository.saveTopic(id: 't1', label: 'Launch');
-    await memoryRepository.saveCommitment(id: 'k1', text: 'Send draft');
+  test(
+    'people, topics and commitments browse without cross-type leakage',
+    () async {
+      await memoryRepository.savePerson(id: 'p1', displayName: 'Maya');
+      await memoryRepository.saveTopic(id: 't1', label: 'Launch');
+      await memoryRepository.saveCommitment(id: 'k1', text: 'Send draft');
 
-    final people = await browserService.list(MemoryEntityType.person);
-    final topics = await browserService.list(MemoryEntityType.topic);
-    final commitments = await browserService.list(MemoryEntityType.commitment);
+      final people = await browserService.list(MemoryEntityType.person);
+      final topics = await browserService.list(MemoryEntityType.topic);
+      final commitments = await browserService.list(
+        MemoryEntityType.commitment,
+      );
 
-    expect(people.single.type, MemoryEntityType.person);
-    expect(people.single.title, 'Maya');
-    expect(topics.single.type, MemoryEntityType.topic);
-    expect(topics.single.title, 'Launch');
-    expect(commitments.single.type, MemoryEntityType.commitment);
-    expect(commitments.single.title, 'Send draft');
-  });
+      expect(people.single.type, MemoryEntityType.person);
+      expect(people.single.title, 'Maya');
+      expect(topics.single.type, MemoryEntityType.topic);
+      expect(topics.single.title, 'Launch');
+      expect(commitments.single.type, MemoryEntityType.commitment);
+      expect(commitments.single.title, 'Send draft');
+    },
+  );
 
   test('detail resolves capture source and direct graph connections', () async {
     await memoryRepository.saveCapture(
@@ -129,80 +131,86 @@ void main() {
     );
   });
 
-  test('hybrid search stays lexical-only without a real query vector', () async {
-    await memoryRepository.saveCapture(
-      id: 'c1',
-      mode: 'text',
-      context: 'work',
-      summary: 'Alpha launch plan',
-    );
-    await vectors.upsert(
-      id: 'e1',
-      ownerType: 'capture',
-      ownerId: 'c1',
-      model: 'embed-a',
-      vector: [1, 0],
-    );
+  test(
+    'hybrid search stays lexical-only without a real query vector',
+    () async {
+      await memoryRepository.saveCapture(
+        id: 'c1',
+        mode: 'text',
+        context: 'work',
+        summary: 'Alpha launch plan',
+      );
+      await vectors.upsert(
+        id: 'e1',
+        ownerType: 'capture',
+        ownerId: 'c1',
+        model: 'embed-a',
+        vector: [1, 0],
+      );
 
-    final lexicalOnly = await browserService.search(query: 'Alpha');
-    expect(lexicalOnly.single.id, 'c1');
-    expect(lexicalOnly.single.lexicalRank, 1);
-    expect(lexicalOnly.single.semanticScore, isNull);
-  });
+      final lexicalOnly = await browserService.search(query: 'Alpha');
+      expect(lexicalOnly.single.id, 'c1');
+      expect(lexicalOnly.single.lexicalRank, 1);
+      expect(lexicalOnly.single.semanticScore, isNull);
+    },
+  );
 
-  test('hybrid search merges real vector hits and isolates model/dimension', () async {
-    await memoryRepository.saveCapture(
-      id: 'c1',
-      mode: 'text',
-      context: 'work',
-      summary: 'Alpha launch plan',
-    );
-    await memoryRepository.saveCapture(
-      id: 'c2',
-      mode: 'text',
-      context: 'work',
-      summary: 'Budget planning',
-    );
-    await vectors.upsert(
-      id: 'e1',
-      ownerType: 'capture',
-      ownerId: 'c1',
-      model: 'embed-a',
-      vector: [1, 0],
-    );
-    await vectors.upsert(
-      id: 'e2',
-      ownerType: 'capture',
-      ownerId: 'c2',
-      model: 'embed-a',
-      vector: [0.8, 0.2],
-    );
-    await vectors.upsert(
-      id: 'e3',
-      ownerType: 'capture',
-      ownerId: 'c2',
-      model: 'embed-b',
-      vector: [1, 0],
-    );
-    await vectors.upsert(
-      id: 'e4',
-      ownerType: 'capture',
-      ownerId: 'c2',
-      model: 'embed-a',
-      vector: [1, 0, 0],
-    );
+  test(
+    'hybrid search merges real vector hits and isolates model/dimension',
+    () async {
+      await memoryRepository.saveCapture(
+        id: 'c1',
+        mode: 'text',
+        context: 'work',
+        summary: 'Alpha launch plan',
+      );
+      await memoryRepository.saveCapture(
+        id: 'c2',
+        mode: 'text',
+        context: 'work',
+        summary: 'Budget planning',
+      );
+      await vectors.upsert(
+        id: 'e1',
+        ownerType: 'capture',
+        ownerId: 'c1',
+        model: 'embed-a',
+        vector: [1, 0],
+      );
+      await vectors.upsert(
+        id: 'e2',
+        ownerType: 'capture',
+        ownerId: 'c2',
+        model: 'embed-a',
+        vector: [0.8, 0.2],
+      );
+      await vectors.upsert(
+        id: 'e3',
+        ownerType: 'capture',
+        ownerId: 'c2',
+        model: 'embed-b',
+        vector: [1, 0],
+      );
+      await vectors.upsert(
+        id: 'e4',
+        ownerType: 'capture',
+        ownerId: 'c2',
+        model: 'embed-a',
+        vector: [1, 0, 0],
+      );
 
-    final hits = await browserService.search(
-      query: 'Alpha',
-      semanticModel: 'embed-a',
-      queryVector: [1, 0],
-    );
+      final hits = await browserService.search(
+        query: 'Alpha',
+        semanticModel: 'embed-a',
+        queryVector: [1, 0],
+      );
 
-    expect(hits.first.id, 'c1');
-    expect(hits.first.lexicalRank, 1);
-    expect(hits.first.semanticScore, isNotNull);
-    expect(hits.map((hit) => hit.id), contains('c2'));
-  });
+      expect(hits.first.id, 'c1');
+      expect(hits.first.lexicalRank, 1);
+      expect(hits.first.semanticScore, isNotNull);
+      expect(hits.map((hit) => hit.id), contains('c2'));
+    },
+  );
 
   test('graph traversal is bidirectional, bounded, and cycle-safe', () async {
     await memoryRepository.saveCapture(

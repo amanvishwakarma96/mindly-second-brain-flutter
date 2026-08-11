@@ -60,11 +60,7 @@ class DefaultMemoryBrowserController implements MemoryBrowserController {
     CaptureBrowserFilter captureFilter = const CaptureBrowserFilter(),
     int limit = 100,
   }) {
-    return _service.list(
-      type,
-      captureFilter: captureFilter,
-      limit: limit,
-    );
+    return _service.list(type, captureFilter: captureFilter, limit: limit);
   }
 
   @override

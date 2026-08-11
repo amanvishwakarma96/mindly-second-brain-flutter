@@ -188,7 +188,9 @@ class _MobileMemoryBrowserScreenState extends State<MobileMemoryBrowserScreen> {
                       final items = snapshot.data ?? const <MemoryListItem>[];
                       if (items.isEmpty) {
                         return const Center(
-                          child: Text('Nothing here yet. Capture a thought first.'),
+                          child: Text(
+                            'Nothing here yet. Capture a thought first.',
+                          ),
                         );
                       }
                       return RefreshIndicator(
@@ -229,12 +231,16 @@ class _MobileMemoryBrowserScreenState extends State<MobileMemoryBrowserScreen> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (snapshot.hasError) {
-                        return const Center(child: Text('Search could not run.'));
+                        return const Center(
+                          child: Text('Search could not run.'),
+                        );
                       }
                       final hits =
                           snapshot.data ?? const <HybridMemorySearchHit>[];
                       if (hits.isEmpty) {
-                        return const Center(child: Text('No matching memories.'));
+                        return const Center(
+                          child: Text('No matching memories.'),
+                        );
                       }
                       return ListView.separated(
                         padding: const EdgeInsets.all(MindlySpacing.md),
@@ -289,13 +295,17 @@ class _MobileMemoryDetail extends StatelessWidget {
       detail.transcript,
       detail.rawText,
     ].whereType<String>().where((value) => value.trim().isNotEmpty).toList();
-    final nodes = graph?.nodes.where((node) => node.depth > 0).toList() ?? const [];
+    final nodes =
+        graph?.nodes.where((node) => node.depth > 0).toList() ?? const [];
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(detail.item.title, style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            detail.item.title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: MindlySpacing.md),
           for (final value in text) ...[
             Text(value),

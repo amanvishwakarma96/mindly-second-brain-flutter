@@ -89,32 +89,35 @@ class HybridMemorySearchService {
       }
     }
 
-    final results = accumulators.values
-        .where((value) => value.content != null)
-        .map(
-          (value) => HybridMemorySearchHit(
-            type: value.type,
-            id: value.id,
-            content: value.content!,
-            score: value.score,
-            lexicalRank: value.lexicalRank,
-            semanticScore: value.semanticScore,
-          ),
-        )
-        .toList(growable: false)
-      ..sort((left, right) {
-        final score = right.score.compareTo(left.score);
-        if (score != 0) {
-          return score;
-        }
-        final type = left.type.index.compareTo(right.type.index);
-        if (type != 0) {
-          return type;
-        }
-        return left.id.compareTo(right.id);
-      });
+    final results =
+        accumulators.values
+            .where((value) => value.content != null)
+            .map(
+              (value) => HybridMemorySearchHit(
+                type: value.type,
+                id: value.id,
+                content: value.content!,
+                score: value.score,
+                lexicalRank: value.lexicalRank,
+                semanticScore: value.semanticScore,
+              ),
+            )
+            .toList(growable: false)
+          ..sort((left, right) {
+            final score = right.score.compareTo(left.score);
+            if (score != 0) {
+              return score;
+            }
+            final type = left.type.index.compareTo(right.type.index);
+            if (type != 0) {
+              return type;
+            }
+            return left.id.compareTo(right.id);
+          });
 
-    return results.take(math.min(limit, results.length)).toList(growable: false);
+    return results
+        .take(math.min(limit, results.length))
+        .toList(growable: false);
   }
 
   String _key(MemoryEntityType type, String id) => '${type.wireName}:$id';

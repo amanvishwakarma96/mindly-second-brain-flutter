@@ -334,9 +334,13 @@ class _WebDetailPane extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(MindlySpacing.lg),
           children: [
-            Text(detail.item.title, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              detail.item.title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: MindlySpacing.md),
-            if (detail.summary?.trim().isNotEmpty == true) Text(detail.summary!),
+            if (detail.summary?.trim().isNotEmpty == true)
+              Text(detail.summary!),
             if (detail.transcript?.trim().isNotEmpty == true) ...[
               const SizedBox(height: MindlySpacing.sm),
               Text(detail.transcript!),

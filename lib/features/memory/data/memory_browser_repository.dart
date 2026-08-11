@@ -47,10 +47,8 @@ class MemoryBrowserRepository {
 
     query
       ..orderBy([
-        (row) => OrderingTerm(
-          expression: row.createdAt,
-          mode: OrderingMode.desc,
-        ),
+        (row) =>
+            OrderingTerm(expression: row.createdAt, mode: OrderingMode.desc),
         (row) => OrderingTerm(expression: row.id),
       ])
       ..limit(limit);
@@ -105,10 +103,8 @@ class MemoryBrowserRepository {
     }
     final query = _database.select(_database.commitments)
       ..orderBy([
-        (row) => OrderingTerm(
-          expression: row.createdAt,
-          mode: OrderingMode.desc,
-        ),
+        (row) =>
+            OrderingTerm(expression: row.createdAt, mode: OrderingMode.desc),
         (row) => OrderingTerm(expression: row.id),
       ])
       ..limit(limit);
@@ -223,10 +219,12 @@ class MemoryBrowserRepository {
     final summary = row.summary?.trim();
     final transcript = row.transcript?.trim();
     final rawText = row.rawText?.trim();
-    final preferred = [summary, transcript, rawText].whereType<String>().firstWhere(
-      (value) => value.isNotEmpty,
-      orElse: () => 'Untitled capture',
-    );
+    final preferred = [summary, transcript, rawText]
+        .whereType<String>()
+        .firstWhere(
+          (value) => value.isNotEmpty,
+          orElse: () => 'Untitled capture',
+        );
     final title = preferred.length > 120
         ? '${preferred.substring(0, 117)}...'
         : preferred;

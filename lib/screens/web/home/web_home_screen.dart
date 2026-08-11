@@ -114,8 +114,9 @@ class _WideWebHome extends StatelessWidget {
                               label: const Text('Record'),
                             ),
                             OutlinedButton.icon(
-                              onPressed: () =>
-                                  Navigator.of(context).pushNamed(AppRoutes.memory),
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.memory),
                               icon: const Icon(Icons.auto_stories_rounded),
                               label: const Text('Browse memory'),
                             ),

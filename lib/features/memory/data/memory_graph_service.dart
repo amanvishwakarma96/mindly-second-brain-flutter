@@ -15,10 +15,18 @@ class MemoryGraphService {
     int maxNodes = 100,
   }) async {
     if (maxDepth < 0) {
-      throw ArgumentError.value(maxDepth, 'maxDepth', 'Must be zero or greater.');
+      throw ArgumentError.value(
+        maxDepth,
+        'maxDepth',
+        'Must be zero or greater.',
+      );
     }
     if (maxNodes <= 0) {
-      throw ArgumentError.value(maxNodes, 'maxNodes', 'Must be greater than zero.');
+      throw ArgumentError.value(
+        maxNodes,
+        'maxNodes',
+        'Must be greater than zero.',
+      );
     }
 
     final root = await _repository.getItem(rootType, rootId);

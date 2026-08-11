@@ -16,7 +16,8 @@ class DesktopMemoryBrowserScreen extends StatefulWidget {
       _DesktopMemoryBrowserScreenState();
 }
 
-class _DesktopMemoryBrowserScreenState extends State<DesktopMemoryBrowserScreen> {
+class _DesktopMemoryBrowserScreenState
+    extends State<DesktopMemoryBrowserScreen> {
   late final MemoryBrowserController _controller;
   late Future<List<MemoryListItem>> _itemsFuture;
   Future<List<HybridMemorySearchHit>>? _searchFuture;
@@ -120,16 +121,14 @@ class _DesktopMemoryBrowserScreenState extends State<DesktopMemoryBrowserScreen>
                         FilterChip(
                           label: const Text('Work'),
                           selected: _filter.context == 'work',
-                          onSelected: (value) => _setContext(
-                            value ? 'work' : null,
-                          ),
+                          onSelected: (value) =>
+                              _setContext(value ? 'work' : null),
                         ),
                         FilterChip(
                           label: const Text('Personal'),
                           selected: _filter.context == 'personal',
-                          onSelected: (value) => _setContext(
-                            value ? 'personal' : null,
-                          ),
+                          onSelected: (value) =>
+                              _setContext(value ? 'personal' : null),
                         ),
                         FilterChip(
                           label: const Text('Pinned'),
@@ -157,10 +156,7 @@ class _DesktopMemoryBrowserScreenState extends State<DesktopMemoryBrowserScreen>
             flex: 2,
             child: _selected == null
                 ? const Center(child: Text('Choose a memory to inspect it.'))
-                : _DesktopDetailPane(
-                    controller: _controller,
-                    item: _selected!,
-                  ),
+                : _DesktopDetailPane(controller: _controller, item: _selected!),
           ),
         ],
       ),
@@ -293,7 +289,10 @@ class _DesktopDetailPane extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(MindlySpacing.lg),
           children: [
-            Text(detail.item.title, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              detail.item.title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: MindlySpacing.md),
             if (detail.summary?.trim().isNotEmpty == true) ...[
               const Text('Summary'),

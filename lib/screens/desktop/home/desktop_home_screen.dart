@@ -53,8 +53,9 @@ class DesktopHomeScreen extends StatelessWidget {
                               label: const Text('Record a thought'),
                             ),
                             OutlinedButton.icon(
-                              onPressed: () =>
-                                  Navigator.of(context).pushNamed(AppRoutes.memory),
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.memory),
                               icon: const Icon(Icons.auto_stories_rounded),
                               label: const Text('Browse memory'),
                             ),
