@@ -25,8 +25,9 @@ jobs:
           channel: stable
           cache: true
       - name: Make Web Insights header responsive
-        shell: python
+        shell: bash
         run: |
+          python3 <<'PY'
           from pathlib import Path
           import re
 
@@ -97,6 +98,7 @@ jobs:
           if count != 1:
               raise SystemExit('Web Insights AppBar block not found exactly once')
           path.write_text(text)
+          PY
       - name: Format Web Insights screen
         run: dart format lib/screens/web/insights/web_insights_screen.dart
       - name: Commit responsive header fix
