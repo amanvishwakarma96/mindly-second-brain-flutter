@@ -90,7 +90,7 @@ void main() {
   test('spend cap blocks before provider dispatch', () async {
     await _seedTwoCaptures(memoryRepository, now);
     await keyService.saveKey('openai', 'test-key');
-    await spendStore.saveCaps(const SpendCaps(dailyUsd: 0.000001));
+    await spendStore.save(const SpendCaps(dailyUsd: 0.000001));
 
     final outcome = await service.generate(Tier3ProviderProfile.openAiDefault);
 
