@@ -150,7 +150,14 @@ class Tier3InsightService {
       );
     }
 
-    await _insightStore.save(insights);
+    final merged = <String, ProactiveInsight>{
+      for (final existing in await _insightStore.load())
+        existing.fingerprint: existing,
+      for (final insight in insights) insight.fingerprint: insight,
+    }.values.toList(growable: false)
+      ..sort(_compareInsights);
+    await _insightStore.save(merged);
+
     return Tier3GenerationOutcome(
       kind: Tier3GenerationOutcomeKind.generated,
       estimate: estimate,
@@ -266,19 +273,19 @@ class Tier3InsightService {
         );
       }
 
-      insights.sort((left, right) {
-        final severity = right.severity.priority.compareTo(
-          left.severity.priority,
-        );
-        if (severity != 0) return severity;
-        final evidence = right.evidenceAt.compareTo(left.evidenceAt);
-        if (evidence != 0) return evidence;
-        return left.fingerprint.compareTo(right.fingerprint);
-      });
+      insights.sort(_compareInsights);
       return List<ProactiveInsight>.unmodifiable(insights);
     } on Object {
       return null;
     }
+  }
+
+  int _compareInsights(ProactiveInsight left, ProactiveInsight right) {
+    final severity = right.severity.priority.compareTo(left.severity.priority);
+    if (severity != 0) return severity;
+    final evidence = right.evidenceAt.compareTo(left.evidenceAt);
+    if (evidence != 0) return evidence;
+    return left.fingerprint.compareTo(right.fingerprint);
   }
 
   String _fingerprint({
