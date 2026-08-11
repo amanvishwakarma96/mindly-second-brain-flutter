@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
+import 'package:mindly/features/insights/presentation/tier3_provider_picker.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
@@ -84,35 +85,7 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
 
   Future<void> _generateTier3() async {
     if (_generatingTier3) return;
-    final profile = await showDialog<Tier3ProviderProfile>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Choose your AI provider'),
-        children: [
-          SimpleDialogOption(
-            onPressed: () =>
-                Navigator.of(context).pop(Tier3ProviderProfile.openAiDefault),
-            child: ListTile(
-              leading: const Icon(Icons.auto_awesome_rounded),
-              title: const Text('OpenAI'),
-              subtitle: Text(Tier3ProviderProfile.openAiDefault.rateCard.model),
-            ),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(
-              context,
-            ).pop(Tier3ProviderProfile.anthropicDefault),
-            child: ListTile(
-              leading: const Icon(Icons.auto_awesome_outlined),
-              title: const Text('Anthropic'),
-              subtitle: Text(
-                Tier3ProviderProfile.anthropicDefault.rateCard.model,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    final profile = await showTier3ProviderPicker(context);
     if (profile == null || !mounted) return;
 
     final estimate = await _controller.estimateTier3(profile);

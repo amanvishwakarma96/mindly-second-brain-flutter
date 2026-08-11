@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
+import 'package:mindly/features/insights/presentation/tier3_provider_picker.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 
@@ -86,49 +87,7 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
 
   Future<void> _generateTier3() async {
     if (_generatingTier3) return;
-    final profile = await showModalBottomSheet<Tier3ProviderProfile>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(MindlySpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Ask AI to notice something?',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: MindlySpacing.sm),
-              const Text(
-                'Mindly will send a bounded set of relevant memories directly to the provider you choose.',
-              ),
-              const SizedBox(height: MindlySpacing.md),
-              ListTile(
-                leading: const Icon(Icons.auto_awesome_rounded),
-                title: const Text('OpenAI'),
-                subtitle: Text(
-                  Tier3ProviderProfile.openAiDefault.rateCard.model,
-                ),
-                onTap: () => Navigator.of(
-                  context,
-                ).pop(Tier3ProviderProfile.openAiDefault),
-              ),
-              ListTile(
-                leading: const Icon(Icons.auto_awesome_outlined),
-                title: const Text('Anthropic'),
-                subtitle: Text(
-                  Tier3ProviderProfile.anthropicDefault.rateCard.model,
-                ),
-                onTap: () => Navigator.of(
-                  context,
-                ).pop(Tier3ProviderProfile.anthropicDefault),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    final profile = await showTier3ProviderPicker(context);
     if (profile == null || !mounted) return;
 
     final estimate = await _controller.estimateTier3(profile);

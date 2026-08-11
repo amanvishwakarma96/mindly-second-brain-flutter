@@ -13,9 +13,8 @@ Future<Tier3ProviderProfile?> showTier3ProviderPicker(
       title: const Text('Choose your AI provider'),
       children: [
         SimpleDialogOption(
-          onPressed: () => Navigator.of(
-            dialogContext,
-          ).pop(_Tier3ProviderChoice.openAi),
+          onPressed: () =>
+              Navigator.of(dialogContext).pop(_Tier3ProviderChoice.openAi),
           child: ListTile(
             leading: const Icon(Icons.auto_awesome_rounded),
             title: const Text('OpenAI'),
@@ -23,9 +22,8 @@ Future<Tier3ProviderProfile?> showTier3ProviderPicker(
           ),
         ),
         SimpleDialogOption(
-          onPressed: () => Navigator.of(
-            dialogContext,
-          ).pop(_Tier3ProviderChoice.anthropic),
+          onPressed: () =>
+              Navigator.of(dialogContext).pop(_Tier3ProviderChoice.anthropic),
           child: ListTile(
             leading: const Icon(Icons.auto_awesome_outlined),
             title: const Text('Anthropic'),
@@ -35,9 +33,8 @@ Future<Tier3ProviderProfile?> showTier3ProviderPicker(
           ),
         ),
         SimpleDialogOption(
-          onPressed: () => Navigator.of(
-            dialogContext,
-          ).pop(_Tier3ProviderChoice.compatible),
+          onPressed: () =>
+              Navigator.of(dialogContext).pop(_Tier3ProviderChoice.compatible),
           child: const ListTile(
             leading: Icon(Icons.hub_outlined),
             title: Text('OpenAI-compatible'),
