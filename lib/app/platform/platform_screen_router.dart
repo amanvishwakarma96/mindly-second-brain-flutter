@@ -2,21 +2,25 @@ import 'package:flutter/widgets.dart';
 import 'package:mindly/app/platform/screen_family.dart';
 import 'package:mindly/features/ai_settings/application/provider_settings_controller.dart';
 import 'package:mindly/features/audio_capture/application/audio_capture_controller.dart';
+import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/memory/application/memory_browser_controller.dart';
 import 'package:mindly/features/text_capture/application/text_capture_controller.dart';
 import 'package:mindly/screens/desktop/capture/desktop_audio_capture_screen.dart';
 import 'package:mindly/screens/desktop/capture/desktop_text_capture_screen.dart';
 import 'package:mindly/screens/desktop/home/desktop_home_screen.dart';
+import 'package:mindly/screens/desktop/insights/desktop_insights_screen.dart';
 import 'package:mindly/screens/desktop/memory/desktop_memory_browser_screen.dart';
 import 'package:mindly/screens/desktop/settings/desktop_provider_settings_screen.dart';
 import 'package:mindly/screens/mobile/capture/mobile_audio_capture_screen.dart';
 import 'package:mindly/screens/mobile/capture/mobile_text_capture_screen.dart';
 import 'package:mindly/screens/mobile/home/mobile_home_screen.dart';
+import 'package:mindly/screens/mobile/insights/mobile_insights_screen.dart';
 import 'package:mindly/screens/mobile/memory/mobile_memory_browser_screen.dart';
 import 'package:mindly/screens/mobile/settings/mobile_provider_settings_screen.dart';
 import 'package:mindly/screens/web/capture/web_audio_capture_screen.dart';
 import 'package:mindly/screens/web/capture/web_text_capture_screen.dart';
 import 'package:mindly/screens/web/home/web_home_screen.dart';
+import 'package:mindly/screens/web/insights/web_insights_screen.dart';
 import 'package:mindly/screens/web/memory/web_memory_browser_screen.dart';
 import 'package:mindly/screens/web/settings/web_provider_settings_screen.dart';
 
@@ -51,6 +55,15 @@ Widget buildPlatformMemory(
   ScreenFamily.mobile => MobileMemoryBrowserScreen(controller: controller),
   ScreenFamily.desktop => DesktopMemoryBrowserScreen(controller: controller),
   ScreenFamily.web => WebMemoryBrowserScreen(controller: controller),
+};
+
+Widget buildPlatformInsights(
+  ScreenFamily family, {
+  InsightController? controller,
+}) => switch (family) {
+  ScreenFamily.mobile => MobileInsightsScreen(controller: controller),
+  ScreenFamily.desktop => DesktopInsightsScreen(controller: controller),
+  ScreenFamily.web => WebInsightsScreen(controller: controller),
 };
 
 Widget buildPlatformProviderSettings(
