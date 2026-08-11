@@ -45,10 +45,15 @@ Future<Tier3ProviderProfile?> showTier3ProviderPicker(
     ),
   );
 
+  if (choice == _Tier3ProviderChoice.compatible) {
+    if (!context.mounted) return null;
+    return _showCompatibleProviderDialog(context);
+  }
+
   return switch (choice) {
     _Tier3ProviderChoice.openAi => Tier3ProviderProfile.openAiDefault,
     _Tier3ProviderChoice.anthropic => Tier3ProviderProfile.anthropicDefault,
-    _Tier3ProviderChoice.compatible => _showCompatibleProviderDialog(context),
+    _Tier3ProviderChoice.compatible => null,
     null => null,
   };
 }
