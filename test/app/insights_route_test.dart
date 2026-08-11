@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mindly/app/app_routes.dart';
 import 'package:mindly/app/mindly_app.dart';
 import 'package:mindly/app/platform/screen_family.dart';
+import 'package:mindly/features/ai_settings/domain/cost_models.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
@@ -49,6 +50,17 @@ class _FakeInsightController implements InsightController {
 
   @override
   Future<List<ProactiveInsight>> dismiss(String fingerprint) async => const [];
+
+  @override
+  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async => null;
+
+  @override
+  Future<Tier3GenerationOutcome> generateTier3(
+    Tier3ProviderProfile profile,
+  ) async => const Tier3GenerationOutcome(
+    kind: Tier3GenerationOutcomeKind.providerFailure,
+    estimate: null,
+  );
 
   @override
   Future<List<ProactiveInsight>> load() async => const [];
