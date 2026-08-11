@@ -4,13 +4,23 @@ import 'package:mindly/features/memory/data/hybrid_memory_search_service.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 
 class MemoryBrowserService {
-  MemoryBrowserService({
+  factory MemoryBrowserService({
     required MemoryBrowserRepository browserRepository,
     required HybridMemorySearchService searchService,
     required MemoryGraphService graphService,
-  }) : _browserRepository = browserRepository,
-       _searchService = searchService,
-       _graphService = graphService;
+  }) {
+    return MemoryBrowserService._(
+      browserRepository,
+      searchService,
+      graphService,
+    );
+  }
+
+  MemoryBrowserService._(
+    this._browserRepository,
+    this._searchService,
+    this._graphService,
+  );
 
   final MemoryBrowserRepository _browserRepository;
   final HybridMemorySearchService _searchService;
