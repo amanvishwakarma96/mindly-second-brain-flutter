@@ -41,7 +41,9 @@ class ProactiveInsightService {
     final visible = candidates.values
         .where(
           (insight) =>
-              !preferences.dismissedFingerprints.contains(insight.fingerprint) &&
+              !preferences.dismissedFingerprints.contains(
+                insight.fingerprint,
+              ) &&
               !preferences.mutedKinds.contains(insight.kind),
         )
         .toList(growable: false);
@@ -84,13 +86,12 @@ class ProactiveInsightService {
     return _evidenceRepository.sourceDetail(source);
   }
 
-  ProactiveInsight _relatedMemoryInsight(
-    InsightRelationshipEvidence relation,
-  ) {
+  ProactiveInsight _relatedMemoryInsight(InsightRelationshipEvidence relation) {
     final sources = <InsightSourceReference>[relation.from, relation.to]
       ..sort((left, right) => left.stableKey.compareTo(right.stableKey));
     return ProactiveInsight(
-      fingerprint: 'relatedMemory|${sources[0].stableKey}|${sources[1].stableKey}',
+      fingerprint:
+          'relatedMemory|${sources[0].stableKey}|${sources[1].stableKey}',
       kind: InsightKind.relatedMemory,
       tier: InsightTier.tier1,
       severity: InsightSeverity.info,
@@ -149,7 +150,8 @@ class ProactiveInsightService {
     }
 
     final createdAt = commitment.createdAt.toUtc();
-    if (dueDate == null && !createdAt.isAfter(now.subtract(staleCommitmentAge))) {
+    if (dueDate == null &&
+        !createdAt.isAfter(now.subtract(staleCommitmentAge))) {
       return ProactiveInsight(
         fingerprint:
             'staleCommitment|${commitment.id}|${createdAt.toIso8601String()}|${Uri.encodeComponent(commitment.text.trim())}',

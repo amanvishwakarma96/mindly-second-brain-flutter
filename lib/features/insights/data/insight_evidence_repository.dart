@@ -105,12 +105,12 @@ class InsightEvidenceRepository {
   }
 
   Future<List<InsightCommitmentEvidence>> loadOpenCommitments() async {
-    final rows = await (_database.select(_database.commitments)
-          ..orderBy([
-            (row) => OrderingTerm(expression: row.createdAt),
-            (row) => OrderingTerm(expression: row.id),
-          ]))
-        .get();
+    final rows =
+        await (_database.select(_database.commitments)..orderBy([
+              (row) => OrderingTerm(expression: row.createdAt),
+              (row) => OrderingTerm(expression: row.id),
+            ]))
+            .get();
     final evidence = <InsightCommitmentEvidence>[];
 
     for (final row in rows) {

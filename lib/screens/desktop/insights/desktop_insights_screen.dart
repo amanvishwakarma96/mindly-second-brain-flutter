@@ -44,7 +44,10 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(source.title),
-        content: SizedBox(width: 520, child: _DesktopSourceDetail(detail: detail)),
+        content: SizedBox(
+          width: 520,
+          child: _DesktopSourceDetail(detail: detail),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -104,9 +107,14 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                 children: [
                   const MindlyBrandBadge(),
                   const SizedBox(height: MindlySpacing.xl),
-                  Text('Insights', style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'Insights',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: MindlySpacing.sm),
-                  const Text('Local signals from your memory graph and commitments.'),
+                  const Text(
+                    'Local signals from your memory graph and commitments.',
+                  ),
                   const Spacer(),
                   OutlinedButton.icon(
                     onPressed: _showMutedKinds,
@@ -127,7 +135,9 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return const Center(child: Text('Insights are unavailable right now.'));
+                  return const Center(
+                    child: Text('Insights are unavailable right now.'),
+                  );
                 }
                 final insights = snapshot.data ?? const <ProactiveInsight>[];
                 if (insights.isEmpty) {
@@ -138,7 +148,8 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                 return ListView.separated(
                   padding: const EdgeInsets.all(MindlySpacing.lg),
                   itemCount: insights.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: MindlySpacing.sm),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: MindlySpacing.sm),
                   itemBuilder: (context, index) {
                     final insight = insights[index];
                     return Card(
@@ -162,7 +173,9 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
             child: _selected == null
                 ? const Padding(
                     padding: EdgeInsets.all(MindlySpacing.lg),
-                    child: Text('Select an insight to review its local evidence.'),
+                    child: Text(
+                      'Select an insight to review its local evidence.',
+                    ),
                   )
                 : _DesktopInsightDetail(
                     insight: _selected!,
@@ -225,9 +238,19 @@ class _DesktopInsightDetail extends StatelessWidget {
           const Spacer(),
           Row(
             children: [
-              Expanded(child: OutlinedButton(onPressed: onMute, child: const Text('Mute type'))),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onMute,
+                  child: const Text('Mute type'),
+                ),
+              ),
               const SizedBox(width: MindlySpacing.sm),
-              Expanded(child: FilledButton(onPressed: onDismiss, child: const Text('Dismiss'))),
+              Expanded(
+                child: FilledButton(
+                  onPressed: onDismiss,
+                  child: const Text('Dismiss'),
+                ),
+              ),
             ],
           ),
         ],

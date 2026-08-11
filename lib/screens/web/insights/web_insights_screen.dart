@@ -92,7 +92,11 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
       appBar: AppBar(
         title: const Row(
           mainAxisSize: MainAxisSize.min,
-          children: [MindlyBrandBadge(), SizedBox(width: MindlySpacing.sm), Text('Insights')],
+          children: [
+            MindlyBrandBadge(),
+            SizedBox(width: MindlySpacing.sm),
+            Text('Insights'),
+          ],
         ),
         actions: [
           TextButton.icon(
@@ -110,7 +114,9 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('Insights are unavailable right now.'));
+            return const Center(
+              child: Text('Insights are unavailable right now.'),
+            );
           }
           final insights = snapshot.data ?? const <ProactiveInsight>[];
           if (insights.isEmpty) {
@@ -127,7 +133,11 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
           return LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
-              final columns = width >= 1200 ? 3 : width >= 760 ? 2 : 1;
+              final columns = width >= 1200
+                  ? 3
+                  : width >= 760
+                  ? 2
+                  : 1;
               final cardWidth = columns == 1
                   ? width
                   : (width - MindlySpacing.lg * (columns - 1)) / columns;
@@ -188,7 +198,10 @@ class _WebInsightCard extends StatelessWidget {
                 Icon(_severityIcon(insight.severity)),
                 const SizedBox(width: MindlySpacing.sm),
                 Expanded(
-                  child: Text(insight.title, style: Theme.of(context).textTheme.titleMedium),
+                  child: Text(
+                    insight.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
               ],
             ),
@@ -208,12 +221,20 @@ class _WebInsightCard extends StatelessWidget {
             Wrap(
               spacing: MindlySpacing.sm,
               children: [
-                OutlinedButton(onPressed: onMute, child: const Text('Mute type')),
-                FilledButton(onPressed: onDismiss, child: const Text('Dismiss')),
+                OutlinedButton(
+                  onPressed: onMute,
+                  child: const Text('Mute type'),
+                ),
+                FilledButton(
+                  onPressed: onDismiss,
+                  child: const Text('Dismiss'),
+                ),
               ],
             ),
             const SizedBox(height: MindlySpacing.sm),
-            Text('${insight.tier.name.toUpperCase()} · ${insight.kind.displayName}'),
+            Text(
+              '${insight.tier.name.toUpperCase()} · ${insight.kind.displayName}',
+            ),
           ],
         ),
       ),

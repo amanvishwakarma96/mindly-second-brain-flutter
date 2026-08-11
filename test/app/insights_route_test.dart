@@ -61,5 +61,6 @@ class _FakeInsightController implements InsightController {
       const [];
 
   @override
-  Future<MemoryDetail?> sourceDetail(InsightSourceReference source) async => null;
+  Future<MemoryDetail?> sourceDetail(InsightSourceReference source) async =>
+      null;
 }

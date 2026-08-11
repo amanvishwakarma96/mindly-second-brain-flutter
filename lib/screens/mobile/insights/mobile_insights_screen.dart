@@ -61,7 +61,10 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Muted insight types', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Muted insight types',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: MindlySpacing.md),
               if (muted.isEmpty)
                 const Text('Nothing is muted.')
@@ -105,7 +108,9 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('Insights are unavailable right now.'));
+            return const Center(
+              child: Text('Insights are unavailable right now.'),
+            );
           }
           final insights = snapshot.data ?? const <ProactiveInsight>[];
           if (insights.isEmpty) {
@@ -122,7 +127,8 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
           return ListView.separated(
             padding: const EdgeInsets.all(MindlySpacing.md),
             itemCount: insights.length,
-            separatorBuilder: (_, _) => const SizedBox(height: MindlySpacing.sm),
+            separatorBuilder: (_, _) =>
+                const SizedBox(height: MindlySpacing.sm),
             itemBuilder: (context, index) {
               final insight = insights[index];
               return Dismissible(
@@ -165,8 +171,14 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                                 }
                               },
                               itemBuilder: (_) => const [
-                                PopupMenuItem(value: 'dismiss', child: Text('Dismiss')),
-                                PopupMenuItem(value: 'mute', child: Text('Mute this type')),
+                                PopupMenuItem(
+                                  value: 'dismiss',
+                                  child: Text('Dismiss'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'mute',
+                                  child: Text('Mute this type'),
+                                ),
                               ],
                             ),
                           ],
@@ -180,7 +192,10 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                           children: [
                             for (final source in insight.sources)
                               ActionChip(
-                                avatar: const Icon(Icons.link_rounded, size: 18),
+                                avatar: const Icon(
+                                  Icons.link_rounded,
+                                  size: 18,
+                                ),
                                 label: Text(source.title),
                                 onPressed: () => _openSource(source),
                               ),
