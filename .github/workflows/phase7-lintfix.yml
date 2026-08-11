@@ -1,0 +1,42 @@
+name: Phase 7 Lint Fix
+
+on:
+  push:
+    branches:
+      - agent/phase-7-tier3-explainable-insights
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: '3.44.8'
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Apply null-aware collection lint fixes
+        run: dart fix --apply --code=use_null_aware_elements
+      - name: Format affected Dart sources
+        run: dart format lib/screens/desktop/insights/desktop_insights_screen.dart lib/screens/web/insights/web_insights_screen.dart lib/features/insights/application/tier3_evidence_builder.dart
+      - name: Commit lint fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- lib/screens/desktop/insights/desktop_insights_screen.dart lib/screens/web/insights/web_insights_screen.dart lib/features/insights/application/tier3_evidence_builder.dart; then
+            echo "No lint fixes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/screens/desktop/insights/desktop_insights_screen.dart lib/screens/web/insights/web_insights_screen.dart lib/features/insights/application/tier3_evidence_builder.dart
+          git commit -m "Fix Phase 7 analyzer lints"
+          git push
