@@ -379,8 +379,9 @@ class _WebSourceDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (detail == null)
+    if (detail == null) {
       return const Text('This source memory is no longer available.');
+    }
     final content = [detail!.summary, detail!.transcript, detail!.rawText]
         .whereType<String>()
         .where((value) => value.trim().isNotEmpty)
