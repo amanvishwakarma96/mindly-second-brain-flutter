@@ -63,6 +63,9 @@ class Tier3ContextRepository {
     Map<String, Tier3ContextItem> items,
     MemoryListItem item,
   ) async {
+    final createdAt = item.createdAt;
+    if (createdAt == null) return;
+
     final source = InsightSourceReference(
       type: item.type,
       id: item.id,
@@ -94,7 +97,7 @@ class Tier3ContextRepository {
     items[source.stableKey] = Tier3ContextItem(
       source: source,
       content: content,
-      createdAt: item.createdAt,
+      createdAt: createdAt,
     );
   }
 
