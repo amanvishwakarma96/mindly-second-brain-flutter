@@ -52,7 +52,8 @@ class _FakeInsightController implements InsightController {
   Future<List<ProactiveInsight>> dismiss(String fingerprint) async => const [];
 
   @override
-  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async => null;
+  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async =>
+      null;
 
   @override
   Future<Tier3GenerationOutcome> generateTier3(
