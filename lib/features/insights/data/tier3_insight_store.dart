@@ -82,13 +82,16 @@ class SecureTier3InsightStore implements Tier3InsightStore {
 
     final kindName = json['kind'];
     final severityName = json['severity'];
-    final kind = InsightKind.values.where((value) => value.name == kindName).firstOrNull;
+    final kind = InsightKind.values
+        .where((value) => value.name == kindName)
+        .firstOrNull;
     final severity = InsightSeverity.values
         .where((value) => value.name == severityName)
         .firstOrNull;
     final evidenceAt = DateTime.tryParse(evidenceAtValue)?.toUtc();
     if (kind == null ||
-        (kind != InsightKind.aiRecommendation && kind != InsightKind.aiWarning) ||
+        (kind != InsightKind.aiRecommendation &&
+            kind != InsightKind.aiWarning) ||
         severity == null ||
         evidenceAt == null) {
       return null;
@@ -100,7 +103,9 @@ class SecureTier3InsightStore implements Tier3InsightStore {
     for (final value in sourcesValue) {
       if (value is! Map) continue;
       final sourceJson = Map<String, Object?>.from(value);
-      final type = MemoryEntityType.tryParse(sourceJson['type'] as String? ?? '');
+      final type = MemoryEntityType.tryParse(
+        sourceJson['type'] as String? ?? '',
+      );
       final id = sourceJson['id'];
       final sourceTitle = sourceJson['title'];
       if (type == null ||

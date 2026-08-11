@@ -145,7 +145,9 @@ class Tier3ProviderProfile {
       throw ArgumentError.value(model, 'model', 'Model is required.');
     }
     if (inputUsdPerMillionTokens < 0 || outputUsdPerMillionTokens < 0) {
-      throw ArgumentError('Compatible-provider token prices cannot be negative.');
+      throw ArgumentError(
+        'Compatible-provider token prices cannot be negative.',
+      );
     }
     if (maxOutputTokens <= 0) {
       throw ArgumentError.value(

@@ -66,7 +66,9 @@ Return only the requested structured object.
       throw ArgumentError('A provider API key is required.');
     }
     if (!context.hasEnoughEvidence) {
-      throw ArgumentError('Tier 3 generation requires at least two context items.');
+      throw ArgumentError(
+        'Tier 3 generation requires at least two context items.',
+      );
     }
 
     return switch (profile.configuration.kind) {
@@ -295,7 +297,9 @@ Return only the requested structured object.
 
   String _contextPrompt(Tier3GenerationContext context) {
     final buffer = StringBuffer()
-      ..writeln('Use only these memory items. Source keys must be copied exactly:');
+      ..writeln(
+        'Use only these memory items. Source keys must be copied exactly:',
+      );
     for (final item in context.items) {
       buffer
         ..writeln('\nSOURCE ${item.source.stableKey}')

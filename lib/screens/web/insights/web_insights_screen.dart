@@ -41,7 +41,10 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
         title: Text(source.title),
         content: SizedBox(width: 560, child: _WebSourceDetail(detail: detail)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
@@ -87,7 +90,8 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
         title: const Text('Choose your AI provider'),
         children: [
           SimpleDialogOption(
-            onPressed: () => Navigator.of(context).pop(Tier3ProviderProfile.openAiDefault),
+            onPressed: () =>
+                Navigator.of(context).pop(Tier3ProviderProfile.openAiDefault),
             child: ListTile(
               leading: const Icon(Icons.auto_awesome_rounded),
               title: const Text('OpenAI'),
@@ -95,11 +99,15 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
             ),
           ),
           SimpleDialogOption(
-            onPressed: () => Navigator.of(context).pop(Tier3ProviderProfile.anthropicDefault),
+            onPressed: () => Navigator.of(
+              context,
+            ).pop(Tier3ProviderProfile.anthropicDefault),
             child: ListTile(
               leading: const Icon(Icons.auto_awesome_outlined),
               title: const Text('Anthropic'),
-              subtitle: Text(Tier3ProviderProfile.anthropicDefault.rateCard.model),
+              subtitle: Text(
+                Tier3ProviderProfile.anthropicDefault.rateCard.model,
+              ),
             ),
           ),
         ],
@@ -110,7 +118,9 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
     final estimate = await _controller.estimateTier3(profile);
     if (!mounted) return;
     if (estimate == null) {
-      _showMessage('Add a little more connected memory before asking AI for an insight.');
+      _showMessage(
+        'Add a little more connected memory before asking AI for an insight.',
+      );
       return;
     }
 
@@ -123,8 +133,14 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
           'Estimated maximum cost: \$${estimate.estimatedUsd.toStringAsFixed(4)}. Your existing web key warning and spend caps still apply.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Generate')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Generate'),
+          ),
         ],
       ),
     );
@@ -136,23 +152,36 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
     setState(() => _generatingTier3 = false);
     if (outcome.generated) {
       _replaceFuture(_controller.load());
-      _showMessage(outcome.insights.isEmpty ? 'AI did not find a well-supported new insight.' : 'AI insights refreshed.');
+      _showMessage(
+        outcome.insights.isEmpty
+            ? 'AI did not find a well-supported new insight.'
+            : 'AI insights refreshed.',
+      );
     } else {
       _showMessage(_tier3OutcomeMessage(outcome.kind));
     }
   }
 
-  String _tier3OutcomeMessage(Tier3GenerationOutcomeKind kind) => switch (kind) {
+  String _tier3OutcomeMessage(
+    Tier3GenerationOutcomeKind kind,
+  ) => switch (kind) {
     Tier3GenerationOutcomeKind.generated => 'AI insights refreshed.',
-    Tier3GenerationOutcomeKind.insufficientEvidence => 'Add a little more connected memory before asking AI for an insight.',
-    Tier3GenerationOutcomeKind.missingKey => 'Add a key for this provider in AI settings first.',
-    Tier3GenerationOutcomeKind.spendBlocked => 'Your AI spend cap blocked this request.',
-    Tier3GenerationOutcomeKind.providerFailure => 'The AI provider is unavailable right now. Your memories were not changed.',
-    Tier3GenerationOutcomeKind.invalidOutput => 'The provider response could not be safely tied back to your memories.',
+    Tier3GenerationOutcomeKind.insufficientEvidence =>
+      'Add a little more connected memory before asking AI for an insight.',
+    Tier3GenerationOutcomeKind.missingKey =>
+      'Add a key for this provider in AI settings first.',
+    Tier3GenerationOutcomeKind.spendBlocked =>
+      'Your AI spend cap blocked this request.',
+    Tier3GenerationOutcomeKind.providerFailure =>
+      'The AI provider is unavailable right now. Your memories were not changed.',
+    Tier3GenerationOutcomeKind.invalidOutput =>
+      'The provider response could not be safely tied back to your memories.',
   };
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -172,7 +201,11 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
           FilledButton.icon(
             onPressed: _generatingTier3 ? null : _generateTier3,
             icon: _generatingTier3
-                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
                 : const Icon(Icons.auto_awesome_rounded),
             label: const Text('Ask AI'),
           ),
@@ -192,7 +225,9 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('Insights are unavailable right now.'));
+            return const Center(
+              child: Text('Insights are unavailable right now.'),
+            );
           }
           final insights = snapshot.data ?? const <ProactiveInsight>[];
           if (insights.isEmpty) {
@@ -209,8 +244,14 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
           return LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
-              final columns = width >= 1200 ? 3 : width >= 760 ? 2 : 1;
-              final cardWidth = columns == 1 ? width : (width - MindlySpacing.lg * (columns - 1)) / columns;
+              final columns = width >= 1200
+                  ? 3
+                  : width >= 760
+                  ? 2
+                  : 1;
+              final cardWidth = columns == 1
+                  ? width
+                  : (width - MindlySpacing.lg * (columns - 1)) / columns;
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(MindlySpacing.lg),
                 child: Wrap(
@@ -223,8 +264,12 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
                         child: _WebInsightCard(
                           insight: insight,
                           onOpenSource: _openSource,
-                          onDismiss: () => _replaceFuture(_controller.dismiss(insight.fingerprint)),
-                          onMute: () => _replaceFuture(_controller.setMuted(insight.kind, true)),
+                          onDismiss: () => _replaceFuture(
+                            _controller.dismiss(insight.fingerprint),
+                          ),
+                          onMute: () => _replaceFuture(
+                            _controller.setMuted(insight.kind, true),
+                          ),
                         ),
                       ),
                   ],
@@ -267,14 +312,22 @@ class _WebInsightCard extends StatelessWidget {
               children: [
                 Icon(_severityIcon(insight.severity)),
                 const SizedBox(width: MindlySpacing.sm),
-                Expanded(child: Text(insight.title, style: Theme.of(context).textTheme.titleMedium)),
+                Expanded(
+                  child: Text(
+                    insight.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: MindlySpacing.sm),
             Text(insight.body),
             const SizedBox(height: MindlySpacing.md),
             if (insight.isAiGenerated) ...[
-              Text('Why am I seeing this?', style: Theme.of(context).textTheme.labelLarge),
+              Text(
+                'Why am I seeing this?',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
               const SizedBox(height: MindlySpacing.sm),
             ],
             for (final source in insight.sources)
@@ -290,8 +343,14 @@ class _WebInsightCard extends StatelessWidget {
             Wrap(
               spacing: MindlySpacing.sm,
               children: [
-                OutlinedButton(onPressed: onMute, child: const Text('Mute type')),
-                FilledButton(onPressed: onDismiss, child: const Text('Dismiss')),
+                OutlinedButton(
+                  onPressed: onMute,
+                  child: const Text('Mute type'),
+                ),
+                FilledButton(
+                  onPressed: onDismiss,
+                  child: const Text('Dismiss'),
+                ),
               ],
             ),
             const SizedBox(height: MindlySpacing.sm),
@@ -320,11 +379,14 @@ class _WebSourceDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (detail == null) return const Text('This source memory is no longer available.');
+    if (detail == null)
+      return const Text('This source memory is no longer available.');
     final content = [detail!.summary, detail!.transcript, detail!.rawText]
         .whereType<String>()
         .where((value) => value.trim().isNotEmpty)
         .join('\n\n');
-    return SingleChildScrollView(child: Text(content.isEmpty ? detail!.item.title : content));
+    return SingleChildScrollView(
+      child: Text(content.isEmpty ? detail!.item.title : content),
+    );
   }
 }

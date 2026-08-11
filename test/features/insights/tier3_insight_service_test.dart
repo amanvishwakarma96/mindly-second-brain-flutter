@@ -99,39 +99,44 @@ void main() {
     expect(transport.calls, 0);
   });
 
-  test('valid provider output persists grounded recommendation and warning', () async {
-    await _seedTwoCaptures(memoryRepository, now);
-    await keyService.saveKey('openai', 'test-key');
-    transport.response = const Tier3ProviderResponse(
-      outputText: '''
+  test(
+    'valid provider output persists grounded recommendation and warning',
+    () async {
+      await _seedTwoCaptures(memoryRepository, now);
+      await keyService.saveKey('openai', 'test-key');
+      transport.response = const Tier3ProviderResponse(
+        outputText: '''
 {"insights":[
   {"kind":"warning","title":"A deadline may be getting close","body":"Review the launch follow-up before it slips further.","sourceKeys":["capture:c1","capture:c2"]},
   {"kind":"recommendation","title":"Bundle the launch notes","body":"Consider turning these related notes into one short action list.","sourceKeys":["capture:c1","capture:c2"]}
 ]}
 ''',
-      inputTokens: 220,
-      outputTokens: 90,
-    );
+        inputTokens: 220,
+        outputTokens: 90,
+      );
 
-    final outcome = await service.generate(Tier3ProviderProfile.openAiDefault);
-    final persisted = await service.load();
+      final outcome = await service.generate(
+        Tier3ProviderProfile.openAiDefault,
+      );
+      final persisted = await service.load();
 
-    expect(outcome.kind, Tier3GenerationOutcomeKind.generated);
-    expect(outcome.insights, hasLength(2));
-    expect(transport.calls, 1);
-    expect(
-      transport.lastContext?.allowedSourceKeys,
-      containsAll(['capture:c1', 'capture:c2']),
-    );
-    expect(persisted, hasLength(2));
-    expect(persisted.every((item) => item.tier == InsightTier.tier3), isTrue);
-    expect(persisted.every((item) => item.sources.length == 2), isTrue);
-    expect(persisted.first.kind, InsightKind.aiWarning);
-    expect(
-      await spendStore.entriesSince(now.subtract(const Duration(days: 1))),
-      hasLength(1),
-    );
-  });
+      expect(outcome.kind, Tier3GenerationOutcomeKind.generated);
+      expect(outcome.insights, hasLength(2));
+      expect(transport.calls, 1);
+      expect(
+        transport.lastContext?.allowedSourceKeys,
+        containsAll(['capture:c1', 'capture:c2']),
+      );
+      expect(persisted, hasLength(2));
+      expect(persisted.every((item) => item.tier == InsightTier.tier3), isTrue);
+      expect(persisted.every((item) => item.sources.length == 2), isTrue);
+      expect(persisted.first.kind, InsightKind.aiWarning);
+      expect(
+        await spendStore.entriesSince(now.subtract(const Duration(days: 1))),
+        hasLength(1),
+      );
+    },
+  );
 
   test('unknown source keys reject the whole provider output', () async {
     await _seedTwoCaptures(memoryRepository, now);

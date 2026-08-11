@@ -44,7 +44,8 @@ class Tier3ContextRepository {
       );
       for (final commitment in commitments) {
         if (items.length >= maxItems) break;
-        if ((commitment.subtitle ?? '').trim().toLowerCase() != 'open') continue;
+        if ((commitment.subtitle ?? '').trim().toLowerCase() != 'open')
+          continue;
         await _addItem(items, commitment);
       }
     }
@@ -86,9 +87,7 @@ class Tier3ContextRepository {
     }
 
     if (content.runes.length > maxContentCharacters) {
-      content = String.fromCharCodes(
-        content.runes.take(maxContentCharacters),
-      );
+      content = String.fromCharCodes(content.runes.take(maxContentCharacters));
     }
     if (content.trim().isEmpty) return;
 

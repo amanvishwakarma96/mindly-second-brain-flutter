@@ -95,21 +95,34 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Ask AI to notice something?', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Ask AI to notice something?',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: MindlySpacing.sm),
-              const Text('Mindly will send a bounded set of relevant memories directly to the provider you choose.'),
+              const Text(
+                'Mindly will send a bounded set of relevant memories directly to the provider you choose.',
+              ),
               const SizedBox(height: MindlySpacing.md),
               ListTile(
                 leading: const Icon(Icons.auto_awesome_rounded),
                 title: const Text('OpenAI'),
-                subtitle: Text(Tier3ProviderProfile.openAiDefault.rateCard.model),
-                onTap: () => Navigator.of(context).pop(Tier3ProviderProfile.openAiDefault),
+                subtitle: Text(
+                  Tier3ProviderProfile.openAiDefault.rateCard.model,
+                ),
+                onTap: () => Navigator.of(
+                  context,
+                ).pop(Tier3ProviderProfile.openAiDefault),
               ),
               ListTile(
                 leading: const Icon(Icons.auto_awesome_outlined),
                 title: const Text('Anthropic'),
-                subtitle: Text(Tier3ProviderProfile.anthropicDefault.rateCard.model),
-                onTap: () => Navigator.of(context).pop(Tier3ProviderProfile.anthropicDefault),
+                subtitle: Text(
+                  Tier3ProviderProfile.anthropicDefault.rateCard.model,
+                ),
+                onTap: () => Navigator.of(
+                  context,
+                ).pop(Tier3ProviderProfile.anthropicDefault),
               ),
             ],
           ),
@@ -121,7 +134,9 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
     final estimate = await _controller.estimateTier3(profile);
     if (!mounted) return;
     if (estimate == null) {
-      _showMessage('Add a little more connected memory before asking AI for an insight.');
+      _showMessage(
+        'Add a little more connected memory before asking AI for an insight.',
+      );
       return;
     }
 
@@ -134,8 +149,14 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
           'Estimated maximum cost: \$${estimate.estimatedUsd.toStringAsFixed(4)}. Your spend caps still apply.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Generate')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Generate'),
+          ),
         ],
       ),
     );
@@ -147,23 +168,36 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
     setState(() => _generatingTier3 = false);
     if (outcome.generated) {
       _replaceFuture(_controller.load());
-      _showMessage(outcome.insights.isEmpty ? 'AI did not find a well-supported new insight.' : 'AI insights refreshed.');
+      _showMessage(
+        outcome.insights.isEmpty
+            ? 'AI did not find a well-supported new insight.'
+            : 'AI insights refreshed.',
+      );
       return;
     }
     _showMessage(_tier3OutcomeMessage(outcome.kind));
   }
 
-  String _tier3OutcomeMessage(Tier3GenerationOutcomeKind kind) => switch (kind) {
+  String _tier3OutcomeMessage(
+    Tier3GenerationOutcomeKind kind,
+  ) => switch (kind) {
     Tier3GenerationOutcomeKind.generated => 'AI insights refreshed.',
-    Tier3GenerationOutcomeKind.insufficientEvidence => 'Add a little more connected memory before asking AI for an insight.',
-    Tier3GenerationOutcomeKind.missingKey => 'Add a key for this provider in AI settings first.',
-    Tier3GenerationOutcomeKind.spendBlocked => 'Your AI spend cap blocked this request.',
-    Tier3GenerationOutcomeKind.providerFailure => 'The AI provider is unavailable right now. Your memories were not changed.',
-    Tier3GenerationOutcomeKind.invalidOutput => 'The provider response could not be safely tied back to your memories.',
+    Tier3GenerationOutcomeKind.insufficientEvidence =>
+      'Add a little more connected memory before asking AI for an insight.',
+    Tier3GenerationOutcomeKind.missingKey =>
+      'Add a key for this provider in AI settings first.',
+    Tier3GenerationOutcomeKind.spendBlocked =>
+      'Your AI spend cap blocked this request.',
+    Tier3GenerationOutcomeKind.providerFailure =>
+      'The AI provider is unavailable right now. Your memories were not changed.',
+    Tier3GenerationOutcomeKind.invalidOutput =>
+      'The provider response could not be safely tied back to your memories.',
   };
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -177,7 +211,11 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
             tooltip: 'Generate AI insights',
             onPressed: _generatingTier3 ? null : _generateTier3,
             icon: _generatingTier3
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
                 : const Icon(Icons.auto_awesome_rounded),
           ),
           IconButton(
@@ -194,7 +232,9 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('Insights are unavailable right now.'));
+            return const Center(
+              child: Text('Insights are unavailable right now.'),
+            );
           }
           final insights = snapshot.data ?? const <ProactiveInsight>[];
           if (insights.isEmpty) {
@@ -211,7 +251,8 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
           return ListView.separated(
             padding: const EdgeInsets.all(MindlySpacing.md),
             itemCount: insights.length,
-            separatorBuilder: (_, _) => const SizedBox(height: MindlySpacing.sm),
+            separatorBuilder: (_, _) =>
+                const SizedBox(height: MindlySpacing.sm),
             itemBuilder: (context, index) {
               final insight = insights[index];
               return Dismissible(
@@ -222,7 +263,8 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                   padding: const EdgeInsets.only(right: MindlySpacing.lg),
                   child: const Icon(Icons.done_rounded),
                 ),
-                onDismissed: (_) => _replaceFuture(_controller.dismiss(insight.fingerprint)),
+                onDismissed: (_) =>
+                    _replaceFuture(_controller.dismiss(insight.fingerprint)),
                 child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(MindlySpacing.md),
@@ -233,18 +275,33 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                           children: [
                             Icon(_severityIcon(insight.severity)),
                             const SizedBox(width: MindlySpacing.sm),
-                            Expanded(child: Text(insight.title, style: Theme.of(context).textTheme.titleMedium)),
+                            Expanded(
+                              child: Text(
+                                insight.title,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
                             PopupMenuButton<String>(
                               onSelected: (value) {
                                 if (value == 'dismiss') {
-                                  _replaceFuture(_controller.dismiss(insight.fingerprint));
+                                  _replaceFuture(
+                                    _controller.dismiss(insight.fingerprint),
+                                  );
                                 } else if (value == 'mute') {
-                                  _replaceFuture(_controller.setMuted(insight.kind, true));
+                                  _replaceFuture(
+                                    _controller.setMuted(insight.kind, true),
+                                  );
                                 }
                               },
                               itemBuilder: (_) => const [
-                                PopupMenuItem(value: 'dismiss', child: Text('Dismiss')),
-                                PopupMenuItem(value: 'mute', child: Text('Mute this type')),
+                                PopupMenuItem(
+                                  value: 'dismiss',
+                                  child: Text('Dismiss'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'mute',
+                                  child: Text('Mute this type'),
+                                ),
                               ],
                             ),
                           ],
@@ -253,7 +310,10 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                         Text(insight.body),
                         const SizedBox(height: MindlySpacing.md),
                         if (insight.isAiGenerated) ...[
-                          Text('Why am I seeing this?', style: Theme.of(context).textTheme.labelLarge),
+                          Text(
+                            'Why am I seeing this?',
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
                           const SizedBox(height: MindlySpacing.sm),
                         ],
                         Wrap(
@@ -262,7 +322,10 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                           children: [
                             for (final source in insight.sources)
                               ActionChip(
-                                avatar: const Icon(Icons.link_rounded, size: 18),
+                                avatar: const Icon(
+                                  Icons.link_rounded,
+                                  size: 18,
+                                ),
                                 label: Text(source.title),
                                 onPressed: () => _openSource(source),
                               ),
@@ -302,7 +365,8 @@ class _MobileSourceDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (detail == null) return const Text('This source memory is no longer available.');
+    if (detail == null)
+      return const Text('This source memory is no longer available.');
     final content = [detail!.summary, detail!.transcript, detail!.rawText]
         .whereType<String>()
         .where((value) => value.trim().isNotEmpty)

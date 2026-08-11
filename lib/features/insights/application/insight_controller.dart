@@ -62,12 +62,15 @@ abstract class InsightController {
 
   Future<MemoryDetail?> sourceDetail(InsightSourceReference source);
 
-  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async => null;
+  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async =>
+      null;
 
   Future<Tier3GenerationOutcome> generateTier3(
     Tier3ProviderProfile profile,
   ) async {
-    throw UnsupportedError('Tier 3 generation is not available on this controller.');
+    throw UnsupportedError(
+      'Tier 3 generation is not available on this controller.',
+    );
   }
 }
 
@@ -121,9 +124,7 @@ class DefaultInsightController implements InsightController {
   }
 
   @override
-  Future<Tier3GenerationOutcome> generateTier3(
-    Tier3ProviderProfile profile,
-  ) {
+  Future<Tier3GenerationOutcome> generateTier3(Tier3ProviderProfile profile) {
     final tier3Service = _tier3Service;
     if (tier3Service == null) {
       return Future<Tier3GenerationOutcome>.value(

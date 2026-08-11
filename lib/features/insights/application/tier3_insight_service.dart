@@ -72,7 +72,9 @@ class Tier3InsightService {
     return insights
         .where(
           (insight) =>
-              !preferences.dismissedFingerprints.contains(insight.fingerprint) &&
+              !preferences.dismissedFingerprints.contains(
+                insight.fingerprint,
+              ) &&
               !preferences.mutedKinds.contains(insight.kind),
         )
         .toList(growable: false);
@@ -84,9 +86,7 @@ class Tier3InsightService {
     return _estimateForContext(context, profile);
   }
 
-  Future<Tier3GenerationOutcome> generate(
-    Tier3ProviderProfile profile,
-  ) async {
+  Future<Tier3GenerationOutcome> generate(Tier3ProviderProfile profile) async {
     final context = await _contextRepository.load();
     if (!context.hasEnoughEvidence) {
       return const Tier3GenerationOutcome(
@@ -267,7 +267,9 @@ class Tier3InsightService {
       }
 
       insights.sort((left, right) {
-        final severity = right.severity.priority.compareTo(left.severity.priority);
+        final severity = right.severity.priority.compareTo(
+          left.severity.priority,
+        );
         if (severity != 0) return severity;
         final evidence = right.evidenceAt.compareTo(left.evidenceAt);
         if (evidence != 0) return evidence;
