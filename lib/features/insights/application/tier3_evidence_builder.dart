@@ -7,13 +7,26 @@ typedef InsightSourceDetailLoader =
     Future<MemoryDetail?> Function(InsightSourceReference source);
 
 class Tier3EvidenceBuilder {
-  const Tier3EvidenceBuilder({
+  factory Tier3EvidenceBuilder({
     required LocalInsightLoader insightLoader,
     required InsightSourceDetailLoader sourceDetailLoader,
-    this.maxSources = 8,
-    this.maxCharacters = 12000,
-  }) : _insightLoader = insightLoader,
-       _sourceDetailLoader = sourceDetailLoader;
+    int maxSources = 8,
+    int maxCharacters = 12000,
+  }) {
+    return Tier3EvidenceBuilder._(
+      insightLoader,
+      sourceDetailLoader,
+      maxSources,
+      maxCharacters,
+    );
+  }
+
+  const Tier3EvidenceBuilder._(
+    this._insightLoader,
+    this._sourceDetailLoader,
+    this.maxSources,
+    this.maxCharacters,
+  );
 
   final LocalInsightLoader _insightLoader;
   final InsightSourceDetailLoader _sourceDetailLoader;
