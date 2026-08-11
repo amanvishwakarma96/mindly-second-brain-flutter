@@ -281,10 +281,7 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                   );
                 }
                 final local = snapshot.data ?? const <ProactiveInsight>[];
-                final insights = <ProactiveInsight>[
-                  if (_tier3Insight != null) _tier3Insight!,
-                  ...local,
-                ];
+                final insights = <ProactiveInsight>[?_tier3Insight, ...local];
                 if (insights.isEmpty) {
                   return const Center(
                     child: Text('Nothing needs your attention right now.'),

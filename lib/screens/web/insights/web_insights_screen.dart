@@ -202,10 +202,7 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
             );
           }
           final localInsights = snapshot.data ?? const <ProactiveInsight>[];
-          final insights = <ProactiveInsight>[
-            if (_tier3Insight != null) _tier3Insight!,
-            ...localInsights,
-          ];
+          final insights = <ProactiveInsight>[?_tier3Insight, ...localInsights];
           return LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
