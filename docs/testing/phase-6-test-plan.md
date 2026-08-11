@@ -21,7 +21,7 @@ Phase 6 adds local proactive insight surfacing on top of the Phase 5 memory/sear
 | P6-02 | Tier 1 follow-up candidate from explicit `follows_up_on` relationship | Card references both linked captures and is deterministic |
 | P6-03 | Tier 2 overdue commitment rule | Open commitment past due date yields warning with commitment/capture source |
 | P6-04 | Tier 2 due-soon commitment rule | Open commitment inside configured horizon yields recommendation; later items do not |
-| P6-05 | Tier 2 stale open commitment rule | Old open commitment with no recent update yields reminder after threshold |
+| P6-05 | Tier 2 stale open commitment rule | Open commitment without a due date and older than the configured `createdAt` threshold yields a reminder; the current commitment schema has no `updatedAt`, so Phase 6 does not claim last-activity tracking |
 | P6-06 | No fabricated insight on insufficient evidence | Empty/sparse memory produces no candidate |
 | P6-07 | Stable fingerprint and duplicate collapse | Equivalent evidence collapses to one insight with deterministic fingerprint |
 | P6-08 | Deterministic ordering | Repeated evaluation returns the same ranked order |
