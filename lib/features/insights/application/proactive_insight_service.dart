@@ -4,13 +4,23 @@ import 'package:mindly/features/insights/domain/insight_models.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 
 class ProactiveInsightService {
-  ProactiveInsightService({
+  factory ProactiveInsightService({
     required InsightEvidenceRepository evidenceRepository,
     required InsightPreferenceStore preferenceStore,
     DateTime Function()? clock,
-  }) : _evidenceRepository = evidenceRepository,
-       _preferenceStore = preferenceStore,
-       _clock = clock ?? DateTime.now;
+  }) {
+    return ProactiveInsightService._(
+      evidenceRepository,
+      preferenceStore,
+      clock ?? DateTime.now,
+    );
+  }
+
+  ProactiveInsightService._(
+    this._evidenceRepository,
+    this._preferenceStore,
+    this._clock,
+  );
 
   static const Duration dueSoonHorizon = Duration(days: 3);
   static const Duration staleCommitmentAge = Duration(days: 14);
