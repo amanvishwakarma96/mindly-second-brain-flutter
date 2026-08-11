@@ -155,46 +155,46 @@ void main() {
     },
   );
 
-  test('ordering and fingerprints are stable across repeated evaluation', () async {
-    await _insertCommitment(
-      database,
-      id: 'overdue-b',
-      text: 'Second overdue item',
-      dueDate: now.subtract(const Duration(hours: 2)),
-      createdAt: now.subtract(const Duration(days: 2)),
-    );
-    await _insertCommitment(
-      database,
-      id: 'overdue-a',
-      text: 'First overdue item',
-      dueDate: now.subtract(const Duration(hours: 1)),
-      createdAt: now.subtract(const Duration(days: 1)),
-    );
-    await _insertCommitment(
-      database,
-      id: 'soon',
-      text: 'Soon item',
-      dueDate: now.add(const Duration(days: 1)),
-      createdAt: now,
-    );
+  test(
+    'ordering and fingerprints are stable across repeated evaluation',
+    () async {
+      await _insertCommitment(
+        database,
+        id: 'overdue-b',
+        text: 'Second overdue item',
+        dueDate: now.subtract(const Duration(hours: 2)),
+        createdAt: now.subtract(const Duration(days: 2)),
+      );
+      await _insertCommitment(
+        database,
+        id: 'overdue-a',
+        text: 'First overdue item',
+        dueDate: now.subtract(const Duration(hours: 1)),
+        createdAt: now.subtract(const Duration(days: 1)),
+      );
+      await _insertCommitment(
+        database,
+        id: 'soon',
+        text: 'Soon item',
+        dueDate: now.add(const Duration(days: 1)),
+        createdAt: now,
+      );
 
-    final first = await service.load();
-    final second = await service.load();
+      final first = await service.load();
+      final second = await service.load();
 
-    expect(
-      second.map((item) => item.fingerprint).toList(),
-      first.map((item) => item.fingerprint).toList(),
-    );
-    expect(
-      first.map((item) => item.kind).toList(),
-      <InsightKind>[
+      expect(
+        second.map((item) => item.fingerprint).toList(),
+        first.map((item) => item.fingerprint).toList(),
+      );
+      expect(first.map((item) => item.kind).toList(), <InsightKind>[
         InsightKind.overdueCommitment,
         InsightKind.overdueCommitment,
         InsightKind.dueSoonCommitment,
-      ],
-    );
-    expect(first.first.body, 'First overdue item');
-  });
+      ]);
+      expect(first.first.body, 'First overdue item');
+    },
+  );
 
   test(
     'dismissal persists until material commitment evidence changes',
