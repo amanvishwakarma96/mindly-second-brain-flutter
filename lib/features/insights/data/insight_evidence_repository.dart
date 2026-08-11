@@ -39,16 +39,19 @@ class InsightCommitmentEvidence {
 
   List<InsightSourceReference> get sources => <InsightSourceReference>[
     commitmentSource,
-    if (captureSource != null) captureSource!,
+    ?captureSource,
   ];
 }
 
 class InsightEvidenceRepository {
-  InsightEvidenceRepository({
+  factory InsightEvidenceRepository({
     required MindlyDatabase database,
     required MemoryBrowserRepository browserRepository,
-  }) : _database = database,
-       _browserRepository = browserRepository;
+  }) {
+    return InsightEvidenceRepository._(database, browserRepository);
+  }
+
+  InsightEvidenceRepository._(this._database, this._browserRepository);
 
   final MindlyDatabase _database;
   final MemoryBrowserRepository _browserRepository;
