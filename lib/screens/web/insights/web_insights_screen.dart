@@ -159,35 +159,58 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final compactHeader = MediaQuery.sizeOf(context).width < 900;
     return Scaffold(
       key: WebInsightsScreen.screenKey,
       appBar: AppBar(
-        title: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            MindlyBrandBadge(),
-            SizedBox(width: MindlySpacing.sm),
-            Text('Insights'),
-          ],
-        ),
+        title: compactHeader
+            ? const Text('Insights')
+            : const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  MindlyBrandBadge(),
+                  SizedBox(width: MindlySpacing.sm),
+                  Text('Insights'),
+                ],
+              ),
         actions: [
-          FilledButton.icon(
-            onPressed: _generatingTier3 ? null : _generateTier3,
-            icon: _generatingTier3
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.auto_awesome_rounded),
-            label: const Text('Ask AI'),
-          ),
-          const SizedBox(width: MindlySpacing.sm),
-          TextButton.icon(
-            onPressed: _showMutedKinds,
-            icon: const Icon(Icons.visibility_off_outlined),
-            label: const Text('Muted types'),
-          ),
+          if (compactHeader)
+            IconButton(
+              tooltip: 'Generate AI insights',
+              onPressed: _generatingTier3 ? null : _generateTier3,
+              icon: _generatingTier3
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.auto_awesome_rounded),
+            )
+          else
+            FilledButton.icon(
+              onPressed: _generatingTier3 ? null : _generateTier3,
+              icon: _generatingTier3
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.auto_awesome_rounded),
+              label: const Text('Ask AI'),
+            ),
+          if (!compactHeader) const SizedBox(width: MindlySpacing.sm),
+          if (compactHeader)
+            IconButton(
+              tooltip: 'Muted insight types',
+              onPressed: _showMutedKinds,
+              icon: const Icon(Icons.visibility_off_outlined),
+            )
+          else
+            TextButton.icon(
+              onPressed: _showMutedKinds,
+              icon: const Icon(Icons.visibility_off_outlined),
+              label: const Text('Muted types'),
+            ),
           const SizedBox(width: MindlySpacing.sm),
         ],
       ),
