@@ -15,6 +15,7 @@ import 'package:mindly/features/insights/data/tier3_insight_transport.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
 import 'package:mindly/features/memory/data/memory_browser_repository.dart';
 import 'package:mindly/features/memory/data/memory_repository.dart';
+import 'package:mindly/features/memory/domain/memory_models.dart';
 
 import '../../helpers/in_memory_secret_store.dart';
 
@@ -118,12 +119,18 @@ void main() {
     expect(outcome.kind, Tier3GenerationOutcomeKind.generated);
     expect(outcome.insights, hasLength(2));
     expect(transport.calls, 1);
-    expect(transport.lastContext?.allowedSourceKeys, containsAll(['capture:c1', 'capture:c2']));
+    expect(
+      transport.lastContext?.allowedSourceKeys,
+      containsAll(['capture:c1', 'capture:c2']),
+    );
     expect(persisted, hasLength(2));
     expect(persisted.every((item) => item.tier == InsightTier.tier3), isTrue);
     expect(persisted.every((item) => item.sources.length == 2), isTrue);
     expect(persisted.first.kind, InsightKind.aiWarning);
-    expect((await spendStore.entriesSince(now.subtract(const Duration(days: 1)))), hasLength(1));
+    expect(
+      await spendStore.entriesSince(now.subtract(const Duration(days: 1))),
+      hasLength(1),
+    );
   });
 
   test('unknown source keys reject the whole provider output', () async {
@@ -142,52 +149,55 @@ void main() {
     expect(await tier3Store.load(), isEmpty);
   });
 
-  test('stored Tier 3 cards obey dismiss and independent kind mute preferences', () async {
-    await _seedTwoCaptures(memoryRepository, now);
-    await tier3Store.save([
-      ProactiveInsight(
-        fingerprint: 'tier3_rec',
-        kind: InsightKind.aiRecommendation,
-        tier: InsightTier.tier3,
-        severity: InsightSeverity.recommendation,
-        title: 'Recommendation',
-        body: 'Try one small next step.',
-        evidenceAt: now,
-        sources: const [
-          InsightSourceReference(
-            type: MemoryEntityType.capture,
-            id: 'c1',
-            title: 'Launch plan',
-          ),
-        ],
-      ),
-      ProactiveInsight(
-        fingerprint: 'tier3_warn',
-        kind: InsightKind.aiWarning,
-        tier: InsightTier.tier3,
-        severity: InsightSeverity.warning,
-        title: 'Warning',
-        body: 'Review this soon.',
-        evidenceAt: now,
-        sources: const [
-          InsightSourceReference(
-            type: MemoryEntityType.capture,
-            id: 'c2',
-            title: 'Launch follow-up',
-          ),
-        ],
-      ),
-    ]);
-    await preferences.save(
-      const InsightPreferences(
-        dismissedFingerprints: {'tier3_warn'},
-        mutedKinds: {InsightKind.aiRecommendation},
-      ),
-    );
+  test(
+    'stored Tier 3 cards obey dismiss and independent kind mute preferences',
+    () async {
+      await _seedTwoCaptures(memoryRepository, now);
+      await tier3Store.save([
+        ProactiveInsight(
+          fingerprint: 'tier3_rec',
+          kind: InsightKind.aiRecommendation,
+          tier: InsightTier.tier3,
+          severity: InsightSeverity.recommendation,
+          title: 'Recommendation',
+          body: 'Try one small next step.',
+          evidenceAt: now,
+          sources: const [
+            InsightSourceReference(
+              type: MemoryEntityType.capture,
+              id: 'c1',
+              title: 'Launch plan',
+            ),
+          ],
+        ),
+        ProactiveInsight(
+          fingerprint: 'tier3_warn',
+          kind: InsightKind.aiWarning,
+          tier: InsightTier.tier3,
+          severity: InsightSeverity.warning,
+          title: 'Warning',
+          body: 'Review this soon.',
+          evidenceAt: now,
+          sources: const [
+            InsightSourceReference(
+              type: MemoryEntityType.capture,
+              id: 'c2',
+              title: 'Launch follow-up',
+            ),
+          ],
+        ),
+      ]);
+      await preferences.save(
+        const InsightPreferences(
+          dismissedFingerprints: {'tier3_warn'},
+          mutedKinds: {InsightKind.aiRecommendation},
+        ),
+      );
 
-    expect(await service.load(), isEmpty);
-    expect(await database.select(database.captures).get(), hasLength(2));
-  });
+      expect(await service.load(), isEmpty);
+      expect(await database.select(database.captures).get(), hasLength(2));
+    },
+  );
 }
 
 Future<void> _seedTwoCaptures(MemoryRepository repository, DateTime now) async {
