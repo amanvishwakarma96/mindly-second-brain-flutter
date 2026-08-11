@@ -170,6 +170,12 @@ void main() {
         context: 'work',
         summary: 'Budget planning',
       );
+      await memoryRepository.saveCapture(
+        id: 'c3',
+        mode: 'text',
+        context: 'work',
+        summary: 'Dimension mismatch only',
+      );
       await vectors.upsert(
         id: 'e1',
         ownerType: 'capture',
@@ -194,7 +200,7 @@ void main() {
       await vectors.upsert(
         id: 'e4',
         ownerType: 'capture',
-        ownerId: 'c2',
+        ownerId: 'c3',
         model: 'embed-a',
         vector: [1, 0, 0],
       );
@@ -209,6 +215,7 @@ void main() {
       expect(hits.first.lexicalRank, 1);
       expect(hits.first.semanticScore, isNotNull);
       expect(hits.map((hit) => hit.id), contains('c2'));
+      expect(hits.map((hit) => hit.id), isNot(contains('c3')));
     },
   );
 
