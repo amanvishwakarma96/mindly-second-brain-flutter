@@ -73,6 +73,8 @@ class MobileHomeScreen extends StatelessWidget {
         onDestinationSelected: (index) {
           if (index == 1) {
             Navigator.of(context).pushNamed(AppRoutes.audioCapture);
+          } else if (index == 2) {
+            Navigator.of(context).pushNamed(AppRoutes.memory);
           } else if (index == 3) {
             Navigator.of(context).pushNamed(AppRoutes.providerSettings);
           }
