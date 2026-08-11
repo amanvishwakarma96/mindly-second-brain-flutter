@@ -35,12 +35,24 @@ class DesktopHomeScreen extends StatelessWidget {
                     child: Card(
                       color: MindlyColors.mint,
                       child: Center(
-                        child: FilledButton.icon(
-                          onPressed: () => Navigator.of(
-                            context,
-                          ).pushNamed(AppRoutes.textCapture),
-                          icon: const Icon(Icons.edit_note_rounded),
-                          label: const Text('Capture a thought'),
+                        child: Wrap(
+                          spacing: MindlySpacing.md,
+                          children: [
+                            FilledButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.textCapture),
+                              icon: const Icon(Icons.edit_note_rounded),
+                              label: const Text('Write a thought'),
+                            ),
+                            FilledButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.audioCapture),
+                              icon: const Icon(Icons.mic_rounded),
+                              label: const Text('Record a thought'),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -81,8 +93,14 @@ class _DesktopSidebar extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.edit_note_rounded),
-            title: const Text('Capture'),
+            title: const Text('Text capture'),
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
+          ),
+          ListTile(
+            leading: const Icon(Icons.mic_rounded),
+            title: const Text('Audio capture'),
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.audioCapture),
           ),
           const ListTile(
             leading: Icon(Icons.auto_stories_rounded),

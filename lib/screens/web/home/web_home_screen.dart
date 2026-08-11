@@ -15,11 +15,9 @@ class WebHomeScreen extends StatelessWidget {
     return Scaffold(
       key: screenKey,
       body: LayoutBuilder(
-        builder: (context, constraints) {
-          return constraints.maxWidth < 760
-              ? const _NarrowWebHome()
-              : const _WideWebHome();
-        },
+        builder: (context, constraints) => constraints.maxWidth < 760
+            ? const _NarrowWebHome()
+            : const _WideWebHome(),
       ),
     );
   }
@@ -46,7 +44,12 @@ class _WideWebHome extends StatelessWidget {
                 TextButton(
                   onPressed: () =>
                       Navigator.of(context).pushNamed(AppRoutes.textCapture),
-                  child: const Text('Capture'),
+                  child: const Text('Text capture'),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.audioCapture),
+                  child: const Text('Audio capture'),
                 ),
                 const SizedBox(height: MindlySpacing.md),
                 const Text('Memory'),
@@ -86,15 +89,27 @@ class _WideWebHome extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'A browser-friendly home, with your memories staying local.',
+                          'Capture in the browser while your memories stay local.',
                         ),
                         const SizedBox(height: MindlySpacing.md),
-                        FilledButton.icon(
-                          onPressed: () => Navigator.of(
-                            context,
-                          ).pushNamed(AppRoutes.textCapture),
-                          icon: const Icon(Icons.edit_note_rounded),
-                          label: const Text('Capture a thought'),
+                        Wrap(
+                          spacing: MindlySpacing.md,
+                          children: [
+                            FilledButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.textCapture),
+                              icon: const Icon(Icons.edit_note_rounded),
+                              label: const Text('Write'),
+                            ),
+                            FilledButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.audioCapture),
+                              icon: const Icon(Icons.mic_rounded),
+                              label: const Text('Record'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -139,6 +154,13 @@ class _NarrowWebHome extends StatelessWidget {
               Navigator.of(context).pushNamed(AppRoutes.textCapture),
           icon: const Icon(Icons.edit_note_rounded),
           label: const Text('Text capture'),
+        ),
+        const SizedBox(height: MindlySpacing.sm),
+        FilledButton.icon(
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.audioCapture),
+          icon: const Icon(Icons.mic_rounded),
+          label: const Text('Audio capture'),
         ),
         const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(

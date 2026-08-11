@@ -15,6 +15,14 @@ dependencies:
   flutter_secure_storage: ^10.3.1
   http: ^1.6.0
   path_provider: ^2.1.6
+  record: ^7.1.1
+  whisper_ggml: ^2.6.0
+
+dependency_overrides:
+  # whisper_ggml still declares the older 2.x FFmpeg package. The maintained
+  # 3.6.2 build adds current iOS simulator XCFrameworks, Linux support, and the
+  # Windows symlink-safe native archive extraction used by this six-target app.
+  ffmpeg_kit_flutter_new_min: 3.6.2
 
 dev_dependencies:
   flutter_test:
