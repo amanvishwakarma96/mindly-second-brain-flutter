@@ -241,8 +241,9 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                   _MobileInsightCard(
                     insight: insight,
                     onOpenSource: _openSource,
-                    onDismiss: () =>
-                        _replaceFuture(_controller.dismiss(insight.fingerprint)),
+                    onDismiss: () => _replaceFuture(
+                      _controller.dismiss(insight.fingerprint),
+                    ),
                     onMute: () => _replaceFuture(
                       _controller.setMuted(insight.kind, true),
                     ),

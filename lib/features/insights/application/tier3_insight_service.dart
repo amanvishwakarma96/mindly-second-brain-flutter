@@ -232,7 +232,8 @@ class Tier3InsightService {
     required Tier3InsightDraft draft,
     required List<InsightSourceReference> sources,
   }) {
-    final sourceKeys = sources.map((source) => source.stableKey).toList()..sort();
+    final sourceKeys = sources.map((source) => source.stableKey).toList()
+      ..sort();
     final value = [
       providerId,
       model,

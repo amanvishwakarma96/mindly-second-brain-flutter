@@ -35,8 +35,7 @@ abstract final class Tier3UiPresenter {
         'The selected provider key is missing.',
       Tier3GenerationOutcomeKind.spendBlocked =>
         'Your spend cap blocked this AI request.',
-      Tier3GenerationOutcomeKind.muted =>
-        'AI synthesis is muted.',
+      Tier3GenerationOutcomeKind.muted => 'AI synthesis is muted.',
       Tier3GenerationOutcomeKind.providerFailure =>
         'The provider request failed. Your local insights are still available.',
       Tier3GenerationOutcomeKind.invalidResponse =>

@@ -47,7 +47,9 @@ class Tier3EvidenceBuilder {
       if (raw.isEmpty) continue;
       final remaining = maxCharacters - usedCharacters;
       if (remaining <= 0) break;
-      final content = raw.length <= remaining ? raw : raw.substring(0, remaining);
+      final content = raw.length <= remaining
+          ? raw
+          : raw.substring(0, remaining);
       if (content.trim().isEmpty) break;
       sources.add(
         Tier3EvidenceSource(

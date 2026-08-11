@@ -10,11 +10,7 @@ import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
 
 class WebInsightsScreen extends StatefulWidget {
-  const WebInsightsScreen({
-    super.key,
-    this.controller,
-    this.tier3Controller,
-  });
+  const WebInsightsScreen({super.key, this.controller, this.tier3Controller});
 
   static const screenKey = ValueKey<String>('screen-web-insights');
 
@@ -260,15 +256,21 @@ class _WebInsightsScreenState extends State<WebInsightsScreen> {
                               child: _WebInsightCard(
                                 insight: insight,
                                 onOpenSource: _openSource,
-                                onDismiss: insight.kind == InsightKind.aiSynthesis
+                                onDismiss:
+                                    insight.kind == InsightKind.aiSynthesis
                                     ? _dismissTier3
                                     : () => _replaceFuture(
-                                        _controller.dismiss(insight.fingerprint),
+                                        _controller.dismiss(
+                                          insight.fingerprint,
+                                        ),
                                       ),
                                 onMute: insight.kind == InsightKind.aiSynthesis
                                     ? _muteTier3
                                     : () => _replaceFuture(
-                                        _controller.setMuted(insight.kind, true),
+                                        _controller.setMuted(
+                                          insight.kind,
+                                          true,
+                                        ),
                                       ),
                               ),
                             ),
@@ -337,7 +339,10 @@ class _WebTier3Panel extends StatelessWidget {
                 decoration: const InputDecoration(labelText: 'Provider'),
                 items: const [
                   DropdownMenuItem(value: 'openai', child: Text('OpenAI')),
-                  DropdownMenuItem(value: 'anthropic', child: Text('Anthropic')),
+                  DropdownMenuItem(
+                    value: 'anthropic',
+                    child: Text('Anthropic'),
+                  ),
                 ],
                 onChanged: busy
                     ? null
@@ -417,12 +422,20 @@ class _WebInsightCard extends StatelessWidget {
             Wrap(
               spacing: MindlySpacing.sm,
               children: [
-                OutlinedButton(onPressed: onMute, child: const Text('Mute type')),
-                FilledButton(onPressed: onDismiss, child: const Text('Dismiss')),
+                OutlinedButton(
+                  onPressed: onMute,
+                  child: const Text('Mute type'),
+                ),
+                FilledButton(
+                  onPressed: onDismiss,
+                  child: const Text('Dismiss'),
+                ),
               ],
             ),
             const SizedBox(height: MindlySpacing.sm),
-            Text('${insight.tier.name.toUpperCase()} · ${insight.kind.displayName}'),
+            Text(
+              '${insight.tier.name.toUpperCase()} · ${insight.kind.displayName}',
+            ),
           ],
         ),
       ),

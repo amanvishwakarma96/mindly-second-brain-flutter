@@ -77,10 +77,7 @@ that appear verbatim in the supplied evidence. Return only the requested object.
           {
             'role': 'user',
             'content': [
-              {
-                'type': 'input_text',
-                'text': _evidencePrompt(evidence),
-              },
+              {'type': 'input_text', 'text': _evidencePrompt(evidence)},
             ],
           },
         ],
@@ -177,7 +174,10 @@ that appear verbatim in the supplied evidence. Return only the requested object.
     );
   }
 
-  Map<String, Object?> _successfulBody(http.Response response, String providerId) {
+  Map<String, Object?> _successfulBody(
+    http.Response response,
+    String providerId,
+  ) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Tier3ProviderRequestException(
         providerId: providerId,
@@ -261,7 +261,8 @@ that appear verbatim in the supplied evidence. Return only the requested object.
     return model;
   }
 
-  String _evidencePrompt(Tier3EvidenceBundle evidence) => '''
+  String _evidencePrompt(Tier3EvidenceBundle evidence) =>
+      '''
 Use this bounded local evidence bundle. Every source_ids value in your response must be one of the source_id values below.
 
 ${evidence.toPromptJson()}

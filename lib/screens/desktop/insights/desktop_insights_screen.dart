@@ -205,7 +205,10 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                 children: [
                   const MindlyBrandBadge(),
                   const SizedBox(height: MindlySpacing.xl),
-                  Text('Insights', style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'Insights',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: MindlySpacing.sm),
                   const Text('Local signals stay available without AI.'),
                   const SizedBox(height: MindlySpacing.lg),
@@ -363,7 +366,10 @@ class _DesktopInsightDetail extends StatelessWidget {
           Text(insight.body),
           if (insight.explanation != null) ...[
             const SizedBox(height: MindlySpacing.md),
-            Text('Why this surfaced', style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              'Why this surfaced',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: MindlySpacing.xs),
             Text(insight.explanation!),
           ],

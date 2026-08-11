@@ -41,29 +41,35 @@ void main() {
         id: 'c1',
         title: 'Launch plan',
       ),
-      rawText: 'Launch is Friday. Review the rollout checklist before Thursday.',
+      rawText:
+          'Launch is Friday. Review the rollout checklist before Thursday.',
     ),
   );
 
-  test('preview is local-only and reports missing key before dispatch', () async {
-    final store = InMemorySecretStore();
-    final spendStore = SecureSpendStore(store);
-    final transport = _FakeTier3Transport();
-    final service = _service(
-      store: store,
-      spendStore: spendStore,
-      transport: transport,
-      evidenceBuilder: evidenceBuilder(),
-      now: now,
-    );
+  test(
+    'preview is local-only and reports missing key before dispatch',
+    () async {
+      final store = InMemorySecretStore();
+      final spendStore = SecureSpendStore(store);
+      final transport = _FakeTier3Transport();
+      final service = _service(
+        store: store,
+        spendStore: spendStore,
+        transport: transport,
+        evidenceBuilder: evidenceBuilder(),
+        now: now,
+      );
 
-    final preview = await service.preview(ExtractionProviderProfile.openAiDefault);
+      final preview = await service.preview(
+        ExtractionProviderProfile.openAiDefault,
+      );
 
-    expect(preview.status, Tier3PreviewStatus.missingKey);
-    expect(preview.sourceCount, 1);
-    expect(preview.estimate, isNotNull);
-    expect(transport.calls, 0);
-  });
+      expect(preview.status, Tier3PreviewStatus.missingKey);
+      expect(preview.sourceCount, 1);
+      expect(preview.estimate, isNotNull);
+      expect(transport.calls, 0);
+    },
+  );
 
   test('spend cap denial blocks before provider dispatch', () async {
     final store = InMemorySecretStore();
@@ -83,51 +89,61 @@ void main() {
       now: now,
     );
 
-    final outcome = await service.generate(ExtractionProviderProfile.openAiDefault);
+    final outcome = await service.generate(
+      ExtractionProviderProfile.openAiDefault,
+    );
 
     expect(outcome.kind, Tier3GenerationOutcomeKind.spendBlocked);
     expect(transport.calls, 0);
-    expect(await spendStore.entriesSince(now.subtract(const Duration(days: 1))), isEmpty);
-  });
-
-  test('valid provider response surfaces only locally rebuilt source refs', () async {
-    final store = InMemorySecretStore();
-    final spendStore = SecureSpendStore(store);
-    final keyService = ProviderKeyService(
-      repository: ProviderKeyRepository(store),
-      isWeb: false,
-    );
-    await keyService.saveKey('openai', 'test-key');
-    final transport = _FakeTier3Transport(
-      response: const Tier3ProviderResponse(
-        outputText:
-            '{"title":"Review rollout","body":"Review the rollout checklist before launch.","explanation":"The local launch source says the checklist should be reviewed before Thursday.","severity":"recommendation","source_ids":["capture:c1"]}',
-        inputTokens: 100,
-        outputTokens: 40,
-      ),
-    );
-    final service = _service(
-      store: store,
-      spendStore: spendStore,
-      transport: transport,
-      evidenceBuilder: evidenceBuilder(),
-      now: now,
-    );
-
-    final outcome = await service.generate(ExtractionProviderProfile.openAiDefault);
-
-    expect(outcome.kind, Tier3GenerationOutcomeKind.generated);
-    expect(outcome.insight?.tier, InsightTier.tier3);
-    expect(outcome.insight?.kind, InsightKind.aiSynthesis);
-    expect(outcome.insight?.sources.single.id, 'c1');
-    expect(outcome.insight?.sources.single.title, 'Launch plan');
-    expect(outcome.insight?.explanation, contains('local launch source'));
-    expect(transport.calls, 1);
     expect(
       await spendStore.entriesSince(now.subtract(const Duration(days: 1))),
-      hasLength(1),
+      isEmpty,
     );
   });
+
+  test(
+    'valid provider response surfaces only locally rebuilt source refs',
+    () async {
+      final store = InMemorySecretStore();
+      final spendStore = SecureSpendStore(store);
+      final keyService = ProviderKeyService(
+        repository: ProviderKeyRepository(store),
+        isWeb: false,
+      );
+      await keyService.saveKey('openai', 'test-key');
+      final transport = _FakeTier3Transport(
+        response: const Tier3ProviderResponse(
+          outputText:
+              '{"title":"Review rollout","body":"Review the rollout checklist before launch.","explanation":"The local launch source says the checklist should be reviewed before Thursday.","severity":"recommendation","source_ids":["capture:c1"]}',
+          inputTokens: 100,
+          outputTokens: 40,
+        ),
+      );
+      final service = _service(
+        store: store,
+        spendStore: spendStore,
+        transport: transport,
+        evidenceBuilder: evidenceBuilder(),
+        now: now,
+      );
+
+      final outcome = await service.generate(
+        ExtractionProviderProfile.openAiDefault,
+      );
+
+      expect(outcome.kind, Tier3GenerationOutcomeKind.generated);
+      expect(outcome.insight?.tier, InsightTier.tier3);
+      expect(outcome.insight?.kind, InsightKind.aiSynthesis);
+      expect(outcome.insight?.sources.single.id, 'c1');
+      expect(outcome.insight?.sources.single.title, 'Launch plan');
+      expect(outcome.insight?.explanation, contains('local launch source'));
+      expect(transport.calls, 1);
+      expect(
+        await spendStore.entriesSince(now.subtract(const Duration(days: 1))),
+        hasLength(1),
+      );
+    },
+  );
 
   test('unknown provider source ID rejects the generated insight', () async {
     final store = InMemorySecretStore();
@@ -151,7 +167,9 @@ void main() {
       now: now,
     );
 
-    final outcome = await service.generate(ExtractionProviderProfile.openAiDefault);
+    final outcome = await service.generate(
+      ExtractionProviderProfile.openAiDefault,
+    );
 
     expect(outcome.kind, Tier3GenerationOutcomeKind.invalidResponse);
     expect(outcome.insight, isNull);
@@ -175,11 +193,16 @@ void main() {
       now: now,
     );
 
-    final outcome = await service.generate(ExtractionProviderProfile.openAiDefault);
+    final outcome = await service.generate(
+      ExtractionProviderProfile.openAiDefault,
+    );
 
     expect(outcome.kind, Tier3GenerationOutcomeKind.providerFailure);
     expect(outcome.toString(), isNot(contains(rawKey)));
-    expect(await spendStore.entriesSince(now.subtract(const Duration(days: 1))), isEmpty);
+    expect(
+      await spendStore.entriesSince(now.subtract(const Duration(days: 1))),
+      isEmpty,
+    );
   });
 
   test('muted AI synthesis blocks before dispatch', () async {
@@ -203,7 +226,9 @@ void main() {
       now: now,
     );
 
-    final outcome = await service.generate(ExtractionProviderProfile.openAiDefault);
+    final outcome = await service.generate(
+      ExtractionProviderProfile.openAiDefault,
+    );
 
     expect(outcome.kind, Tier3GenerationOutcomeKind.muted);
     expect(transport.calls, 0);

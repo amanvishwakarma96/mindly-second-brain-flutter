@@ -50,13 +50,9 @@ abstract class Tier3InsightController {
     return DefaultTier3InsightController(service);
   }
 
-  Future<Tier3GenerationPreview> preview(
-    ExtractionProviderProfile profile,
-  );
+  Future<Tier3GenerationPreview> preview(ExtractionProviderProfile profile);
 
-  Future<Tier3GenerationOutcome> generate(
-    ExtractionProviderProfile profile,
-  );
+  Future<Tier3GenerationOutcome> generate(ExtractionProviderProfile profile);
 }
 
 class DefaultTier3InsightController implements Tier3InsightController {
