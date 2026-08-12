@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mindly/app/app_routes.dart';
 import 'package:mindly/app/platform/platform_screen_router.dart';
@@ -6,10 +8,11 @@ import 'package:mindly/features/ai_settings/application/provider_settings_contro
 import 'package:mindly/features/audio_capture/application/audio_capture_controller.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/memory/application/memory_browser_controller.dart';
+import 'package:mindly/features/notifications/application/notification_controller.dart';
 import 'package:mindly/features/text_capture/application/text_capture_controller.dart';
 import 'package:mindly/shared/design_tokens/mindly_theme.dart';
 
-class MindlyApp extends StatelessWidget {
+class MindlyApp extends StatefulWidget {
   const MindlyApp({
     super.key,
     this.screenFamilyOverride,
@@ -18,6 +21,7 @@ class MindlyApp extends StatelessWidget {
     this.audioCaptureControllerOverride,
     this.memoryBrowserControllerOverride,
     this.insightControllerOverride,
+    this.notificationControllerOverride,
   });
 
   final ScreenFamily? screenFamilyOverride;
@@ -26,12 +30,37 @@ class MindlyApp extends StatelessWidget {
   final AudioCaptureController? audioCaptureControllerOverride;
   final MemoryBrowserController? memoryBrowserControllerOverride;
   final InsightController? insightControllerOverride;
+  final NotificationController? notificationControllerOverride;
+
+  @override
+  State<MindlyApp> createState() => _MindlyAppState();
+}
+
+class _MindlyAppState extends State<MindlyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  late final NotificationController _notificationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationController =
+        widget.notificationControllerOverride ??
+        NotificationController.production(onOpenRoute: _openNotificationRoute);
+    unawaited(_notificationController.initializeAndReconcile());
+  }
+
+  void _openNotificationRoute(String route) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigatorKey.currentState?.pushNamed(route);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final family = screenFamilyOverride ?? resolveScreenFamily();
+    final family = widget.screenFamilyOverride ?? resolveScreenFamily();
 
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Mindly',
       debugShowCheckedModeBanner: false,
       theme: MindlyTheme.light(),
@@ -42,7 +71,7 @@ class MindlyApp extends StatelessWidget {
             settings: settings,
             builder: (_) => buildPlatformTextCapture(
               family,
-              controller: textCaptureControllerOverride,
+              controller: widget.textCaptureControllerOverride,
             ),
           );
         }
@@ -51,7 +80,7 @@ class MindlyApp extends StatelessWidget {
             settings: settings,
             builder: (_) => buildPlatformAudioCapture(
               family,
-              controller: audioCaptureControllerOverride,
+              controller: widget.audioCaptureControllerOverride,
             ),
           );
         }
@@ -60,7 +89,7 @@ class MindlyApp extends StatelessWidget {
             settings: settings,
             builder: (_) => buildPlatformMemory(
               family,
-              controller: memoryBrowserControllerOverride,
+              controller: widget.memoryBrowserControllerOverride,
             ),
           );
         }
@@ -69,7 +98,7 @@ class MindlyApp extends StatelessWidget {
             settings: settings,
             builder: (_) => buildPlatformInsights(
               family,
-              controller: insightControllerOverride,
+              controller: widget.insightControllerOverride,
             ),
           );
         }
@@ -78,7 +107,16 @@ class MindlyApp extends StatelessWidget {
             settings: settings,
             builder: (_) => buildPlatformProviderSettings(
               family,
-              controller: providerSettingsControllerOverride,
+              controller: widget.providerSettingsControllerOverride,
+            ),
+          );
+        }
+        if (settings.name == AppRoutes.notificationSettings) {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => buildPlatformNotificationSettings(
+              family,
+              controller: _notificationController,
             ),
           );
         }
