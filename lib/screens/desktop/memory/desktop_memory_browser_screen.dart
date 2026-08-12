@@ -66,7 +66,7 @@ class _DesktopMemoryBrowserScreenState
     final current = _selected == null
         ? -1
         : items.indexWhere((item) => item.id == _selected!.id);
-    final next = (current + delta).clamp(0, items.length - 1);
+    final next = (current + delta).clamp(0, items.length - 1).toInt();
     setState(() => _selected = items[next]);
   }
 
