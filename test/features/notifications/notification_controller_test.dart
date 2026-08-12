@@ -13,16 +13,24 @@ import 'package:mindly/features/notifications/domain/notification_models.dart';
 
 void main() {
   test(
-    'startup initialization never requests permission when disabled',
+    'startup stays fully lazy and never requests permission when disabled',
     () async {
       final gateway = _FakeGateway();
-      final controller = _controller(gateway: gateway);
+      var insightFactoryCalls = 0;
+      final controller = _controller(
+        gateway: gateway,
+        insightControllerFactory: () {
+          insightFactoryCalls++;
+          return const _FakeInsightController([]);
+        },
+      );
 
       await controller.initializeAndReconcile();
 
-      expect(gateway.initializeCalls, 1);
+      expect(gateway.initializeCalls, 0);
       expect(gateway.permissionCalls, 0);
       expect(gateway.scheduled, isEmpty);
+      expect(insightFactoryCalls, 0);
     },
   );
 
@@ -117,7 +125,15 @@ void main() {
   test('notification payload only routes an Insights payload', () async {
     final routes = <String>[];
     final gateway = _FakeGateway();
-    final controller = _controller(gateway: gateway, onOpenRoute: routes.add);
+    final controller = _controller(
+      gateway: gateway,
+      preferenceStore: _MemoryPreferenceStore(
+        const NotificationPreferences(
+          digestFrequency: NotificationDigestFrequency.daily,
+        ),
+      ),
+      onOpenRoute: routes.add,
+    );
     await controller.initializeAndReconcile();
 
     gateway.emit(const NotificationPayload(route: AppRoutes.insights).encode());
@@ -133,6 +149,7 @@ DefaultNotificationController _controller({
   _MemoryPreferenceStore? preferenceStore,
   _MemoryDeliveryStore? deliveryStore,
   InsightController? insightController,
+  InsightController Function()? insightControllerFactory,
   void Function(String route)? onOpenRoute,
 }) {
   return DefaultNotificationController(
@@ -140,7 +157,9 @@ DefaultNotificationController _controller({
     deliveryStore: deliveryStore ?? _MemoryDeliveryStore(),
     planner: const NotificationPlanner(digestWindowSize: 2),
     gateway: gateway,
-    insightController: insightController ?? const _FakeInsightController([]),
+    insightControllerFactory:
+        insightControllerFactory ??
+        () => insightController ?? const _FakeInsightController([]),
     onOpenRoute: onOpenRoute ?? (_) {},
     now: () => DateTime(2026, 8, 12, 12),
   );
