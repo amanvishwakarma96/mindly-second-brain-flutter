@@ -4,11 +4,16 @@ import 'package:mindly/features/ai_settings/domain/cost_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 
 class DesktopProviderSettingsScreen extends StatefulWidget {
-  const DesktopProviderSettingsScreen({super.key, this.controller});
+  const DesktopProviderSettingsScreen({
+    super.key,
+    this.controller,
+    this.embedded = false,
+  });
 
   static const screenKey = ValueKey<String>('screen-desktop-provider-settings');
 
   final ProviderSettingsController? controller;
+  final bool embedded;
 
   @override
   State<DesktopProviderSettingsScreen> createState() =>
@@ -72,99 +77,108 @@ class _DesktopProviderSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final content = _buildContent(context);
+    if (widget.embedded) {
+      return KeyedSubtree(
+        key: const ValueKey<String>('desktop-settings-provider-tab'),
+        child: content,
+      );
+    }
+
     return Scaffold(
       key: DesktopProviderSettingsScreen.screenKey,
       appBar: AppBar(title: const Text('AI provider settings')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: ListView(
-            padding: const EdgeInsets.all(MindlySpacing.xl),
-            children: [
-              Text(
-                'Bring your own API key',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: MindlySpacing.lg),
-              DropdownButtonFormField<String>(
-                initialValue: _providerId,
-                decoration: const InputDecoration(labelText: 'Provider'),
-                items: const [
-                  DropdownMenuItem(value: 'openai', child: Text('OpenAI')),
-                  DropdownMenuItem(
-                    value: 'anthropic',
-                    child: Text('Anthropic'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'compatible',
-                    child: Text('OpenAI-compatible'),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _providerId = value!),
-              ),
-              const SizedBox(height: MindlySpacing.md),
-              TextField(
-                controller: _keyController,
-                obscureText: true,
-                autocorrect: false,
-                enableSuggestions: false,
-                decoration: const InputDecoration(labelText: 'API key'),
-              ),
-              const SizedBox(height: MindlySpacing.md),
-              Wrap(
-                spacing: MindlySpacing.sm,
-                children: [
-                  FilledButton(
-                    onPressed: _saveKey,
-                    child: const Text('Save / rotate key'),
-                  ),
-                  TextButton(
-                    onPressed: _removeKey,
-                    child: const Text('Remove key'),
-                  ),
-                ],
-              ),
-              const Divider(height: MindlySpacing.xl),
-              Text(
-                'Cost controls',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: MindlySpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _dailyController,
-                      decoration: const InputDecoration(
-                        labelText: 'Daily cap (USD)',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: MindlySpacing.md),
-                  Expanded(
-                    child: TextField(
-                      controller: _weeklyController,
-                      decoration: const InputDecoration(
-                        labelText: 'Weekly cap (USD)',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: MindlySpacing.md),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton(
-                  onPressed: _saveCaps,
-                  child: const Text('Save spend caps'),
+      body: content,
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: ListView(
+          padding: const EdgeInsets.all(MindlySpacing.xl),
+          children: [
+            Text(
+              'Bring your own API key',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: MindlySpacing.lg),
+            DropdownButtonFormField<String>(
+              initialValue: _providerId,
+              decoration: const InputDecoration(labelText: 'Provider'),
+              items: const [
+                DropdownMenuItem(value: 'openai', child: Text('OpenAI')),
+                DropdownMenuItem(
+                  value: 'anthropic',
+                  child: Text('Anthropic'),
                 ),
-              ),
-              if (_status.isNotEmpty) ...[
-                const SizedBox(height: MindlySpacing.md),
-                Text(_status),
+                DropdownMenuItem(
+                  value: 'compatible',
+                  child: Text('OpenAI-compatible'),
+                ),
               ],
+              onChanged: (value) => setState(() => _providerId = value!),
+            ),
+            const SizedBox(height: MindlySpacing.md),
+            TextField(
+              controller: _keyController,
+              obscureText: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              decoration: const InputDecoration(labelText: 'API key'),
+            ),
+            const SizedBox(height: MindlySpacing.md),
+            Wrap(
+              spacing: MindlySpacing.sm,
+              children: [
+                FilledButton(
+                  onPressed: _saveKey,
+                  child: const Text('Save / rotate key'),
+                ),
+                TextButton(
+                  onPressed: _removeKey,
+                  child: const Text('Remove key'),
+                ),
+              ],
+            ),
+            const Divider(height: MindlySpacing.xl),
+            Text('Cost controls', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: MindlySpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _dailyController,
+                    decoration: const InputDecoration(
+                      labelText: 'Daily cap (USD)',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: MindlySpacing.md),
+                Expanded(
+                  child: TextField(
+                    controller: _weeklyController,
+                    decoration: const InputDecoration(
+                      labelText: 'Weekly cap (USD)',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: MindlySpacing.md),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton(
+                onPressed: _saveCaps,
+                child: const Text('Save spend caps'),
+              ),
+            ),
+            if (_status.isNotEmpty) ...[
+              const SizedBox(height: MindlySpacing.md),
+              Text(_status),
             ],
-          ),
+          ],
         ),
       ),
     );
