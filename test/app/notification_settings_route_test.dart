@@ -5,16 +5,30 @@ import 'package:mindly/app/mindly_app.dart';
 import 'package:mindly/app/platform/screen_family.dart';
 import 'package:mindly/features/notifications/application/notification_controller.dart';
 import 'package:mindly/features/notifications/domain/notification_models.dart';
+import 'package:mindly/screens/desktop/home/desktop_home_screen.dart';
 import 'package:mindly/screens/desktop/settings/desktop_notification_settings_screen.dart';
+import 'package:mindly/screens/mobile/home/mobile_home_screen.dart';
 import 'package:mindly/screens/mobile/settings/mobile_notification_settings_screen.dart';
+import 'package:mindly/screens/web/home/web_home_screen.dart';
 import 'package:mindly/screens/web/settings/web_notification_settings_screen.dart';
 
 void main() {
-  for (final entry in <ScreenFamily, Key>{
-    ScreenFamily.mobile: MobileNotificationSettingsScreen.screenKey,
-    ScreenFamily.desktop: DesktopNotificationSettingsScreen.screenKey,
-    ScreenFamily.web: WebNotificationSettingsScreen.screenKey,
-  }.entries) {
+  final cases = <ScreenFamily, ({Key homeKey, Key targetKey})>{
+    ScreenFamily.mobile: (
+      homeKey: MobileHomeScreen.screenKey,
+      targetKey: MobileNotificationSettingsScreen.screenKey,
+    ),
+    ScreenFamily.desktop: (
+      homeKey: DesktopHomeScreen.screenKey,
+      targetKey: DesktopNotificationSettingsScreen.screenKey,
+    ),
+    ScreenFamily.web: (
+      homeKey: WebHomeScreen.screenKey,
+      targetKey: WebNotificationSettingsScreen.screenKey,
+    ),
+  };
+
+  for (final entry in cases.entries) {
     testWidgets('${entry.key.name} routes to its own notification settings', (
       tester,
     ) async {
@@ -27,17 +41,21 @@ void main() {
           notificationControllerOverride: controller,
         ),
       );
+      await tester.pump();
+
+      final homeFinder = find.byKey(entry.value.homeKey);
+      expect(homeFinder, findsOneWidget);
       Navigator.of(
-        tester.element(find.byType(Scaffold).first),
+        tester.element(homeFinder),
       ).pushNamed(AppRoutes.notificationSettings);
       await tester.pumpAndSettle();
 
-      expect(find.byKey(entry.value), findsOneWidget);
+      expect(find.byKey(entry.value.targetKey), findsOneWidget);
       final otherKeys = <Key>{
         MobileNotificationSettingsScreen.screenKey,
         DesktopNotificationSettingsScreen.screenKey,
         WebNotificationSettingsScreen.screenKey,
-      }..remove(entry.value);
+      }..remove(entry.value.targetKey);
       for (final key in otherKeys) {
         expect(find.byKey(key), findsNothing);
       }
