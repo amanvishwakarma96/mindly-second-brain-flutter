@@ -7,6 +7,7 @@ class DesktopNotificationSettingsScreen extends StatefulWidget {
   const DesktopNotificationSettingsScreen({
     super.key,
     required this.controller,
+    this.embedded = false,
   });
 
   static const screenKey = ValueKey<String>(
@@ -14,6 +15,7 @@ class DesktopNotificationSettingsScreen extends StatefulWidget {
   );
 
   final NotificationController controller;
+  final bool embedded;
 
   @override
   State<DesktopNotificationSettingsScreen> createState() =>
@@ -64,182 +66,186 @@ class _DesktopNotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final capabilities = widget.controller.capabilities;
+    final content = _buildContent(context);
+    if (widget.embedded) {
+      return KeyedSubtree(
+        key: const ValueKey<String>('desktop-settings-notification-tab'),
+        child: content,
+      );
+    }
+
     return Scaffold(
       key: DesktopNotificationSettingsScreen.screenKey,
       appBar: AppBar(title: const Text('Notification preferences')),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(MindlySpacing.xl),
-                child: SizedBox(
-                  width: 720,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(MindlySpacing.xl),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Helpful, not noisy',
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                          const SizedBox(height: MindlySpacing.sm),
-                          Text(capabilities.message),
-                          const SizedBox(height: MindlySpacing.lg),
-                          SwitchListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: const Text('Tier 2 pattern alerts'),
-                            subtitle: const Text(
-                              'Schedule one local alert for each newly surfaced Tier 2 insight.',
+      body: content,
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    final capabilities = widget.controller.capabilities;
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(MindlySpacing.xl),
+        child: SizedBox(
+          width: 720,
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(MindlySpacing.xl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Helpful, not noisy',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: MindlySpacing.sm),
+                  Text(capabilities.message),
+                  const SizedBox(height: MindlySpacing.lg),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Tier 2 pattern alerts'),
+                    subtitle: const Text(
+                      'Schedule one local alert for each newly surfaced Tier 2 insight.',
+                    ),
+                    value: _preferences.tier2AlertsEnabled,
+                    onChanged: capabilities.canSchedule
+                        ? (value) => setState(
+                            () => _preferences = _preferences.copyWith(
+                              tier2AlertsEnabled: value,
                             ),
-                            value: _preferences.tier2AlertsEnabled,
-                            onChanged: capabilities.canSchedule
-                                ? (value) => setState(
-                                    () => _preferences = _preferences.copyWith(
-                                      tier2AlertsEnabled: value,
-                                    ),
+                          )
+                        : null,
+                  ),
+                  const Divider(),
+                  DropdownButtonFormField<NotificationDigestFrequency>(
+                    initialValue: _preferences.digestFrequency,
+                    decoration: const InputDecoration(
+                      labelText: 'Digest frequency',
+                    ),
+                    items: [
+                      for (final value in NotificationDigestFrequency.values)
+                        DropdownMenuItem(
+                          value: value,
+                          child: Text(value.displayName),
+                        ),
+                    ],
+                    onChanged: capabilities.canSchedule
+                        ? (value) => setState(
+                            () => _preferences = _preferences.copyWith(
+                              digestFrequency:
+                                  value ?? NotificationDigestFrequency.off,
+                            ),
+                          )
+                        : null,
+                  ),
+                  const SizedBox(height: MindlySpacing.md),
+                  _TimeRow(
+                    label: 'Digest time',
+                    value: _format(
+                      _preferences.digestHour * 60 + _preferences.digestMinute,
+                    ),
+                    enabled: capabilities.canSchedule,
+                    onTap: () async {
+                      final picked = await _pick(
+                        _preferences.digestHour * 60 + _preferences.digestMinute,
+                      );
+                      if (picked == null) return;
+                      setState(() {
+                        _preferences = _preferences.copyWith(
+                          digestHour: picked.hour,
+                          digestMinute: picked.minute,
+                        );
+                      });
+                    },
+                  ),
+                  const Divider(),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Quiet hours'),
+                    subtitle: const Text(
+                      'Alerts that land in this window wait until quiet hours end.',
+                    ),
+                    value: _preferences.quietHoursEnabled,
+                    onChanged: capabilities.canSchedule
+                        ? (enabled) => setState(() {
+                            _preferences = enabled
+                                ? _preferences.copyWith(
+                                    quietStartMinutes: 22 * 60,
+                                    quietEndMinutes: 7 * 60,
                                   )
-                                : null,
-                          ),
-                          const Divider(),
-                          DropdownButtonFormField<NotificationDigestFrequency>(
-                            initialValue: _preferences.digestFrequency,
-                            decoration: const InputDecoration(
-                              labelText: 'Digest frequency',
-                            ),
-                            items: [
-                              for (final value
-                                  in NotificationDigestFrequency.values)
-                                DropdownMenuItem(
-                                  value: value,
-                                  child: Text(value.displayName),
-                                ),
-                            ],
-                            onChanged: capabilities.canSchedule
-                                ? (value) => setState(
-                                    () => _preferences = _preferences.copyWith(
-                                      digestFrequency:
-                                          value ??
-                                          NotificationDigestFrequency.off,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(height: MindlySpacing.md),
-                          _TimeRow(
-                            label: 'Digest time',
-                            value: _format(
-                              _preferences.digestHour * 60 +
-                                  _preferences.digestMinute,
-                            ),
-                            enabled: capabilities.canSchedule,
+                                : _preferences.copyWith(
+                                    quietEndMinutes:
+                                        _preferences.quietStartMinutes,
+                                  );
+                          })
+                        : null,
+                  ),
+                  if (_preferences.quietHoursEnabled)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TimeRow(
+                            label: 'Quiet starts',
+                            value: _format(_preferences.quietStartMinutes),
+                            enabled: true,
                             onTap: () async {
                               final picked = await _pick(
-                                _preferences.digestHour * 60 +
-                                    _preferences.digestMinute,
+                                _preferences.quietStartMinutes,
                               );
                               if (picked == null) return;
                               setState(() {
                                 _preferences = _preferences.copyWith(
-                                  digestHour: picked.hour,
-                                  digestMinute: picked.minute,
+                                  quietStartMinutes:
+                                      picked.hour * 60 + picked.minute,
                                 );
                               });
                             },
                           ),
-                          const Divider(),
-                          SwitchListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: const Text('Quiet hours'),
-                            subtitle: const Text(
-                              'Alerts that land in this window wait until quiet hours end.',
-                            ),
-                            value: _preferences.quietHoursEnabled,
-                            onChanged: capabilities.canSchedule
-                                ? (enabled) => setState(() {
-                                    _preferences = enabled
-                                        ? _preferences.copyWith(
-                                            quietStartMinutes: 22 * 60,
-                                            quietEndMinutes: 7 * 60,
-                                          )
-                                        : _preferences.copyWith(
-                                            quietEndMinutes:
-                                                _preferences.quietStartMinutes,
-                                          );
-                                  })
-                                : null,
+                        ),
+                        const SizedBox(width: MindlySpacing.lg),
+                        Expanded(
+                          child: _TimeRow(
+                            label: 'Quiet ends',
+                            value: _format(_preferences.quietEndMinutes),
+                            enabled: true,
+                            onTap: () async {
+                              final picked = await _pick(
+                                _preferences.quietEndMinutes,
+                              );
+                              if (picked == null) return;
+                              setState(() {
+                                _preferences = _preferences.copyWith(
+                                  quietEndMinutes:
+                                      picked.hour * 60 + picked.minute,
+                                );
+                              });
+                            },
                           ),
-                          if (_preferences.quietHoursEnabled)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _TimeRow(
-                                    label: 'Quiet starts',
-                                    value: _format(
-                                      _preferences.quietStartMinutes,
-                                    ),
-                                    enabled: true,
-                                    onTap: () async {
-                                      final picked = await _pick(
-                                        _preferences.quietStartMinutes,
-                                      );
-                                      if (picked == null) return;
-                                      setState(() {
-                                        _preferences = _preferences.copyWith(
-                                          quietStartMinutes:
-                                              picked.hour * 60 + picked.minute,
-                                        );
-                                      });
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: MindlySpacing.lg),
-                                Expanded(
-                                  child: _TimeRow(
-                                    label: 'Quiet ends',
-                                    value: _format(
-                                      _preferences.quietEndMinutes,
-                                    ),
-                                    enabled: true,
-                                    onTap: () async {
-                                      final picked = await _pick(
-                                        _preferences.quietEndMinutes,
-                                      );
-                                      if (picked == null) return;
-                                      setState(() {
-                                        _preferences = _preferences.copyWith(
-                                          quietEndMinutes:
-                                              picked.hour * 60 + picked.minute,
-                                        );
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          const SizedBox(height: MindlySpacing.lg),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: FilledButton(
-                              onPressed: capabilities.canSchedule && !_saving
-                                  ? _save
-                                  : null,
-                              child: Text(_saving ? 'Saving…' : 'Save'),
-                            ),
-                          ),
-                          if (_status.isNotEmpty) ...[
-                            const SizedBox(height: MindlySpacing.md),
-                            Text(_status),
-                          ],
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: MindlySpacing.lg),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton(
+                      onPressed: capabilities.canSchedule && !_saving ? _save : null,
+                      child: Text(_saving ? 'Saving…' : 'Save'),
                     ),
                   ),
-                ),
+                  if (_status.isNotEmpty) ...[
+                    const SizedBox(height: MindlySpacing.md),
+                    Text(_status),
+                  ],
+                ],
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 
