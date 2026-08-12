@@ -67,6 +67,15 @@ class DesktopHomeScreen extends StatelessWidget {
                               icon: const Icon(Icons.auto_awesome_rounded),
                               label: const Text('Review insights'),
                             ),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.notificationSettings),
+                              icon: const Icon(
+                                Icons.notifications_none_rounded,
+                              ),
+                              label: const Text('Notifications'),
+                            ),
                           ],
                         ),
                       ),
@@ -102,35 +111,51 @@ class _DesktopSidebar extends StatelessWidget {
         children: [
           const MindlyBrandBadge(),
           const SizedBox(height: MindlySpacing.xl),
-          const ListTile(
-            leading: Icon(Icons.home_rounded),
-            title: Text('Home'),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                const ListTile(
+                  leading: Icon(Icons.home_rounded),
+                  title: Text('Home'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.edit_note_rounded),
+                  title: const Text('Text capture'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.textCapture),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.mic_rounded),
+                  title: const Text('Audio capture'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.audioCapture),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.auto_stories_rounded),
+                  title: const Text('Memory'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.memory),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.auto_awesome_rounded),
+                  title: const Text('Insights'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.insights),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.notifications_none_rounded),
+                  title: const Text('Notifications'),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.notificationSettings),
+                ),
+              ],
+            ),
           ),
-          ListTile(
-            leading: const Icon(Icons.edit_note_rounded),
-            title: const Text('Text capture'),
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.textCapture),
-          ),
-          ListTile(
-            leading: const Icon(Icons.mic_rounded),
-            title: const Text('Audio capture'),
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.audioCapture),
-          ),
-          ListTile(
-            leading: const Icon(Icons.auto_stories_rounded),
-            title: const Text('Memory'),
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.memory),
-          ),
-          ListTile(
-            leading: const Icon(Icons.auto_awesome_rounded),
-            title: const Text('Insights'),
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.insights),
-          ),
-          const Spacer(),
           ListTile(
             leading: const Icon(Icons.settings_rounded),
-            title: const Text('Settings'),
+            title: const Text('AI settings'),
             onTap: () =>
                 Navigator.of(context).pushNamed(AppRoutes.providerSettings),
           ),

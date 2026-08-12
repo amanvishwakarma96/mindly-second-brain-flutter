@@ -75,6 +75,17 @@ class MobileHomeScreen extends StatelessWidget {
               onTap: () => Navigator.of(context).pushNamed(AppRoutes.insights),
             ),
           ),
+          const SizedBox(height: MindlySpacing.md),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.notifications_none_rounded),
+              title: const Text('Notification preferences'),
+              subtitle: const Text('Choose quiet hours and digest frequency.'),
+              onTap: () => Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.notificationSettings),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(

@@ -4,4 +4,5 @@ abstract final class AppRoutes {
   static const memory = '/memory';
   static const insights = '/insights';
   static const providerSettings = '/settings/providers';
+  static const notificationSettings = '/settings/notifications';
 }
