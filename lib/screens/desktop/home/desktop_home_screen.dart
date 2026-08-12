@@ -67,6 +67,13 @@ class DesktopHomeScreen extends StatelessWidget {
                               icon: const Icon(Icons.auto_awesome_rounded),
                               label: const Text('Review insights'),
                             ),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.of(context).pushNamed(
+                                AppRoutes.notificationSettings,
+                              ),
+                              icon: const Icon(Icons.notifications_none_rounded),
+                              label: const Text('Notifications'),
+                            ),
                           ],
                         ),
                       ),
@@ -127,10 +134,17 @@ class _DesktopSidebar extends StatelessWidget {
             title: const Text('Insights'),
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.insights),
           ),
+          ListTile(
+            leading: const Icon(Icons.notifications_none_rounded),
+            title: const Text('Notifications'),
+            onTap: () => Navigator.of(
+              context,
+            ).pushNamed(AppRoutes.notificationSettings),
+          ),
           const Spacer(),
           ListTile(
             leading: const Icon(Icons.settings_rounded),
-            title: const Text('Settings'),
+            title: const Text('AI settings'),
             onTap: () =>
                 Navigator.of(context).pushNamed(AppRoutes.providerSettings),
           ),

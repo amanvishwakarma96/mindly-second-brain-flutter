@@ -62,6 +62,12 @@ class _WideWebHome extends StatelessWidget {
                       Navigator.of(context).pushNamed(AppRoutes.insights),
                   child: const Text('Insights'),
                 ),
+                TextButton(
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.notificationSettings),
+                  child: const Text('Notifications'),
+                ),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () => Navigator.of(
@@ -195,6 +201,14 @@ class _NarrowWebHome extends StatelessWidget {
           onPressed: () => Navigator.of(context).pushNamed(AppRoutes.insights),
           icon: const Icon(Icons.auto_awesome_rounded),
           label: const Text('Review insights'),
+        ),
+        const SizedBox(height: MindlySpacing.sm),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.of(
+            context,
+          ).pushNamed(AppRoutes.notificationSettings),
+          icon: const Icon(Icons.notifications_none_rounded),
+          label: const Text('Notification capability'),
         ),
         const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(
