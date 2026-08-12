@@ -64,13 +64,15 @@ class NotificationPreferences {
   };
 
   factory NotificationPreferences.fromJson(Map<String, Object?> json) {
-    final frequencyName = json['digestFrequency'] as String?;
+    final rawFrequency = json['digestFrequency'];
+    final frequencyName = rawFrequency is String ? rawFrequency : null;
     final frequency = NotificationDigestFrequency.values.firstWhere(
       (value) => value.name == frequencyName,
       orElse: () => NotificationDigestFrequency.off,
     );
+    final rawTier2 = json['tier2AlertsEnabled'];
     return NotificationPreferences(
-      tier2AlertsEnabled: json['tier2AlertsEnabled'] as bool? ?? false,
+      tier2AlertsEnabled: rawTier2 is bool ? rawTier2 : false,
       digestFrequency: frequency,
       digestHour: _boundedInt(json['digestHour'], 0, 23, 9),
       digestMinute: _boundedInt(json['digestMinute'], 0, 59, 0),
@@ -122,20 +124,22 @@ class NotificationDeliveryState {
 
   factory NotificationDeliveryState.fromJson(Map<String, Object?> json) {
     return NotificationDeliveryState(
-      notifiedFingerprints:
-          (json['notifiedFingerprints'] as List<Object?>? ?? const [])
-              .whereType<String>()
-              .toList(growable: false),
-      alertIds: (json['alertIds'] as List<Object?>? ?? const [])
+      notifiedFingerprints: _list(json['notifiedFingerprints'])
+          .whereType<String>()
+          .toList(growable: false),
+      alertIds: _list(json['alertIds'])
           .whereType<num>()
           .map((value) => value.toInt())
           .toList(growable: false),
-      digestIds: (json['digestIds'] as List<Object?>? ?? const [])
+      digestIds: _list(json['digestIds'])
           .whereType<num>()
           .map((value) => value.toInt())
           .toList(growable: false),
     );
   }
+
+  static List<Object?> _list(Object? value) =>
+      value is List ? value.cast<Object?>() : const <Object?>[];
 }
 
 class NotificationPayload {
@@ -156,9 +160,10 @@ class NotificationPayload {
       if (decoded is! Map<String, dynamic>) return null;
       final route = decoded['route'];
       if (route is! String || !route.startsWith('/')) return null;
+      final rawFingerprint = decoded['insightFingerprint'];
       return NotificationPayload(
         route: route,
-        insightFingerprint: decoded['insightFingerprint'] as String?,
+        insightFingerprint: rawFingerprint is String ? rawFingerprint : null,
       );
     } on FormatException {
       return null;
