@@ -16,9 +16,14 @@ class DesktopHomeScreen extends StatelessWidget {
       key: screenKey,
       body: Row(
         children: [
-          const SizedBox(width: 220, child: _DesktopSidebar()),
+          const SizedBox(
+            key: ValueKey<String>('desktop-home-sidebar'),
+            width: 220,
+            child: _DesktopSidebar(),
+          ),
           const VerticalDivider(width: 1),
           Expanded(
+            key: const ValueKey<String>('desktop-home-main'),
             child: Padding(
               padding: const EdgeInsets.all(MindlySpacing.xl),
               child: Column(
@@ -70,11 +75,9 @@ class DesktopHomeScreen extends StatelessWidget {
                             OutlinedButton.icon(
                               onPressed: () => Navigator.of(
                                 context,
-                              ).pushNamed(AppRoutes.notificationSettings),
-                              icon: const Icon(
-                                Icons.notifications_none_rounded,
-                              ),
-                              label: const Text('Notifications'),
+                              ).pushNamed(AppRoutes.settings),
+                              icon: const Icon(Icons.settings_rounded),
+                              label: const Text('Settings'),
                             ),
                           ],
                         ),
@@ -87,10 +90,13 @@ class DesktopHomeScreen extends StatelessWidget {
           ),
           const VerticalDivider(width: 1),
           const SizedBox(
+            key: ValueKey<String>('desktop-home-detail'),
             width: 280,
             child: Padding(
               padding: EdgeInsets.all(MindlySpacing.lg),
-              child: Text('Details and connections'),
+              child: Text(
+                'Review space\n\nOpen Memory or Insights to inspect sources and connections without leaving the desktop workflow.',
+              ),
             ),
           ),
         ],
@@ -143,21 +149,13 @@ class _DesktopSidebar extends StatelessWidget {
                   onTap: () =>
                       Navigator.of(context).pushNamed(AppRoutes.insights),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.notifications_none_rounded),
-                  title: const Text('Notifications'),
-                  onTap: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.notificationSettings),
-                ),
               ],
             ),
           ),
           ListTile(
             leading: const Icon(Icons.settings_rounded),
-            title: const Text('AI settings'),
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+            title: const Text('Settings'),
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.settings),
           ),
         ],
       ),

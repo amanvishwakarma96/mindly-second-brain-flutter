@@ -3,6 +3,7 @@ import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
 import 'package:mindly/features/insights/presentation/tier3_provider_picker.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
+import 'package:mindly/screens/mobile/widgets/mobile_primary_navigation.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 
 class MobileInsightsScreen extends StatefulWidget {
@@ -29,7 +30,9 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
   }
 
   void _replaceFuture(Future<List<ProactiveInsight>> future) {
-    setState(() => _insightsFuture = future);
+    setState(() {
+      _insightsFuture = future;
+    });
   }
 
   Future<void> _openSource(InsightSourceReference source) async {
@@ -306,6 +309,7 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
           );
         },
       ),
+      bottomNavigationBar: const MobilePrimaryNavigation(selectedIndex: 3),
     );
   }
 
