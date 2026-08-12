@@ -123,7 +123,10 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
       id: notification.id,
       title: notification.title,
       body: notification.body,
-      scheduledDate: tz.TZDateTime.from(notification.scheduledAt.toUtc(), tz.UTC),
+      scheduledDate: tz.TZDateTime.from(
+        notification.scheduledAt.toUtc(),
+        tz.UTC,
+      ),
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: notification.payload.encode(),

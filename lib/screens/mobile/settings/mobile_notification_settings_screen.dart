@@ -124,7 +124,9 @@ class _MobileNotificationSettingsScreenState
                 const Divider(),
                 DropdownButtonFormField<NotificationDigestFrequency>(
                   initialValue: _preferences.digestFrequency,
-                  decoration: const InputDecoration(labelText: 'Digest frequency'),
+                  decoration: const InputDecoration(
+                    labelText: 'Digest frequency',
+                  ),
                   items: [
                     for (final value in NotificationDigestFrequency.values)
                       DropdownMenuItem(
@@ -156,7 +158,9 @@ class _MobileNotificationSettingsScreenState
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Quiet hours'),
-                  subtitle: const Text('Delay alerts until your quiet window ends.'),
+                  subtitle: const Text(
+                    'Delay alerts until your quiet window ends.',
+                  ),
                   value: _preferences.quietHoursEnabled,
                   onChanged: capabilities.canSchedule
                       ? (enabled) => setState(() {
@@ -192,7 +196,9 @@ class _MobileNotificationSettingsScreenState
                 ],
                 const SizedBox(height: MindlySpacing.lg),
                 FilledButton(
-                  onPressed: capabilities.canSchedule && !_saving ? _save : null,
+                  onPressed: capabilities.canSchedule && !_saving
+                      ? _save
+                      : null,
                   child: Text(_saving ? 'Saving…' : 'Save preferences'),
                 ),
                 if (_status.isNotEmpty) ...[

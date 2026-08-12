@@ -12,16 +12,19 @@ import 'package:mindly/features/notifications/data/notification_store.dart';
 import 'package:mindly/features/notifications/domain/notification_models.dart';
 
 void main() {
-  test('startup initialization never requests permission when disabled', () async {
-    final gateway = _FakeGateway();
-    final controller = _controller(gateway: gateway);
+  test(
+    'startup initialization never requests permission when disabled',
+    () async {
+      final gateway = _FakeGateway();
+      final controller = _controller(gateway: gateway);
 
-    await controller.initializeAndReconcile();
+      await controller.initializeAndReconcile();
 
-    expect(gateway.initializeCalls, 1);
-    expect(gateway.permissionCalls, 0);
-    expect(gateway.scheduled, isEmpty);
-  });
+      expect(gateway.initializeCalls, 1);
+      expect(gateway.permissionCalls, 0);
+      expect(gateway.scheduled, isEmpty);
+    },
+  );
 
   test('explicit first enable requests permission before scheduling', () async {
     final gateway = _FakeGateway(permissionGranted: true);
@@ -61,25 +64,28 @@ void main() {
     expect(gateway.scheduled, isEmpty);
   });
 
-  test('unsupported scheduling rejects enable without permission request', () async {
-    final gateway = _FakeGateway(
-      capabilities: const NotificationCapabilities(
-        platform: MindlyNotificationPlatform.web,
-        canSchedule: false,
-        canShowImmediate: false,
-        message: 'Web scheduling unavailable.',
-      ),
-    );
-    final controller = _controller(gateway: gateway);
+  test(
+    'unsupported scheduling rejects enable without permission request',
+    () async {
+      final gateway = _FakeGateway(
+        capabilities: const NotificationCapabilities(
+          platform: MindlyNotificationPlatform.web,
+          canSchedule: false,
+          canShowImmediate: false,
+          message: 'Web scheduling unavailable.',
+        ),
+      );
+      final controller = _controller(gateway: gateway);
 
-    final outcome = await controller.savePreferences(
-      const NotificationPreferences(tier2AlertsEnabled: true),
-    );
+      final outcome = await controller.savePreferences(
+        const NotificationPreferences(tier2AlertsEnabled: true),
+      );
 
-    expect(outcome.kind, NotificationSaveOutcomeKind.unsupported);
-    expect(gateway.permissionCalls, 0);
-    expect(gateway.initializeCalls, 0);
-  });
+      expect(outcome.kind, NotificationSaveOutcomeKind.unsupported);
+      expect(gateway.permissionCalls, 0);
+      expect(gateway.initializeCalls, 0);
+    },
+  );
 
   test('Tier 2 fingerprint is scheduled only once across reconciles', () async {
     final gateway = _FakeGateway();
@@ -111,15 +117,10 @@ void main() {
   test('notification payload only routes an Insights payload', () async {
     final routes = <String>[];
     final gateway = _FakeGateway();
-    final controller = _controller(
-      gateway: gateway,
-      onOpenRoute: routes.add,
-    );
+    final controller = _controller(gateway: gateway, onOpenRoute: routes.add);
     await controller.initializeAndReconcile();
 
-    gateway.emit(
-      const NotificationPayload(route: AppRoutes.insights).encode(),
-    );
+    gateway.emit(const NotificationPayload(route: AppRoutes.insights).encode());
     gateway.emit(const NotificationPayload(route: '/memory').encode());
     gateway.emit('not-json');
 
@@ -157,9 +158,7 @@ ProactiveInsight _tier2Insight(String fingerprint) => ProactiveInsight(
 );
 
 class _MemoryPreferenceStore implements NotificationPreferenceStore {
-  _MemoryPreferenceStore([
-    this.value = const NotificationPreferences(),
-  ]);
+  _MemoryPreferenceStore([this.value = const NotificationPreferences()]);
 
   NotificationPreferences value;
 
@@ -173,9 +172,7 @@ class _MemoryPreferenceStore implements NotificationPreferenceStore {
 }
 
 class _MemoryDeliveryStore implements NotificationDeliveryStore {
-  _MemoryDeliveryStore([
-    this.value = const NotificationDeliveryState(),
-  ]);
+  _MemoryDeliveryStore([this.value = const NotificationDeliveryState()]);
 
   NotificationDeliveryState value;
 
@@ -244,7 +241,8 @@ class _FakeInsightController implements InsightController {
   Future<List<ProactiveInsight>> dismiss(String fingerprint) async => insights;
 
   @override
-  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async => null;
+  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async =>
+      null;
 
   @override
   Future<Tier3GenerationOutcome> generateTier3(
@@ -265,5 +263,6 @@ class _FakeInsightController implements InsightController {
       insights;
 
   @override
-  Future<MemoryDetail?> sourceDetail(InsightSourceReference source) async => null;
+  Future<MemoryDetail?> sourceDetail(InsightSourceReference source) async =>
+      null;
 }

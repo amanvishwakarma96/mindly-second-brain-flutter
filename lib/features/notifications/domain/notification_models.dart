@@ -80,12 +80,7 @@ class NotificationPreferences {
         1439,
         22 * 60,
       ),
-      quietEndMinutes: _boundedInt(
-        json['quietEndMinutes'],
-        0,
-        1439,
-        7 * 60,
-      ),
+      quietEndMinutes: _boundedInt(json['quietEndMinutes'], 0, 1439, 7 * 60),
     );
   }
 
@@ -113,8 +108,7 @@ class NotificationDeliveryState {
     List<int>? digestIds,
   }) {
     return NotificationDeliveryState(
-      notifiedFingerprints:
-          notifiedFingerprints ?? this.notifiedFingerprints,
+      notifiedFingerprints: notifiedFingerprints ?? this.notifiedFingerprints,
       alertIds: alertIds ?? this.alertIds,
       digestIds: digestIds ?? this.digestIds,
     );
@@ -128,9 +122,10 @@ class NotificationDeliveryState {
 
   factory NotificationDeliveryState.fromJson(Map<String, Object?> json) {
     return NotificationDeliveryState(
-      notifiedFingerprints: (json['notifiedFingerprints'] as List<Object?>? ?? const [])
-          .whereType<String>()
-          .toList(growable: false),
+      notifiedFingerprints:
+          (json['notifiedFingerprints'] as List<Object?>? ?? const [])
+              .whereType<String>()
+              .toList(growable: false),
       alertIds: (json['alertIds'] as List<Object?>? ?? const [])
           .whereType<num>()
           .map((value) => value.toInt())
@@ -191,7 +186,15 @@ class PlannedNotification {
   final bool isDigest;
 }
 
-enum MindlyNotificationPlatform { android, iOS, macOS, windows, linux, web, other }
+enum MindlyNotificationPlatform {
+  android,
+  iOS,
+  macOS,
+  windows,
+  linux,
+  web,
+  other,
+}
 
 class NotificationCapabilities {
   const NotificationCapabilities({

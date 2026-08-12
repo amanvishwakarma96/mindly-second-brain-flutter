@@ -83,7 +83,9 @@ Widget buildPlatformNotificationSettings(
   ScreenFamily family, {
   required NotificationController controller,
 }) => switch (family) {
-  ScreenFamily.mobile => MobileNotificationSettingsScreen(controller: controller),
+  ScreenFamily.mobile => MobileNotificationSettingsScreen(
+    controller: controller,
+  ),
   ScreenFamily.desktop => DesktopNotificationSettingsScreen(
     controller: controller,
   ),

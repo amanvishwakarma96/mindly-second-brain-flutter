@@ -4,10 +4,7 @@ import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
 
 class WebNotificationSettingsScreen extends StatelessWidget {
-  const WebNotificationSettingsScreen({
-    super.key,
-    required this.controller,
-  });
+  const WebNotificationSettingsScreen({super.key, required this.controller});
 
   static const screenKey = ValueKey<String>('screen-web-notification-settings');
 

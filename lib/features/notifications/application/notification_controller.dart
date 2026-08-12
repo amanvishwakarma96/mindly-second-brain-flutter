@@ -6,7 +6,12 @@ import 'package:mindly/features/notifications/data/local_notification_gateway.da
 import 'package:mindly/features/notifications/data/notification_store.dart';
 import 'package:mindly/features/notifications/domain/notification_models.dart';
 
-enum NotificationSaveOutcomeKind { saved, permissionDenied, unsupported, failed }
+enum NotificationSaveOutcomeKind {
+  saved,
+  permissionDenied,
+  unsupported,
+  failed,
+}
 
 class NotificationSaveOutcome {
   const NotificationSaveOutcome(this.kind, {this.message});

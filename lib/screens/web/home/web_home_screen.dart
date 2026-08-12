@@ -204,9 +204,8 @@ class _NarrowWebHome extends StatelessWidget {
         ),
         const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(
-          onPressed: () => Navigator.of(
-            context,
-          ).pushNamed(AppRoutes.notificationSettings),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.notificationSettings),
           icon: const Icon(Icons.notifications_none_rounded),
           label: const Text('Notification capability'),
         ),

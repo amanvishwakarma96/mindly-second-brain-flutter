@@ -3,7 +3,10 @@ import 'package:mindly/features/insights/domain/insight_models.dart';
 import 'package:mindly/features/notifications/domain/notification_models.dart';
 
 class NotificationPlanner {
-  const NotificationPlanner({this.digestWindowSize = 14, this.maxTier2Alerts = 8});
+  const NotificationPlanner({
+    this.digestWindowSize = 14,
+    this.maxTier2Alerts = 8,
+  });
 
   final int digestWindowSize;
   final int maxTier2Alerts;
@@ -69,10 +72,7 @@ class NotificationPlanner {
       for (var index = 0; index < candidates.length; index++)
         _tier2Plan(
           candidates[index],
-          nextAllowedTime(
-            now.add(Duration(minutes: index + 1)),
-            preferences,
-          ),
+          nextAllowedTime(now.add(Duration(minutes: index + 1)), preferences),
         ),
     ];
   }
@@ -90,10 +90,11 @@ class NotificationPlanner {
     var safety = 0;
     while (plans.length < digestWindowSize && safety < 40) {
       safety++;
-      final isWeekday = cursor.weekday >= DateTime.monday &&
+      final isWeekday =
+          cursor.weekday >= DateTime.monday &&
           cursor.weekday <= DateTime.friday;
-      final eligible = preferences.digestFrequency ==
-              NotificationDigestFrequency.daily ||
+      final eligible =
+          preferences.digestFrequency == NotificationDigestFrequency.daily ||
           isWeekday;
       if (eligible) {
         final candidate = DateTime(

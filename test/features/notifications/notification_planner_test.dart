@@ -72,7 +72,8 @@ void main() {
       expect(plans.first.scheduledAt, DateTime(2026, 8, 17, 9));
       expect(
         plans.every(
-          (plan) => plan.scheduledAt.weekday >= DateTime.monday &&
+          (plan) =>
+              plan.scheduledAt.weekday >= DateTime.monday &&
               plan.scheduledAt.weekday <= DateTime.friday,
         ),
         isTrue,

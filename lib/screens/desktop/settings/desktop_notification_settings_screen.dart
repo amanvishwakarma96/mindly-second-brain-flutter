@@ -4,7 +4,10 @@ import 'package:mindly/features/notifications/domain/notification_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 
 class DesktopNotificationSettingsScreen extends StatefulWidget {
-  const DesktopNotificationSettingsScreen({super.key, required this.controller});
+  const DesktopNotificationSettingsScreen({
+    super.key,
+    required this.controller,
+  });
 
   static const screenKey = ValueKey<String>(
     'screen-desktop-notification-settings',
@@ -117,7 +120,8 @@ class _DesktopNotificationSettingsScreenState
                             onChanged: capabilities.canSchedule
                                 ? (value) => setState(
                                     () => _preferences = _preferences.copyWith(
-                                      digestFrequency: value ??
+                                      digestFrequency:
+                                          value ??
                                           NotificationDigestFrequency.off,
                                     ),
                                   )
@@ -219,8 +223,7 @@ class _DesktopNotificationSettingsScreenState
                           Align(
                             alignment: Alignment.centerRight,
                             child: FilledButton(
-                              onPressed:
-                                  capabilities.canSchedule && !_saving
+                              onPressed: capabilities.canSchedule && !_saving
                                   ? _save
                                   : null,
                               child: Text(_saving ? 'Saving…' : 'Save'),
