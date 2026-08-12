@@ -139,7 +139,7 @@ class NotificationDeliveryState {
   }
 
   static List<Object?> _list(Object? value) =>
-      value is List ? value.cast<Object?>() : const <Object?>[];
+      value is List<Object?> ? value : const <Object?>[];
 }
 
 class NotificationPayload {
