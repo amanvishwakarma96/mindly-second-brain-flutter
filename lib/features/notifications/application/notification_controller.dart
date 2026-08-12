@@ -140,10 +140,7 @@ class DefaultNotificationController implements NotificationController {
     if (!preferences.anyEnabled) {
       await _gateway.cancelIds([...state.digestIds, ...state.alertIds]);
       await _deliveryStore.write(
-        state.copyWith(
-          digestIds: const <int>[],
-          alertIds: const <int>[],
-        ),
+        state.copyWith(digestIds: const <int>[], alertIds: const <int>[]),
       );
       return;
     }
@@ -168,7 +165,8 @@ class DefaultNotificationController implements NotificationController {
       return;
     }
 
-    final insightController = _insightController ??= _insightControllerFactory();
+    final insightController = _insightController ??=
+        _insightControllerFactory();
     final activeInsights = await insightController.load();
     final alertPlans = _planner.planTier2Alerts(
       insights: activeInsights,

@@ -72,41 +72,44 @@ void main() {
     expect(gateway.scheduled, isEmpty);
   });
 
-  test('disabling existing schedules initializes only to cancel them', () async {
-    final gateway = _FakeGateway();
-    final preferenceStore = _MemoryPreferenceStore(
-      const NotificationPreferences(
-        digestFrequency: NotificationDigestFrequency.daily,
-      ),
-    );
-    final deliveryStore = _MemoryDeliveryStore()
-      ..value = const NotificationDeliveryState(
-        alertIds: [101],
-        digestIds: [201, 202],
+  test(
+    'disabling existing schedules initializes only to cancel them',
+    () async {
+      final gateway = _FakeGateway();
+      final preferenceStore = _MemoryPreferenceStore(
+        const NotificationPreferences(
+          digestFrequency: NotificationDigestFrequency.daily,
+        ),
       );
-    var insightFactoryCalls = 0;
-    final controller = _controller(
-      gateway: gateway,
-      preferenceStore: preferenceStore,
-      deliveryStore: deliveryStore,
-      insightControllerFactory: () {
-        insightFactoryCalls++;
-        return const _FakeInsightController([]);
-      },
-    );
+      final deliveryStore = _MemoryDeliveryStore()
+        ..value = const NotificationDeliveryState(
+          alertIds: [101],
+          digestIds: [201, 202],
+        );
+      var insightFactoryCalls = 0;
+      final controller = _controller(
+        gateway: gateway,
+        preferenceStore: preferenceStore,
+        deliveryStore: deliveryStore,
+        insightControllerFactory: () {
+          insightFactoryCalls++;
+          return const _FakeInsightController([]);
+        },
+      );
 
-    final outcome = await controller.savePreferences(
-      const NotificationPreferences(),
-    );
+      final outcome = await controller.savePreferences(
+        const NotificationPreferences(),
+      );
 
-    expect(outcome.kind, NotificationSaveOutcomeKind.saved);
-    expect(gateway.initializeCalls, 1);
-    expect(gateway.permissionCalls, 0);
-    expect(gateway.cancelled, containsAll([101, 201, 202]));
-    expect((await deliveryStore.read()).alertIds, isEmpty);
-    expect((await deliveryStore.read()).digestIds, isEmpty);
-    expect(insightFactoryCalls, 0);
-  });
+      expect(outcome.kind, NotificationSaveOutcomeKind.saved);
+      expect(gateway.initializeCalls, 1);
+      expect(gateway.permissionCalls, 0);
+      expect(gateway.cancelled, containsAll([101, 201, 202]));
+      expect((await deliveryStore.read()).alertIds, isEmpty);
+      expect((await deliveryStore.read()).digestIds, isEmpty);
+      expect(insightFactoryCalls, 0);
+    },
+  );
 
   test(
     'unsupported scheduling rejects enable without permission request',
