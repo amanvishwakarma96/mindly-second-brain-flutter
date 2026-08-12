@@ -124,17 +124,15 @@ class NotificationDeliveryState {
 
   factory NotificationDeliveryState.fromJson(Map<String, Object?> json) {
     return NotificationDeliveryState(
-      notifiedFingerprints: _list(json['notifiedFingerprints'])
-          .whereType<String>()
-          .toList(growable: false),
-      alertIds: _list(json['alertIds'])
-          .whereType<num>()
-          .map((value) => value.toInt())
-          .toList(growable: false),
-      digestIds: _list(json['digestIds'])
-          .whereType<num>()
-          .map((value) => value.toInt())
-          .toList(growable: false),
+      notifiedFingerprints: _list(
+        json['notifiedFingerprints'],
+      ).whereType<String>().toList(growable: false),
+      alertIds: _list(
+        json['alertIds'],
+      ).whereType<num>().map((value) => value.toInt()).toList(growable: false),
+      digestIds: _list(
+        json['digestIds'],
+      ).whereType<num>().map((value) => value.toInt()).toList(growable: false),
     );
   }
 
