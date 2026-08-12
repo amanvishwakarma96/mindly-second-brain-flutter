@@ -30,7 +30,9 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
   }
 
   void _replaceFuture(Future<List<ProactiveInsight>> future) {
-    setState(() => _insightsFuture = future);
+    setState(() {
+      _insightsFuture = future;
+    });
   }
 
   Future<void> _openSource(InsightSourceReference source) async {
