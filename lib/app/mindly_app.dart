@@ -102,6 +102,16 @@ class _MindlyAppState extends State<MindlyApp> {
             ),
           );
         }
+        if (settings.name == AppRoutes.settings) {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => buildPlatformSettings(
+              family,
+              providerController: widget.providerSettingsControllerOverride,
+              notificationController: _notificationController,
+            ),
+          );
+        }
         if (settings.name == AppRoutes.providerSettings) {
           return MaterialPageRoute<void>(
             settings: settings,
