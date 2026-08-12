@@ -106,7 +106,8 @@ class DefaultNotificationController implements NotificationController {
 
     try {
       final previous = await _preferenceStore.read();
-      if (preferences.anyEnabled) {
+      if (capabilities.canSchedule &&
+          (preferences.anyEnabled || previous.anyEnabled)) {
         await _ensureInitialized();
       }
       if (preferences.anyEnabled && !previous.anyEnabled) {
@@ -167,8 +168,7 @@ class DefaultNotificationController implements NotificationController {
       return;
     }
 
-    final insightController =
-        _insightController ??= _insightControllerFactory();
+    final insightController = _insightController ??= _insightControllerFactory();
     final activeInsights = await insightController.load();
     final alertPlans = _planner.planTier2Alerts(
       insights: activeInsights,
