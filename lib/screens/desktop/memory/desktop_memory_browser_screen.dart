@@ -253,7 +253,9 @@ class _DesktopMemoryBrowserScreenState
                     selected: _selected?.id == item.id,
                     leading: Icon(_icon(item.type)),
                     title: Text(item.title),
-                    subtitle: item.subtitle == null ? null : Text(item.subtitle!),
+                    subtitle: item.subtitle == null
+                        ? null
+                        : Text(item.subtitle!),
                     trailing: item.isPinned
                         ? const Icon(Icons.push_pin_rounded)
                         : null,

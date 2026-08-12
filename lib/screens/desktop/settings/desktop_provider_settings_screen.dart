@@ -109,10 +109,7 @@ class _DesktopProviderSettingsScreenState
               decoration: const InputDecoration(labelText: 'Provider'),
               items: const [
                 DropdownMenuItem(value: 'openai', child: Text('OpenAI')),
-                DropdownMenuItem(
-                  value: 'anthropic',
-                  child: Text('Anthropic'),
-                ),
+                DropdownMenuItem(value: 'anthropic', child: Text('Anthropic')),
                 DropdownMenuItem(
                   value: 'compatible',
                   child: Text('OpenAI-compatible'),
@@ -143,7 +140,10 @@ class _DesktopProviderSettingsScreenState
               ],
             ),
             const Divider(height: MindlySpacing.xl),
-            Text('Cost controls', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Cost controls',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: MindlySpacing.md),
             Row(
               children: [

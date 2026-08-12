@@ -29,7 +29,9 @@ class MobileSettingsScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.key_rounded),
               title: const Text('AI provider & spend'),
-              subtitle: const Text('Keys, provider choice, and spending limits'),
+              subtitle: const Text(
+                'Keys, provider choice, and spending limits',
+              ),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () =>
                   Navigator.of(context).pushNamed(AppRoutes.providerSettings),
@@ -42,8 +44,9 @@ class MobileSettingsScreen extends StatelessWidget {
               title: const Text('Notifications'),
               subtitle: const Text('Digests, pattern alerts, and quiet hours'),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.notificationSettings),
+              onTap: () => Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.notificationSettings),
             ),
           ),
         ],

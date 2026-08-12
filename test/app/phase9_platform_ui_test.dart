@@ -176,7 +176,10 @@ void main() {
     tester.view.physicalSize = const Size(600, 800);
     await tester.pump();
     expect(find.byKey(const ValueKey<String>('web-home-wide')), findsNothing);
-    expect(find.byKey(const ValueKey<String>('web-home-narrow')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('web-home-narrow')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -185,29 +188,30 @@ void main() {
     ScreenFamily.desktop: DesktopSettingsScreen.screenKey,
     ScreenFamily.web: WebSettingsScreen.screenKey,
   }.entries) {
-    testWidgets('${entry.key.name} routes to its own combined settings screen', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        MindlyApp(
-          screenFamilyOverride: entry.key,
-          providerSettingsControllerOverride: _providerController(
-            isWeb: entry.key == ScreenFamily.web,
+    testWidgets(
+      '${entry.key.name} routes to its own combined settings screen',
+      (tester) async {
+        await tester.pumpWidget(
+          MindlyApp(
+            screenFamilyOverride: entry.key,
+            providerSettingsControllerOverride: _providerController(
+              isWeb: entry.key == ScreenFamily.web,
+            ),
+            notificationControllerOverride: _FakeNotificationController(
+              canSchedule: entry.key != ScreenFamily.web,
+            ),
           ),
-          notificationControllerOverride: _FakeNotificationController(
-            canSchedule: entry.key != ScreenFamily.web,
-          ),
-        ),
-      );
-      await tester.pump();
+        );
+        await tester.pump();
 
-      Navigator.of(
-        tester.element(find.byType(Scaffold).first),
-      ).pushNamed(AppRoutes.settings);
-      await tester.pumpAndSettle();
+        Navigator.of(
+          tester.element(find.byType(Scaffold).first),
+        ).pushNamed(AppRoutes.settings);
+        await tester.pumpAndSettle();
 
-      expect(find.byKey(entry.value), findsOneWidget);
-    });
+        expect(find.byKey(entry.value), findsOneWidget);
+      },
+    );
   }
 
   testWidgets('desktop settings exposes provider and notification tabs', (
@@ -354,7 +358,8 @@ class _FakeInsightController implements InsightController {
   }
 
   @override
-  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async => null;
+  Future<CostEstimate?> estimateTier3(Tier3ProviderProfile profile) async =>
+      null;
 
   @override
   Future<Tier3GenerationOutcome> generateTier3(

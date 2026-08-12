@@ -23,9 +23,7 @@ class WebSettingsScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final narrow = constraints.maxWidth < 760;
-          return narrow
-              ? const _NarrowWebSettings()
-              : const _WideWebSettings();
+          return narrow ? const _NarrowWebSettings() : const _WideWebSettings();
         },
       ),
     );
@@ -104,10 +102,7 @@ class _NarrowWebSettings extends StatelessWidget {
       key: const ValueKey<String>('web-settings-narrow'),
       padding: const EdgeInsets.all(MindlySpacing.md),
       children: [
-        Text(
-          'Settings',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
+        Text('Settings', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: MindlySpacing.sm),
         const Text('Choose what you want to adjust in this browser.'),
         const SizedBox(height: MindlySpacing.lg),

@@ -151,7 +151,8 @@ class _DesktopNotificationSettingsScreenState
                     enabled: capabilities.canSchedule,
                     onTap: () async {
                       final picked = await _pick(
-                        _preferences.digestHour * 60 + _preferences.digestMinute,
+                        _preferences.digestHour * 60 +
+                            _preferences.digestMinute,
                       );
                       if (picked == null) return;
                       setState(() {
@@ -232,7 +233,9 @@ class _DesktopNotificationSettingsScreenState
                   Align(
                     alignment: Alignment.centerRight,
                     child: FilledButton(
-                      onPressed: capabilities.canSchedule && !_saving ? _save : null,
+                      onPressed: capabilities.canSchedule && !_saving
+                          ? _save
+                          : null,
                       child: Text(_saving ? 'Saving…' : 'Save'),
                     ),
                   ),
