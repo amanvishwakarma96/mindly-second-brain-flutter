@@ -172,9 +172,7 @@ class _MemoryPreferenceStore implements NotificationPreferenceStore {
 }
 
 class _MemoryDeliveryStore implements NotificationDeliveryStore {
-  _MemoryDeliveryStore([this.value = const NotificationDeliveryState()]);
-
-  NotificationDeliveryState value;
+  NotificationDeliveryState value = const NotificationDeliveryState();
 
   @override
   Future<NotificationDeliveryState> read() async => value;
