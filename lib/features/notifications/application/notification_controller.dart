@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_initializing_formals
+
 import 'package:mindly/app/app_routes.dart';
 import 'package:mindly/core/security/flutter_secure_secret_store.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
