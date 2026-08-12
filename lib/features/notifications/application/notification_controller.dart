@@ -34,7 +34,7 @@ abstract class NotificationController {
       deliveryStore: SecureNotificationDeliveryStore(secureStore),
       planner: const NotificationPlanner(),
       gateway: FlutterLocalNotificationGateway(),
-      insightController: InsightController.production(),
+      insightControllerFactory: InsightController.production,
       onOpenRoute: onOpenRoute,
     );
   }
@@ -54,14 +54,14 @@ class DefaultNotificationController implements NotificationController {
     required NotificationDeliveryStore deliveryStore,
     required NotificationPlanner planner,
     required LocalNotificationGateway gateway,
-    required InsightController insightController,
+    required InsightController Function() insightControllerFactory,
     required void Function(String route) onOpenRoute,
     DateTime Function()? now,
   }) : _preferenceStore = preferenceStore,
        _deliveryStore = deliveryStore,
        _planner = planner,
        _gateway = gateway,
-       _insightController = insightController,
+       _insightControllerFactory = insightControllerFactory,
        _onOpenRoute = onOpenRoute,
        _now = now ?? DateTime.now;
 
@@ -69,9 +69,10 @@ class DefaultNotificationController implements NotificationController {
   final NotificationDeliveryStore _deliveryStore;
   final NotificationPlanner _planner;
   final LocalNotificationGateway _gateway;
-  final InsightController _insightController;
+  final InsightController Function() _insightControllerFactory;
   final void Function(String route) _onOpenRoute;
   final DateTime Function() _now;
+  InsightController? _insightController;
   bool _initialized = false;
 
   @override
@@ -83,11 +84,10 @@ class DefaultNotificationController implements NotificationController {
   @override
   Future<void> initializeAndReconcile() async {
     try {
-      await _ensureInitialized();
       final preferences = await _preferenceStore.read();
-      if (preferences.anyEnabled && capabilities.canSchedule) {
-        await reconcile();
-      }
+      if (!preferences.anyEnabled || !capabilities.canSchedule) return;
+      await _ensureInitialized();
+      await reconcile();
     } catch (_) {
       // Notification setup must never prevent local memory access or app startup.
     }
@@ -105,8 +105,10 @@ class DefaultNotificationController implements NotificationController {
     }
 
     try {
-      await _ensureInitialized();
       final previous = await _preferenceStore.read();
+      if (preferences.anyEnabled) {
+        await _ensureInitialized();
+      }
       if (preferences.anyEnabled && !previous.anyEnabled) {
         final granted = await _gateway.requestPermission();
         if (!granted) {
@@ -130,11 +132,22 @@ class DefaultNotificationController implements NotificationController {
   @override
   Future<void> reconcile() async {
     if (!capabilities.canSchedule) return;
-    await _ensureInitialized();
 
     final preferences = await _preferenceStore.read();
     var state = await _deliveryStore.read();
 
+    if (!preferences.anyEnabled) {
+      await _gateway.cancelIds([...state.digestIds, ...state.alertIds]);
+      await _deliveryStore.write(
+        state.copyWith(
+          digestIds: const <int>[],
+          alertIds: const <int>[],
+        ),
+      );
+      return;
+    }
+
+    await _ensureInitialized();
     await _gateway.cancelIds(state.digestIds);
     final digestPlans = _planner.planDigests(
       preferences: preferences,
@@ -154,7 +167,9 @@ class DefaultNotificationController implements NotificationController {
       return;
     }
 
-    final activeInsights = await _insightController.load();
+    final insightController =
+        _insightController ??= _insightControllerFactory();
+    final activeInsights = await insightController.load();
     final alertPlans = _planner.planTier2Alerts(
       insights: activeInsights,
       preferences: preferences,
