@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
+import 'package:mindly/features/insights/presentation/tier3_provider_picker.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
@@ -20,6 +21,7 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
   late final InsightController _controller;
   late Future<List<ProactiveInsight>> _insightsFuture;
   ProactiveInsight? _selected;
+  bool _generatingTier3 = false;
 
   @override
   void initState() {
@@ -37,9 +39,7 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
 
   Future<void> _openSource(InsightSourceReference source) async {
     final detail = await _controller.sourceDetail(source);
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -60,9 +60,7 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
 
   Future<void> _showMutedKinds() async {
     final muted = await _controller.mutedKinds();
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -92,6 +90,80 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
     );
   }
 
+  Future<void> _generateTier3() async {
+    if (_generatingTier3) return;
+    final profile = await showTier3ProviderPicker(context);
+    if (profile == null || !mounted) return;
+
+    final estimate = await _controller.estimateTier3(profile);
+    if (!mounted) return;
+    if (estimate == null) {
+      _showMessage(
+        'Add a little more connected memory before asking AI for an insight.',
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Generate AI insights?'),
+        content: Text(
+          'Mindly will send a bounded set of relevant memories directly to ${profile.configuration.displayName}. '
+          'Estimated maximum cost: \$${estimate.estimatedUsd.toStringAsFixed(4)}. Existing spend caps still apply.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Generate'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _generatingTier3 = true);
+    final outcome = await _controller.generateTier3(profile);
+    if (!mounted) return;
+    setState(() => _generatingTier3 = false);
+    if (outcome.generated) {
+      _replaceFuture(_controller.load());
+      _showMessage(
+        outcome.insights.isEmpty
+            ? 'AI did not find a well-supported new insight.'
+            : 'AI insights refreshed.',
+      );
+    } else {
+      _showMessage(_tier3OutcomeMessage(outcome.kind));
+    }
+  }
+
+  String _tier3OutcomeMessage(
+    Tier3GenerationOutcomeKind kind,
+  ) => switch (kind) {
+    Tier3GenerationOutcomeKind.generated => 'AI insights refreshed.',
+    Tier3GenerationOutcomeKind.insufficientEvidence =>
+      'Add a little more connected memory before asking AI for an insight.',
+    Tier3GenerationOutcomeKind.missingKey =>
+      'Add a key for this provider in AI settings first.',
+    Tier3GenerationOutcomeKind.spendBlocked =>
+      'Your AI spend cap blocked this request.',
+    Tier3GenerationOutcomeKind.providerFailure =>
+      'The AI provider is unavailable right now. Your memories were not changed.',
+    Tier3GenerationOutcomeKind.invalidOutput =>
+      'The provider response could not be safely tied back to your memories.',
+  };
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,9 +185,21 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                   ),
                   const SizedBox(height: MindlySpacing.sm),
                   const Text(
-                    'Local signals from your memory graph and commitments.',
+                    'Local signals appear automatically. Predictive AI insights are generated only when you ask.',
                   ),
                   const Spacer(),
+                  FilledButton.icon(
+                    onPressed: _generatingTier3 ? null : _generateTier3,
+                    icon: _generatingTier3
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.auto_awesome_rounded),
+                    label: const Text('Ask AI'),
+                  ),
+                  const SizedBox(height: MindlySpacing.sm),
                   OutlinedButton.icon(
                     onPressed: _showMutedKinds,
                     icon: const Icon(Icons.visibility_off_outlined),
@@ -158,7 +242,11 @@ class _DesktopInsightsScreenState extends State<DesktopInsightsScreen> {
                         leading: Icon(_severityIcon(insight.severity)),
                         title: Text(insight.title),
                         subtitle: Text(insight.body),
-                        trailing: Text(insight.tier.name.toUpperCase()),
+                        trailing: Text(
+                          insight.isAiGenerated
+                              ? 'AI · TIER3'
+                              : insight.tier.name.toUpperCase(),
+                        ),
                         onTap: () => setState(() => _selected = insight),
                       ),
                     );
@@ -220,11 +308,18 @@ class _DesktopInsightDetail extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (insight.isAiGenerated) ...[
+            const Chip(label: Text('AI-generated')),
+            const SizedBox(height: MindlySpacing.sm),
+          ],
           Text(insight.title, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: MindlySpacing.sm),
           Text(insight.body),
           const SizedBox(height: MindlySpacing.lg),
-          Text('Sources', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            insight.isAiGenerated ? 'Why am I seeing this?' : 'Sources',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: MindlySpacing.sm),
           for (final source in insight.sources)
             Align(

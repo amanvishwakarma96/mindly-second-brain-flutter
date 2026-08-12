@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindly/features/insights/application/insight_controller.dart';
 import 'package:mindly/features/insights/domain/insight_models.dart';
+import 'package:mindly/features/insights/presentation/tier3_provider_picker.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 
@@ -18,6 +19,7 @@ class MobileInsightsScreen extends StatefulWidget {
 class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
   late final InsightController _controller;
   late Future<List<ProactiveInsight>> _insightsFuture;
+  bool _generatingTier3 = false;
 
   @override
   void initState() {
@@ -32,9 +34,7 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
 
   Future<void> _openSource(InsightSourceReference source) async {
     final detail = await _controller.sourceDetail(source);
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -49,9 +49,7 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
 
   Future<void> _showMutedKinds() async {
     final muted = await _controller.mutedKinds();
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
       builder: (context) => SafeArea(
@@ -87,6 +85,80 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
     );
   }
 
+  Future<void> _generateTier3() async {
+    if (_generatingTier3) return;
+    final profile = await showTier3ProviderPicker(context);
+    if (profile == null || !mounted) return;
+
+    final estimate = await _controller.estimateTier3(profile);
+    if (!mounted) return;
+    if (estimate == null) {
+      _showMessage(
+        'Add a little more connected memory before asking AI for an insight.',
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Generate AI insights?'),
+        content: Text(
+          'This sends the selected memory context directly to ${profile.configuration.displayName}. '
+          'Estimated maximum cost: \$${estimate.estimatedUsd.toStringAsFixed(4)}. Your spend caps still apply.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Generate'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _generatingTier3 = true);
+    final outcome = await _controller.generateTier3(profile);
+    if (!mounted) return;
+    setState(() => _generatingTier3 = false);
+    if (outcome.generated) {
+      _replaceFuture(_controller.load());
+      _showMessage(
+        outcome.insights.isEmpty
+            ? 'AI did not find a well-supported new insight.'
+            : 'AI insights refreshed.',
+      );
+      return;
+    }
+    _showMessage(_tier3OutcomeMessage(outcome.kind));
+  }
+
+  String _tier3OutcomeMessage(
+    Tier3GenerationOutcomeKind kind,
+  ) => switch (kind) {
+    Tier3GenerationOutcomeKind.generated => 'AI insights refreshed.',
+    Tier3GenerationOutcomeKind.insufficientEvidence =>
+      'Add a little more connected memory before asking AI for an insight.',
+    Tier3GenerationOutcomeKind.missingKey =>
+      'Add a key for this provider in AI settings first.',
+    Tier3GenerationOutcomeKind.spendBlocked =>
+      'Your AI spend cap blocked this request.',
+    Tier3GenerationOutcomeKind.providerFailure =>
+      'The AI provider is unavailable right now. Your memories were not changed.',
+    Tier3GenerationOutcomeKind.invalidOutput =>
+      'The provider response could not be safely tied back to your memories.',
+  };
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,6 +166,17 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
       appBar: AppBar(
         title: const Text('Insights'),
         actions: [
+          IconButton(
+            tooltip: 'Generate AI insights',
+            onPressed: _generatingTier3 ? null : _generateTier3,
+            icon: _generatingTier3
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.auto_awesome_rounded),
+          ),
           IconButton(
             tooltip: 'Muted insight types',
             onPressed: _showMutedKinds,
@@ -118,7 +201,7 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
               child: Padding(
                 padding: EdgeInsets.all(MindlySpacing.xl),
                 child: Text(
-                  'Nothing needs your attention right now. New insights will stay grounded in your saved memories.',
+                  'Nothing needs your attention right now. Local insights appear automatically; AI insights are always generated only when you ask.',
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -139,9 +222,8 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                   padding: const EdgeInsets.only(right: MindlySpacing.lg),
                   child: const Icon(Icons.done_rounded),
                 ),
-                onDismissed: (_) {
-                  _replaceFuture(_controller.dismiss(insight.fingerprint));
-                },
+                onDismissed: (_) =>
+                    _replaceFuture(_controller.dismiss(insight.fingerprint)),
                 child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(MindlySpacing.md),
@@ -186,6 +268,13 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                         const SizedBox(height: MindlySpacing.sm),
                         Text(insight.body),
                         const SizedBox(height: MindlySpacing.md),
+                        if (insight.isAiGenerated) ...[
+                          Text(
+                            'Why am I seeing this?',
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                          const SizedBox(height: MindlySpacing.sm),
+                        ],
                         Wrap(
                           spacing: MindlySpacing.sm,
                           runSpacing: MindlySpacing.sm,
@@ -203,7 +292,9 @@ class _MobileInsightsScreenState extends State<MobileInsightsScreen> {
                         ),
                         const SizedBox(height: MindlySpacing.sm),
                         Text(
-                          '${insight.tier.name.toUpperCase()} · ${insight.kind.displayName}',
+                          insight.isAiGenerated
+                              ? 'AI-GENERATED · TIER3 · ${insight.kind.displayName}'
+                              : '${insight.tier.name.toUpperCase()} · ${insight.kind.displayName}',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
