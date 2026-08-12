@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mindly/features/memory/application/memory_browser_controller.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
@@ -60,6 +61,15 @@ class _DesktopMemoryBrowserScreenState
     });
   }
 
+  void _moveSelection(List<MemoryListItem> items, int delta) {
+    if (items.isEmpty) return;
+    final current = _selected == null
+        ? -1
+        : items.indexWhere((item) => item.id == _selected!.id);
+    final next = (current + delta).clamp(0, items.length - 1);
+    setState(() => _selected = items[next]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +77,7 @@ class _DesktopMemoryBrowserScreenState
       body: Row(
         children: [
           SizedBox(
+            key: const ValueKey<String>('desktop-memory-sidebar'),
             width: 220,
             child: Padding(
               padding: const EdgeInsets.all(MindlySpacing.md),
@@ -153,9 +164,15 @@ class _DesktopMemoryBrowserScreenState
           ),
           const VerticalDivider(width: 1),
           Expanded(
+            key: const ValueKey<String>('desktop-memory-detail-pane'),
             flex: 2,
             child: _selected == null
-                ? const Center(child: Text('Choose a memory to inspect it.'))
+                ? const Center(
+                    child: Text(
+                      'Choose a memory to inspect it. Use ↑ and ↓ to move through the list.',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
                 : _DesktopDetailPane(controller: _controller, item: _selected!),
           ),
         ],
@@ -216,24 +233,36 @@ class _DesktopMemoryBrowserScreenState
         if (items.isEmpty) {
           return const Center(child: Text('Nothing here yet.'));
         }
-        return ListView.builder(
-          padding: const EdgeInsets.all(MindlySpacing.lg),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final item = items[index];
-            return Card(
-              child: ListTile(
-                selected: _selected?.id == item.id,
-                leading: Icon(_icon(item.type)),
-                title: Text(item.title),
-                subtitle: item.subtitle == null ? null : Text(item.subtitle!),
-                trailing: item.isPinned
-                    ? const Icon(Icons.push_pin_rounded)
-                    : null,
-                onTap: () => setState(() => _selected = item),
-              ),
-            );
+        return CallbackShortcuts(
+          bindings: {
+            const SingleActivator(LogicalKeyboardKey.arrowDown): () =>
+                _moveSelection(items, 1),
+            const SingleActivator(LogicalKeyboardKey.arrowUp): () =>
+                _moveSelection(items, -1),
           },
+          child: Focus(
+            autofocus: true,
+            child: ListView.builder(
+              key: const ValueKey<String>('desktop-memory-master-list'),
+              padding: const EdgeInsets.all(MindlySpacing.lg),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Card(
+                  child: ListTile(
+                    selected: _selected?.id == item.id,
+                    leading: Icon(_icon(item.type)),
+                    title: Text(item.title),
+                    subtitle: item.subtitle == null ? null : Text(item.subtitle!),
+                    trailing: item.isPinned
+                        ? const Icon(Icons.push_pin_rounded)
+                        : null,
+                    onTap: () => setState(() => _selected = item),
+                  ),
+                );
+              },
+            ),
+          ),
         );
       },
     );
