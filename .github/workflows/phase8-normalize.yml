@@ -1,0 +1,40 @@
+name: Phase 8 Normalize
+
+on:
+  push:
+    branches:
+      - agent/phase-8-notifications
+
+permissions:
+  contents: write
+
+concurrency:
+  group: phase8-normalize-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.8'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart format lib test tool
+      - name: Commit normalized files if needed
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.lock lib test tool
+          if git diff --cached --quiet; then
+            echo "No normalization changes needed."
+            exit 0
+          fi
+          git commit -m "Normalize Phase 8 dependencies and formatting"
+          git push
