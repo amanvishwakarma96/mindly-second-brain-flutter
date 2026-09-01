@@ -106,7 +106,7 @@ jobs:
       - run: flutter build linux --debug
       - name: Create Linux Tarball
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: tar -czf mindly-linux-debug.tar.gz -C build/linux/x64/release bundle/
+        run: tar -czf mindly-linux-debug.tar.gz -C build/linux/x64/debug bundle/
       - name: Upload Linux Build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
