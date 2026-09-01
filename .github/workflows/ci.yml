@@ -56,6 +56,13 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build apk --debug
+      - name: Upload Android APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 30
 
   web:
     name: Build Web
@@ -69,6 +76,13 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build web
+      - name: Upload Web Build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web/
+          retention-days: 30
 
   linux:
     name: Build Linux
@@ -90,6 +104,16 @@ jobs:
       - run: flutter config --enable-linux-desktop
       - run: flutter pub get
       - run: flutter build linux --debug
+      - name: Create Linux Tarball
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: tar -czf mindly-linux-debug.tar.gz -C build/linux/x64/release bundle/
+      - name: Upload Linux Build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: mindly-linux-debug.tar.gz
+          retention-days: 30
 
   windows:
     name: Build Windows
@@ -104,6 +128,18 @@ jobs:
       - run: flutter config --enable-windows-desktop
       - run: flutter pub get
       - run: flutter build windows --debug
+      - name: Create Windows Zip
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "build/windows/x64/runner/Debug" -DestinationPath "mindly-windows-debug.zip"
+      - name: Upload Windows Build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: mindly-windows-debug.zip
+          retention-days: 30
 
   macos:
     name: Build macOS
@@ -118,6 +154,19 @@ jobs:
       - run: flutter config --enable-macos-desktop
       - run: flutter pub get
       - run: flutter build macos --debug
+      - name: Create macOS Dmg
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p build/macos/dmg
+          cp -r build/macos/Build/Products/Debug/mindly.app build/macos/dmg/ || true
+          hdiutil create -volname "Mindly" -srcfolder build/macos/dmg -ov -format UDZO mindly-macos-debug.dmg
+      - name: Upload macOS Build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: mindly-macos-debug.dmg
+          retention-days: 30
 
   ios:
     name: Build iOS simulator
@@ -149,3 +198,74 @@ jobs:
 
             sleep $((attempt * 10))
           done
+
+  create-release-artifacts:
+    name: Create Release Artifacts
+    runs-on: ubuntu-latest
+    needs: [quality, android, web, linux, windows, macos, ios]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Create Release Notes
+        run: |
+          cat > RELEASE_NOTES.md << 'EOF'
+          # Mindly Build Artifacts - ${{ github.run_number }}
+          
+          **Commit:** ${{ github.sha }}
+          **Branch:** ${{ github.ref_name }}
+          **Build Date:** $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          
+          ## Included Artifacts
+          
+          - **Android APK** - `android-apk/app-debug.apk`
+          - **Web Build** - `web-build/` (ready for deployment)
+          - **Linux Build** - `linux-build/mindly-linux-debug.tar.gz`
+          - **Windows Build** - `windows-build/mindly-windows-debug.zip`
+          - **macOS Build** - `macos-build/mindly-macos-debug.dmg`
+          - **iOS Simulator Build** - Available in iOS build logs
+          
+          ## Installation Instructions
+          
+          ### Android
+          ```bash
+          adb install artifacts/android-apk/app-debug.apk
+          ```
+          
+          ### Web
+          Deploy the contents of `artifacts/web-build/` to your web server.
+          
+          ### Linux
+          ```bash
+          tar -xzf artifacts/linux-build/mindly-linux-debug.tar.gz
+          ./bundle/mindly
+          ```
+          
+          ### Windows
+          Extract `artifacts/windows-build/mindly-windows-debug.zip` and run the executable.
+          
+          ### macOS
+          Double-click `artifacts/macos-build/mindly-macos-debug.dmg` to mount and run.
+          
+          ---
+          Generated by GitHub Actions Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-all-artifacts
+          path: artifacts/
+          retention-days: 30
+      - name: Create GitHub Release (if tagged)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/**/*
+          body_path: RELEASE_NOTES.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
