@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindly/app/app_routes.dart';
 import 'package:mindly/features/home/application/home_presenter.dart';
+import 'package:mindly/screens/mobile/widgets/mobile_primary_navigation.dart';
 import 'package:mindly/shared/design_tokens/mindly_colors.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 import 'package:mindly/shared/widgets/mindly_brand_badge.dart';
@@ -28,6 +29,7 @@ class MobileHomeScreen extends StatelessWidget {
           Card(
             color: MindlyColors.mint,
             child: InkWell(
+              key: const ValueKey<String>('mobile-quick-text-capture'),
               borderRadius: BorderRadius.circular(12),
               onTap: () =>
                   Navigator.of(context).pushNamed(AppRoutes.textCapture),
@@ -48,6 +50,7 @@ class MobileHomeScreen extends StatelessWidget {
           Card(
             color: MindlyColors.peach,
             child: InkWell(
+              key: const ValueKey<String>('mobile-quick-audio-capture'),
               borderRadius: BorderRadius.circular(12),
               onTap: () =>
                   Navigator.of(context).pushNamed(AppRoutes.audioCapture),
@@ -78,49 +81,17 @@ class MobileHomeScreen extends StatelessWidget {
           const SizedBox(height: MindlySpacing.md),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.notifications_none_rounded),
-              title: const Text('Notification preferences'),
-              subtitle: const Text('Choose quiet hours and digest frequency.'),
-              onTap: () => Navigator.of(
-                context,
-              ).pushNamed(AppRoutes.notificationSettings),
+              leading: const Icon(Icons.settings_rounded),
+              title: const Text('Settings'),
+              subtitle: const Text(
+                'Manage AI providers, spend limits, and notifications.',
+              ),
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.settings),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        onDestinationSelected: (index) {
-          if (index == 1) {
-            Navigator.of(context).pushNamed(AppRoutes.audioCapture);
-          } else if (index == 2) {
-            Navigator.of(context).pushNamed(AppRoutes.memory);
-          } else if (index == 3) {
-            Navigator.of(context).pushNamed(AppRoutes.insights);
-          } else if (index == 4) {
-            Navigator.of(context).pushNamed(AppRoutes.providerSettings);
-          }
-        },
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.mic_rounded),
-            label: 'Capture',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.auto_stories_rounded),
-            label: 'Memory',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.auto_awesome_rounded),
-            label: 'Insights',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_rounded),
-            label: 'Settings',
-          ),
-        ],
-      ),
+      bottomNavigationBar: const MobilePrimaryNavigation(selectedIndex: 0),
     );
   }
 }

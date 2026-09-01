@@ -29,6 +29,7 @@ class _WideWebHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      key: const ValueKey<String>('web-home-wide'),
       children: [
         SizedBox(
           width: 200,
@@ -62,17 +63,10 @@ class _WideWebHome extends StatelessWidget {
                       Navigator.of(context).pushNamed(AppRoutes.insights),
                   child: const Text('Insights'),
                 ),
-                TextButton(
-                  onPressed: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.notificationSettings),
-                  child: const Text('Notifications'),
-                ),
                 const Spacer(),
                 TextButton.icon(
-                  onPressed: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.providerSettings),
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.settings),
                   icon: const Icon(Icons.settings_rounded),
                   label: const Text('Settings'),
                 ),
@@ -158,6 +152,7 @@ class _NarrowWebHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      key: const ValueKey<String>('web-home-narrow'),
       padding: const EdgeInsets.all(MindlySpacing.md),
       children: [
         const MindlyBrandBadge(),
@@ -173,7 +168,9 @@ class _NarrowWebHome extends StatelessWidget {
           color: MindlyColors.peach,
           child: Padding(
             padding: EdgeInsets.all(MindlySpacing.lg),
-            child: Text('The web layout has collapsed for this browser width.'),
+            child: Text(
+              'This browser is narrow, so Mindly keeps the same features in a simpler single-column flow.',
+            ),
           ),
         ),
         const SizedBox(height: MindlySpacing.md),
@@ -204,17 +201,9 @@ class _NarrowWebHome extends StatelessWidget {
         ),
         const SizedBox(height: MindlySpacing.sm),
         OutlinedButton.icon(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(AppRoutes.notificationSettings),
-          icon: const Icon(Icons.notifications_none_rounded),
-          label: const Text('Notification capability'),
-        ),
-        const SizedBox(height: MindlySpacing.sm),
-        OutlinedButton.icon(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(AppRoutes.providerSettings),
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.settings),
           icon: const Icon(Icons.settings_rounded),
-          label: const Text('AI provider settings'),
+          label: const Text('Settings'),
         ),
       ],
     );

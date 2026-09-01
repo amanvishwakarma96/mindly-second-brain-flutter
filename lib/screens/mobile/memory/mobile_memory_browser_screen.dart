@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindly/features/memory/application/memory_browser_controller.dart';
 import 'package:mindly/features/memory/domain/memory_models.dart';
+import 'package:mindly/screens/mobile/widgets/mobile_primary_navigation.dart';
 import 'package:mindly/shared/design_tokens/mindly_spacing.dart';
 
 class MobileMemoryBrowserScreen extends StatefulWidget {
@@ -51,6 +52,96 @@ class _MobileMemoryBrowserScreenState extends State<MobileMemoryBrowserScreen> {
         _itemsFuture = _loadItems();
       }
     });
+  }
+
+  Future<void> _showFilters() async {
+    var draft = _filter;
+    final next = await showModalBottomSheet<CaptureBrowserFilter>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              MindlySpacing.lg,
+              0,
+              MindlySpacing.lg,
+              MindlySpacing.lg,
+            ),
+            child: Column(
+              key: const ValueKey<String>('mobile-memory-filter-sheet'),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Filter memories',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: MindlySpacing.md),
+                Wrap(
+                  spacing: MindlySpacing.sm,
+                  runSpacing: MindlySpacing.sm,
+                  children: [
+                    FilterChip(
+                      label: const Text('Work'),
+                      selected: draft.context == 'work',
+                      onSelected: (selected) => setSheetState(
+                        () => draft = CaptureBrowserFilter(
+                          context: selected ? 'work' : null,
+                          isPinned: draft.isPinned,
+                        ),
+                      ),
+                    ),
+                    FilterChip(
+                      label: const Text('Personal'),
+                      selected: draft.context == 'personal',
+                      onSelected: (selected) => setSheetState(
+                        () => draft = CaptureBrowserFilter(
+                          context: selected ? 'personal' : null,
+                          isPinned: draft.isPinned,
+                        ),
+                      ),
+                    ),
+                    FilterChip(
+                      label: const Text('Pinned'),
+                      selected: draft.isPinned == true,
+                      onSelected: (selected) => setSheetState(
+                        () => draft = CaptureBrowserFilter(
+                          context: draft.context,
+                          isPinned: selected ? true : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: MindlySpacing.lg),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => setSheetState(
+                        () => draft = const CaptureBrowserFilter(),
+                      ),
+                      child: const Text('Clear'),
+                    ),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () => Navigator.of(sheetContext).pop(draft),
+                      child: const Text('Apply filters'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (next == null || !mounted) {
+      return;
+    }
+    _filter = next;
+    _refreshItems();
   }
 
   Future<void> _showDetail(MemoryEntityType type, String id) async {
@@ -131,42 +222,28 @@ class _MobileMemoryBrowserScreenState extends State<MobileMemoryBrowserScreen> {
           ),
           if (_query.isEmpty && _type == MemoryEntityType.capture)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: MindlySpacing.md),
-              child: Wrap(
-                spacing: MindlySpacing.sm,
+              padding: const EdgeInsets.fromLTRB(
+                MindlySpacing.md,
+                MindlySpacing.sm,
+                MindlySpacing.md,
+                0,
+              ),
+              child: Row(
                 children: [
-                  FilterChip(
-                    label: const Text('Work'),
-                    selected: _filter.context == 'work',
-                    onSelected: (selected) {
-                      _filter = CaptureBrowserFilter(
-                        context: selected ? 'work' : null,
-                        isPinned: _filter.isPinned,
-                      );
-                      _refreshItems();
-                    },
+                  OutlinedButton.icon(
+                    key: const ValueKey<String>('mobile-memory-filter-button'),
+                    onPressed: _showFilters,
+                    icon: const Icon(Icons.tune_rounded),
+                    label: const Text('Filters'),
                   ),
-                  FilterChip(
-                    label: const Text('Personal'),
-                    selected: _filter.context == 'personal',
-                    onSelected: (selected) {
-                      _filter = CaptureBrowserFilter(
-                        context: selected ? 'personal' : null,
-                        isPinned: _filter.isPinned,
-                      );
-                      _refreshItems();
-                    },
-                  ),
-                  FilterChip(
-                    label: const Text('Pinned'),
-                    selected: _filter.isPinned == true,
-                    onSelected: (selected) {
-                      _filter = CaptureBrowserFilter(
-                        context: _filter.context,
-                        isPinned: selected ? true : null,
-                      );
-                      _refreshItems();
-                    },
+                  const SizedBox(width: MindlySpacing.sm),
+                  Expanded(
+                    child: Text(
+                      _activeFilterLabel(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ),
                 ],
               ),
@@ -264,7 +341,16 @@ class _MobileMemoryBrowserScreenState extends State<MobileMemoryBrowserScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const MobilePrimaryNavigation(selectedIndex: 2),
     );
+  }
+
+  String _activeFilterLabel() {
+    final labels = <String>[];
+    if (_filter.context == 'work') labels.add('Work');
+    if (_filter.context == 'personal') labels.add('Personal');
+    if (_filter.isPinned == true) labels.add('Pinned');
+    return labels.isEmpty ? 'Showing all captures' : labels.join(' · ');
   }
 
   String _label(MemoryEntityType type) => switch (type) {
